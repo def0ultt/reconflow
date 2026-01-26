@@ -13,8 +13,9 @@ class Shell:
         self.context = context
         self.completer = Completer().get_completer()
         self.style = Style.from_dict({
-            'prompt': '#00ff00 bold',
-            'project': '#00aaff',
+            'prompt': '#5fafff bold',  # Lighter, more premium blue
+            'workspace': 'bold #00fab4', # Mint green / Cyan for workspace
+            'module': '#afafff italic', # Light purple for module
         })
         self.session = PromptSession(
             completer=self.completer,
@@ -23,18 +24,19 @@ class Shell:
     
     def get_prompt(self):
         style_list = []
-        if self.context.current_project:
-            style_list.append(f"[{self.context.current_project.name}]")
+        if self.context.current_workspace:
+            style_list.append(f"➜ {self.context.current_workspace.name}")
         
         prompt_str = "reconflow"
-        if hasattr(self.context, 'active_module_path') and self.context.active_module_path:
-             prompt_str += f" ({self.context.active_module_path})"
-             
-        padding = " " if not style_list else " " # fix padding logic simplified
         
-        # simplified HTML construction
-        proj_part = f'<project>{" ".join(style_list)}</project> ' if style_list else ""
-        return HTML(f'{proj_part}<prompt>{prompt_str}></prompt> ')
+        mod_part = ""
+        if hasattr(self.context, 'active_module_path') and self.context.active_module_path:
+             mod_part = f" <module>({self.context.active_module_path})</module>"
+             
+        ws_part = f'<workspace>{" ".join(style_list)}</workspace> ' if style_list else ""
+        
+        # Structure: [Workspace] reconflow (Module) >
+        return HTML(f'{ws_part}<prompt>{prompt_str}</prompt>{mod_part} <prompt>❯</prompt> ')
 
     def start(self):
         print("Welcome to ReconFlow. Type 'help' for commands.")
@@ -56,7 +58,7 @@ class Shell:
                 if cmd in COMMANDS:
                     COMMANDS[cmd](self.context, arg)
                 else:
-                    print(f"❌ Unknown command: {cmd}")
+                    print(f" Unknown command: {cmd}")
 
             except (KeyboardInterrupt, EOFError):
                 break

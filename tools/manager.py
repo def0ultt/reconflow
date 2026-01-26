@@ -26,7 +26,7 @@ class ToolManager:
         try:
             regex = re.compile(pattern, re.IGNORECASE)
         except re.error:
-            print(f"❌ Invalid regex: {pattern}")
+            print(f" Invalid regex: {pattern}")
             return []
 
         results = []

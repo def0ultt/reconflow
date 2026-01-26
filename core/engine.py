@@ -12,7 +12,7 @@ class Engine:
     def execute_workflow(self, workflow_name: str):
         workflow = self.context.workflow_manager.get_workflow(workflow_name)
         if not workflow:
-            print(f"❌ Workflow '{workflow_name}' not found")
+            print(f" Workflow '{workflow_name}' not found")
             return
         
         print(f"🚀 Running workflow: {workflow_name}")
