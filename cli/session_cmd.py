@@ -27,14 +27,14 @@ def cmd_sessions(ctx: Context, arg: str):
         return
 
     # Default action: List sessions
-    # Filter by workspace unless -a is passed? 
-    # For now, list all for current workspace if active, or all if -a
+    # Filter by project unless -a is passed? 
+    # For now, list all for current project if active, or all if -a
     
-    if not ctx.current_workspace:
-        print("[-] No active workspace. Sessions are tied to workspaces.")
+    if not ctx.current_project:
+        print("[-] No active project. Sessions are tied to projects.")
         return
 
-    sessions = ctx.session_manager.list_sessions(workspace_id=ctx.current_workspace.id)
+    sessions = ctx.session_manager.list_sessions(project_id=ctx.current_project.id)
     
     # Filter for active only if -a is NOT present? 
     # User request: "sessions -a : two show all session"
@@ -50,13 +50,13 @@ def cmd_sessions(ctx: Context, arg: str):
         print("No active sessions.")
         return
 
-    table = Table(title=f"Active Sessions" if not args.all else "All Sessions")
-    table.add_column("Id", style="cyan")
+    table = Table(title=f"Active Sessions" if not args.all else "All Sessions", box=None, show_header=True, header_style="bold cyan")
+    table.add_column("Id", style="blue", justify="right")
     table.add_column("Name", style="magenta")
     table.add_column("Type", style="green") # Module name?
     table.add_column("Status", style="yellow")
     table.add_column("Information", style="white")
-    table.add_column("Connection", style="blue") # Target
+    table.add_column("Connection", style="bold blue") # Target
 
     for s in sessions:
         info = s.info if s.info else ""
@@ -69,4 +69,6 @@ def cmd_sessions(ctx: Context, arg: str):
             s.target or ""
         )
     
+    console.print()
     console.print(table)
+    console.print()

@@ -21,6 +21,12 @@ class ToolManager:
     def list_modules(self):
         return sorted(list(self.modules.keys()))
 
+    def get_module_by_id(self, idx: int):
+        modules = self.list_modules()
+        if 0 <= idx < len(modules):
+            return modules[idx] # Return path
+        return None
+
     def search_modules(self, pattern: str):
         """Search modules by path or description using regex."""
         try:
@@ -30,7 +36,10 @@ class ToolManager:
             return []
 
         results = []
-        for path, module_cls in self.modules.items():
+        modules = self.list_modules()
+        
+        for i, path in enumerate(modules):
+            module_cls = self.modules[path]
             # Instantiate to get meta info
             try:
                 mod = module_cls()
@@ -38,8 +47,8 @@ class ToolManager:
                 desc = mod.meta.get('description', '')
                 
                 if regex.search(path) or regex.search(name) or regex.search(desc):
-                    results.append((path, mod.meta))
+                    results.append((i, path, mod.meta))
             except Exception:
                 pass
                 
-        return sorted(results, key=lambda x: x[0])
+        return results

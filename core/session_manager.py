@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 from typing import Dict, Optional, List
 from sqlalchemy.orm import Session
-from db.models import SessionModel, Workspace
+from db.models import SessionModel, Project
 from db.session import get_session
 from core.base import BaseModule
 
@@ -16,15 +16,15 @@ class SessionManager:
         """
         Creates a new session in the DB and starts the module in a background thread.
         """
-        if not context.current_workspace:
-            print("❌ No active workspace. Cannot create session.")
+        if not context.current_project:
+            print("❌ No active project. Cannot create session.")
             return None
 
         # Create DB Entry
         db: Session = get_session()
         try:
             new_session = SessionModel(
-                workspace_id=context.current_workspace.id,
+                project_id=context.current_project.id,
                 module=module.meta['name'],
                 target=target,
                 status="running",
@@ -77,12 +77,12 @@ class SessionManager:
             if status in ["completed", "failed", "stopped"] and session_id in self.active_sessions:
                 del self.active_sessions[session_id]
 
-    def list_sessions(self, workspace_id: int = None) -> List[SessionModel]:
+    def list_sessions(self, project_id: int = None) -> List[SessionModel]:
         db: Session = get_session()
         try:
             query = db.query(SessionModel)
-            if workspace_id:
-                query = query.filter(SessionModel.workspace_id == workspace_id)
+            if project_id:
+                query = query.filter(SessionModel.project_id == project_id)
             return query.all()
         finally:
             db.close()
