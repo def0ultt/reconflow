@@ -76,10 +76,16 @@ class ReconCompleter(PTCompleter):
                     try:
                         files = self.context.project_repo.get_files(self.context.current_project.id)
                         import os
+                        project_root = self.context.current_project.path
                         for f in files:
-                            fname = os.path.basename(f.file_path)
-                            if fname.startswith(current_word):
-                                yield Completion(fname, start_position=-len(current_word))
+                            # Use relative path for completion
+                            try:
+                                rel_path = os.path.relpath(f.file_path, project_root)
+                            except ValueError:
+                                rel_path = os.path.basename(f.file_path)
+                            
+                            if rel_path.startswith(current_word):
+                                yield Completion(rel_path, start_position=-len(current_word))
                     except Exception:
                          pass
 

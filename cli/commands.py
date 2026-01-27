@@ -101,7 +101,7 @@ def cmd_show(ctx: Context, arg: str):
         console.print(table)
     
     elif arg == 'modules':
-        cmd_list(ctx, "")
+        cmd_list_modules(ctx, "")
 
     elif arg == 'sessions':
         cmd_sessions(ctx, "-a")
@@ -112,11 +112,11 @@ def cmd_show(ctx: Context, arg: str):
             print("No projects found.")
             return
 
-        table = Table(title="Projects", box=None, show_header=True, header_style="bold cyan")
-        table.add_column("ID", style="blue", justify="right")
-        table.add_column("Name", style="bold green")
-        table.add_column("Created At", style="white")
-        table.add_column("Status", style="yellow")
+        table = Table(title="Projects", show_header=True, header_style="bold cyan")
+        table.add_column("ID", style="cyan", justify="center")
+        table.add_column("Name", style="green", justify="center")
+        table.add_column("Created At", style="magenta", justify="center")
+        table.add_column("Status", style="yellow", justify="center")
 
         current_id = ctx.current_project.id if ctx.current_project else -1
 
@@ -134,9 +134,9 @@ def cmd_show(ctx: Context, arg: str):
             print("No workflows found.")
             return
         
-        table = Table(title="Workflows", box=None, show_header=True, header_style="bold cyan")
-        table.add_column("Name", style="bold green")
-        table.add_column("Steps", style="magenta")
+        table = Table(title="Workflows", show_header=True, header_style="bold cyan")
+        table.add_column("Name", style="green", justify="center")
+        table.add_column("Steps", style="magenta", justify="center")
         
         for name, steps in workflows.items():
             table.add_row(name, str(len(steps)))
@@ -149,9 +149,9 @@ def cmd_show(ctx: Context, arg: str):
         print("Usage: show [options|modules|sessions|projects|workflows]")
 
 def cmd_help(ctx: Context, arg: str):
-    table = Table(title="Core Commands", box=None, show_header=True, header_style="bold cyan")
-    table.add_column("Command", style="bold blue")
-    table.add_column("Description", style="white")
+    table = Table(title="Core Commands", show_header=True, header_style="bold cyan",show_lines=True)
+    table.add_column("Command", style="bold cyan", justify="left")
+    table.add_column("Description", style="bold white", justify="left" )
 
     help_data = [
         ("use", "Select a module by name"),
@@ -160,10 +160,11 @@ def cmd_help(ctx: Context, arg: str):
         ("run", "Execute the module (-j/-d for background)"),
         ("show", "Displays options, modules, projects, etc."),
         ("options", "Displays options for the active module"),
-        ("list", "List available modules"),
         ("search", "Search modules (regex)"),
         ("project", "Create/Switch project"),
         ("sessions", "Manage background sessions"),
+        ("ls", "List files for current project"),
+        ("cat","view file contents in  current project "),
         ("help", "Help menu"),
         ("exit", "Exit the console"),
     ]
@@ -218,13 +219,13 @@ def cmd_create_project(ctx: Context, arg: str):
     
     if selected:
         ctx.current_project = selected
-        print(f"✅ Switched to project '{selected.name}'")
+        print(f"[+] Switched to project '{selected.name}'")
     else:
-        print(f"❌ Project '{target}' not found.")
+        print(f"[-] Project '{target}' not found.")
 
 def cmd_ls(ctx: Context, arg: str):
     if not ctx.current_project:
-        console.print("[red]No active project. Use 'project <name>' first.[/red]")
+        console.print("[red][-] No active project. Use 'project <name>' first.[/red]")
         return
     
     files = ctx.project_repo.get_files(ctx.current_project.id)
@@ -232,15 +233,20 @@ def cmd_ls(ctx: Context, arg: str):
         console.print("[yellow]No files in this project.[/yellow]")
         return
 
-    table = Table(title=f"Files in {ctx.current_project.name}", box=None, show_header=True, header_style="bold cyan")
-    table.add_column("Tool", style="magenta")
-    table.add_column("Filename", style="bold green")
-    table.add_column("Size", style="blue", justify="right")
-    table.add_column("Date", style="white")
+    table = Table(title=f"Files in {ctx.current_project.name}",show_header=True, header_style="bold cyan")
+    table.add_column("Path", style="cyan", justify="center")
+    table.add_column("Size (B)", style="magenta", justify="center")
+    table.add_column("Date", style="green", justify="center")
 
+    project_root = ctx.current_project.path
     for f in files:
-        fname = os.path.basename(f.file_path)
-        table.add_row(f.tool_name, fname, str(f.file_size_bytes), str(f.created_at))
+        # Calculate relative path
+        try:
+           rel_path = os.path.relpath(f.file_path, project_root)
+        except ValueError:
+           rel_path = f.file_path
+        
+        table.add_row(rel_path, str(f.file_size_bytes), str(f.created_at))
     
     console.print()
     console.print(table)
@@ -259,17 +265,30 @@ def cmd_cat(ctx: Context, arg: str):
     content = ctx.file_manager.get_file_content(ctx.current_project.id, filename)
     
     if content:
-        # Simple heuristic for syntax highlighting
-        ext = filename.split('.')[-1] if '.' in filename else ""
-        lexer = "text"
-        if ext in ["json", "js"]: lexer = "json"
-        elif ext in ["py"]: lexer = "python"
-        elif ext in ["xml", "html"]: lexer = "html"
-        elif ext in ["yaml", "yml"]: lexer = "yaml"
+        console.print(f"[bold cyan][*] SQLite read file: {filename}[/bold cyan]")
         
-        # Check if content looks like just data list
-        syntax = Syntax(content, lexer, theme="monokai", line_numbers=True)
-        console.print(syntax)
+        # Display as Table as requested
+        # We try to detect structure. 
+        # If simple lines, single column. 
+        # If CSV-like (comma/tab), split it? 
+        # For complexity, let's treat it as single column lines for now, or raw if JSON.
+        
+        lines = content.strip().splitlines()
+        
+        # JSON detection for pretty printing
+        if filename.endswith('.json') or (content.strip().startswith('{') and content.strip().endswith('}')):
+             syntax = Syntax(content, "json", theme="monokai", line_numbers=True)
+             console.print(syntax)
+             return
+
+        # Table display for text files
+        result_table = Table(box=None, show_header=False)
+        result_table.add_column("Content", style="white")
+        
+        for line in lines:
+            result_table.add_row(line)
+        
+        console.print(result_table)
     else:
         console.print(f"[red]File '{filename}' not found in project.[/red]")
 
@@ -279,11 +298,11 @@ def cmd_list_modules(ctx: Context, arg: str):
         print("No modules found.")
         return
 
-    table = Table(title="Available Modules", box=None, show_header=True, header_style="bold cyan")
-    table.add_column("ID", style="blue", justify="right")
-    table.add_column("Path", style="bold green")
-    table.add_column("Name", style="magenta")
-    table.add_column("Description", style="white")
+    table = Table(title="Available Modules", show_header=True, header_style="bold cyan")
+    table.add_column("ID", style="cyan", justify="center")
+    table.add_column("Path", style="magenta", justify="center")
+    table.add_column("Name", style="green", justify="center")
+    table.add_column("Description", style="white", justify="center")
 
     for i, path in enumerate(modules):
         try:

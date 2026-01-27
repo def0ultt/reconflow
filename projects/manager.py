@@ -16,8 +16,8 @@ class ProjectManager:
             print(f"Project {name} already exists.")
             return existing
         
-        results_path = get_results_dir() / name
-        results_path.mkdir(exist_ok=True)
+        results_path = get_results_dir() / "projects" / name
+        results_path.mkdir(parents=True, exist_ok=True)
         
         new_proj = Project(name=name, path=str(results_path))
         self.session.add(new_proj)
