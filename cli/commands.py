@@ -41,6 +41,20 @@ def cmd_set(ctx: Context, arg: str):
         return
     
     opt, val = parts[0].lower(), parts[1]
+    
+    # Variable Substitution
+    if val.startswith('$'):
+        var_key = val
+        project_id = ctx.current_project.id if ctx.current_project else None
+        resolved = ctx.settings_manager.get_variable(var_key, project_id)
+        
+        if resolved is not None:
+            console.print(f"[dim]Resolved {var_key} -> {resolved}[/dim]")
+            val = resolved
+        else:
+            console.print(f"[red]Error: Variable '{var_key}' not found.[/red]")
+            return
+
     if ctx.active_module.update_option(opt, val):
         print(f"{opt} => {val}")
     else:
@@ -98,7 +112,7 @@ def cmd_show(ctx: Context, arg: str):
         table.add_column("Name", style="cyan")
         table.add_column("Current Setting", style="magenta")
         table.add_column("Required", style="green")
-        table.add_column("Description", style="white")
+        table.add_column("Description", style="dim white")
 
         for name, opt in ctx.active_module.options.items():
             table.add_row(name, str(opt.value), str(opt.required), opt.description)
@@ -152,11 +166,18 @@ def cmd_show(ctx: Context, arg: str):
 
     else:
         print("Usage: show [options|modules|sessions|projects|workflows]")
-
+from rich import box
 def cmd_help(ctx: Context, arg: str):
-    table = Table(title="Core Commands", show_header=True, header_style="bold cyan",show_lines=True)
-    table.add_column("Command", style="bold cyan", justify="left")
-    table.add_column("Description", style="bold white", justify="left" )
+    table = Table(
+    title="[red]Core Commands[/red]",
+    show_header=True,
+    header_style="bold cyan",
+    show_lines=True,
+    box=box.ROUNDED,          # Makes corners round and smooth
+    border_style="white" # Makes the lines yellow
+)
+    table.add_column("[red]Command[/red]", style="bold cyan", justify="center")
+    table.add_column("[red]Description[/red]", style="bold white", justify="left" )
 
     help_data = [
         ("use", "Select a module by name"),
@@ -338,7 +359,7 @@ def cmd_search(ctx: Context, arg: str):
     table.add_column("[red]ID[/red]", style="bold blue", justify="right")
     table.add_column("[red]Path[/red]", style="bold blue")
     table.add_column("[red]Name[/red]", style="bold white")
-    table.add_column("[red]Description[/red]", style=" white")
+    table.add_column("[red]Description[/red]", style="dim white")
     
     for idx, path, meta in results:
         table.add_row(str(idx+1), path, meta.get('name', 'Unknown'), meta.get('description', ''))
