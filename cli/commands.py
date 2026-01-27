@@ -48,6 +48,11 @@ def cmd_set(ctx: Context, arg: str):
 
 
 from cli.session_cmd import cmd_sessions
+from cli.startup import run_settings_flow
+
+def cmd_settings(ctx: Context, arg: str):
+    run_settings_flow(ctx)
+
 
 def cmd_run(ctx: Context, arg: str):
     if not ctx.active_module:
@@ -166,6 +171,7 @@ def cmd_help(ctx: Context, arg: str):
         ("ls", "List files for current project"),
         ("cat","view file contents in  current project "),
         ("help", "Help menu"),
+        ("settings", "Open settings menu"),
         ("exit", "Exit the console"),
     ]
 
@@ -233,10 +239,10 @@ def cmd_ls(ctx: Context, arg: str):
         console.print("[yellow]No files in this project.[/yellow]")
         return
 
-    table = Table(title=f"Files in {ctx.current_project.name}",show_header=True, header_style="bold cyan")
-    table.add_column("Path", style="cyan", justify="center")
-    table.add_column("Size (B)", style="magenta", justify="center")
-    table.add_column("Date", style="green", justify="center")
+    table = Table(title=f"Files in {ctx.current_project.name}",box=None,show_header=True, header_style="bold cyan")
+    table.add_column("[red]Path[/red]", style="bold blue", justify="center")
+    table.add_column("[red]Size (B)[/red]", style="bold white", justify="center")
+    table.add_column("[red]Date[/red]", style="bold white", justify="center")
 
     project_root = ctx.current_project.path
     for f in files:
@@ -328,11 +334,11 @@ def cmd_search(ctx: Context, arg: str):
         print("No matching modules found.")
         return
     
-    table = Table(title=f"Search Results: {arg}", box=None, show_header=True, header_style="bold cyan")
-    table.add_column("ID", style="blue", justify="right")
-    table.add_column("Path", style="bold green")
-    table.add_column("Name", style="magenta")
-    table.add_column("Description", style="white")
+    table = Table(title=f"Search Results: {arg}", show_header=True, header_style="bold cyan")
+    table.add_column("[red]ID[/red]", style="bold blue", justify="right")
+    table.add_column("[red]Path[/red]", style="bold blue")
+    table.add_column("[red]Name[/red]", style="bold white")
+    table.add_column("[red]Description[/red]", style=" white")
     
     for idx, path, meta in results:
         table.add_row(str(idx+1), path, meta.get('name', 'Unknown'), meta.get('description', ''))
@@ -359,4 +365,5 @@ COMMANDS = {
     'search': cmd_search,
     'options': cmd_options,
     'sessions': cmd_sessions,
+    'settings': cmd_settings,
 }

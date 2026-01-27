@@ -3,3 +3,5 @@ pydantic
 pyyaml
 sqlalchemy
 rich
+pyfiglet
+questionary

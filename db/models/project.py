@@ -17,6 +17,7 @@ class Project(Base):
     scans = relationship("ScanResult", back_populates="project", cascade="all, delete-orphan")
     sessions = relationship("SessionModel", back_populates="project", cascade="all, delete-orphan")
     files = relationship("ProjectFile", back_populates="project", cascade="all, delete-orphan")
+    variables = relationship("Variable", back_populates="project", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Project(name={self.name}, path={self.path})>"

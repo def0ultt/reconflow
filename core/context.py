@@ -21,6 +21,9 @@ class Context:
         self.project_repo = ProjectRepository(self.session_db)
         self.file_manager = FileManager(self.project_repo)
         
+        from core.settings_manager import SettingsManager
+        self.settings_manager = SettingsManager(self.session_db)
+
         self.project_manager = ProjectManager() # Encapsulates some logic, but we might prefer repo
         self.tool_manager = ToolManager()
         
