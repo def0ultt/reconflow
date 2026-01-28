@@ -187,7 +187,7 @@ def cmd_help(ctx: Context, arg: str):
         ("show", "Displays options, modules, projects, etc."),
         ("options", "Displays options for the active module"),
         ("search", "Search modules (regex)"),
-        ("project", "Create/Switch project"),
+        ("project", "Switch project(add -c for create and -d for delete )"),
         ("sessions", "Manage background sessions"),
         ("ls", "List files for current project"),
         ("cat","view file contents in  current project "),
@@ -205,6 +205,7 @@ def cmd_help(ctx: Context, arg: str):
 
 from rich.syntax import Syntax
 import os
+import shutil
 
 def cmd_create_project(ctx: Context, arg: str):
     """
@@ -228,6 +229,56 @@ def cmd_create_project(ctx: Context, arg: str):
         if proj:
             ctx.current_project = proj
             print(f"✅ Project '{proj.name}' created and active.")
+        return
+
+    if args[0] == '-d':
+        if len(args) < 2:
+            print("Usage: project -d <name>")
+            return
+        
+        target_name = args[1]
+        p_repo = ctx.project_repo
+        
+        # Resolve project
+        project_to_delete = p_repo.get_by_name(target_name)
+        if not project_to_delete and target_name.isdigit():
+             project_to_delete = p_repo.get(int(target_name))
+             
+        if not project_to_delete:
+            print(f"[-] Project '{target_name}' not found.")
+            return
+
+        # Confirmation
+        console.print(f"[bold red]WARNING:[/bold red] You are about to delete project '{project_to_delete.name}' and ALL its files.")
+        console.print(f"Path: {project_to_delete.path}")
+        confirm = input("Are you sure? [y/N] ").strip().lower()
+        
+        if confirm == 'y':
+            # Delete files
+            try:
+                if os.path.exists(project_to_delete.path):
+                    shutil.rmtree(project_to_delete.path)
+                    console.print(f"[+] Files at {project_to_delete.path} deleted.")
+                else:
+                    console.print(f"[yellow][!] Path {project_to_delete.path} did not exist.[/yellow]")
+            except Exception as e:
+                console.print(f"[red]Error deleting files: {e}[/red]")
+                # We continue to delete DB record even if file deletion fails?
+                # Probably best to continue or ask? 
+                # Strict interpretation: "delete it". I'll proceed.
+
+            # Delete DB
+            if p_repo.delete(project_to_delete.id):
+                console.print(f"✅ Project '{project_to_delete.name}' database record deleted.")
+            else:
+                 console.print(f"[red]Error deleting project from database.[/red]")
+
+            # Reset active project if it was the one deleted
+            if ctx.current_project and ctx.current_project.id == project_to_delete.id:
+                ctx.current_project = None
+                console.print("[yellow]Active project was deleted. Switched to None.[/yellow]")
+        else:
+            print("Deletion cancelled.")
         return
 
     # Select project by name or ID

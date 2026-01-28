@@ -55,6 +55,12 @@ class ReconCompleter(PTCompleter):
                 # context has project_repo
                 # But project_manager.list_projects() returns objects
                 
+                # Suggest flags
+                flags = ['-c', '-d']
+                for f in flags:
+                    if f.startswith(current_word):
+                        yield Completion(f, start_position=-len(current_word))
+
                 # Fetch dynamically
                 try:
                     projects = self.context.project_repo.get_all()
