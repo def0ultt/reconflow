@@ -1,0 +1,13 @@
+
+metadata:
+  id: mock-tool
+  name: Mock Tool
+  
+inputs:
+  text: "default_text"
+  outfile: "out.txt"
+
+steps:
+  - id: write
+    tool: echo
+    args: '"{{inputs.text}}" >> {{project_path}}/{{inputs.outfile}}'
