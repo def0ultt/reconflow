@@ -1,5 +1,7 @@
 import json
 import os
+import glob
+import yaml
 from utils.paths import get_project_root
 
 class WorkflowManager:
@@ -10,6 +12,30 @@ class WorkflowManager:
         self.workflow_file = get_project_root() / workflow_file
         self.workflows = {}
         self.load_workflows()
+        self.load_yaml_workflows()
+
+    def load_yaml_workflows(self, root_dir="workflows"):
+        """Scans for .yml files in workflows/ directory."""
+        path = get_project_root() / root_dir
+        if not path.exists():
+            return
+            
+        for filepath in glob.glob(str(path / "*.yml")) + glob.glob(str(path / "*.yaml")):
+             try:
+                 with open(filepath, 'r') as f:
+                     data = yaml.safe_load(f)
+                     if not data: continue
+                     
+                     # Use ID or Filename as key
+                     # User example has 'id' in metadata
+                     wf_id = data.get('metadata', {}).get('id')
+                     if not wf_id:
+                         wf_id = os.path.splitext(os.path.basename(filepath))[0]
+                     
+                     self.workflows[wf_id] = data
+                     print(f"[+] Loaded YAML Workflow: {wf_id}")
+             except Exception as e:
+                 print(f"Error loading workflow {filepath}: {e}")
 
     def create_workflow(self, name: str, steps: list):
         self.workflows[name] = steps

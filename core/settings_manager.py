@@ -83,3 +83,20 @@ class SettingsManager:
             return query.filter((Variable.project_id == None) | (Variable.project_id == project_id)).all()
         else:
             return query.filter(Variable.project_id == None).all()
+
+    def get_all_secrets(self) -> dict:
+        """Return all API keys as a dictionary {tool_name: key}."""
+        keys = self.list_api_keys()
+        return {k.tool_name: k.key for k in keys}
+
+    def get_global_vars_dict(self, project_id: int = None) -> dict:
+        """
+        Return a dictionary of variables for the context.
+        Strips the leading '$' from keys to be used in Jinja {{key}}.
+        """
+        vars_list = self.list_variables(project_id=project_id)
+        result = {}
+        for v in vars_list:
+            clean_key = v.key.lstrip('$')
+            result[clean_key] = v.value
+        return result

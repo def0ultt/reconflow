@@ -1,0 +1,18 @@
+type: workflow
+info:
+  id: demo-flow
+  name: Demo Import Flow
+  description: A workflow that uses the imported demo-ping tool
+  author: User
+
+vars:
+  target: 
+    default: "1.1.1.1"
+    required: true
+
+workflow:
+  - name: check-alive
+    module: custom/demo_tool
+    inputs:
+      target: "{{target}}"
+      count: 1

@@ -1,0 +1,15 @@
+
+metadata:
+  id: mock-flow
+  name: Mock Flow
+
+variables:
+  my_var: "InitialValue"
+  res_file: "result.txt"
+
+modules:
+  - id: step_A
+    module: custom/mock_tool
+    inputs:
+      text: "FromFlow: {{my_var}}"
+      outfile: "{{res_file}}"

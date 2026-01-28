@@ -1,0 +1,21 @@
+
+type: module
+info:
+  id: mock-tool
+  name: Mock Tool
+  description: Mock tool
+  author: Test
+
+vars:
+  text: 
+    default: "default_text"
+  outfile: 
+    default: "out.txt"
+
+steps:
+  - name: write
+    tool: echo
+    # Use direct variable access {{text}}
+    args: '"{{text}}" >> {{project_path}}/{{outfile}}'
+    output:
+      path: "{{project_path}}/{{outfile}}"
