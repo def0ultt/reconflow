@@ -233,12 +233,11 @@ def cmd_import(ctx: Context, arg: str):
         return
 
     # Validate YAML
+    from core.schema import validate_yaml
     try:
         with open(source_path, 'r') as f:
             data = yaml.safe_load(f)
-            if not data or 'metadata' not in data:
-                 print("Invalid format: Missing 'metadata' block.")
-                 return
+            validate_yaml(data)
     except Exception as e:
         print(f"Invalid YAML file: {e}")
         return

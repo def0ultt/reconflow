@@ -41,21 +41,16 @@ class ToolManager:
                 
                 # Solution: Create a closure/factory or use a lambda that returns the configured instance?
                 # But our get_module() expects a CLASS that it instantiates.
-                # So we create a dynamic subclass.
-                
+                # Create Dynamic Class (GenericYamlModule) specific to this file
+                # Use default arg to bind closure
                 class DynamicYamlModule(GenericYamlModule):
-                    def __init__(self_inner):
-                        super().__init__(yaml_path=filepath)
+                    def __init__(self_inner, path=filepath):
+                         super().__init__(yaml_path=path)
                 
-                # Copy meta from YAML without full parse? 
-                # Ideally we parse it once to get the proper ID/Name for registration if we wanted to use ID.
-                # But context.tool_manager uses filesystem-like paths.
-                
-                # Let's peek into the file to set meta on the class?
+                # Check validation (Schema)
                 try:
-                    # Temporary instantiation to read meta
-                    temp = GenericYamlModule(filepath)
-                    DynamicYamlModule.meta = temp.meta
+                     temp = GenericYamlModule(filepath)
+                     DynamicYamlModule.meta = temp.meta
                 except Exception as e:
                      print(f"Failed to load YAML module {filepath}: {e}")
                      continue
@@ -87,8 +82,8 @@ class ToolManager:
 
                 # Create Dynamic WorkflowModule
                 class DynamicWorkflowModule(WorkflowModule):
-                    def __init__(self_inner):
-                         super().__init__(yaml_path=filepath)
+                    def __init__(self_inner, path=filepath):
+                         super().__init__(yaml_path=path)
                          
                 try:
                      temp = WorkflowModule(filepath)

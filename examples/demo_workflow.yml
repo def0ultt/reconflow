@@ -1,13 +1,17 @@
-metadata:
+type: workflow
+info:
   id: demo-flow
   name: Demo Import Flow
   description: A workflow that uses the imported demo-ping tool
+  author: User
 
-variables:
-  target: 1.1.1.1
+vars:
+  target: 
+    default: "1.1.1.1"
+    required: true
 
-modules:
-  - id: check-alive
+workflow:
+  - name: check-alive
     module: custom/demo_tool
     inputs:
       target: "{{target}}"

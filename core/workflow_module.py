@@ -1,92 +1,92 @@
+
 from core.base import BaseModule, Option
 from workflow.engine import WorkflowRunner
 import yaml
 import os
 from typing import TYPE_CHECKING, Any
+from core.schema import validate_yaml, WorkflowSchema
 
 if TYPE_CHECKING:
     from core.context import Context
-from workflow.engine import WorkflowRunner
-import yaml
-import os
 
 class WorkflowModule(BaseModule):
     """
     Wraps a YAML workflow definition into a standard Module.
-    Allows 'use workflow/xyz', 'set var val', 'run'.
+    Strictly follows the new WorkflowSchema.
     """
     def __init__(self, yaml_path: str = None):
         super().__init__()
         self.yaml_path = yaml_path
-        self._wf_def = {}
+        self.schema: WorkflowSchema = None
+        
         if yaml_path:
             self.load_from_yaml(yaml_path)
 
     def load_from_yaml(self, path: str):
         if not os.path.exists(path):
-            return # Should raise?
+            return 
         
         with open(path, 'r') as f:
-            self._wf_def = yaml.safe_load(f)
+            raw_data = yaml.safe_load(f)
+
+        # Validate
+        model = validate_yaml(raw_data)
+        if not isinstance(model, WorkflowSchema):
+             raise ValueError(f"File {path} is not a Workflow (type={getattr(model, 'type', 'unknown')})")
+        
+        self.schema = model
 
         # Meta
-        meta = self._wf_def.get('metadata', {})
         self.meta.update({
-            'name': meta.get('name', 'Unknown Workflow'),
-            'description': meta.get('description', ''),
-            'author': meta.get('author', 'Unknown'),
-            'id': meta.get('id', 'workflow')
+            'name': self.schema.info.name,
+            'description': self.schema.info.description,
+            'author': self.schema.info.author,
+            'id': self.schema.info.id
         })
 
-        # Variables -> Options
-        # We treat all top-level variables as settable options
-        variables = self._wf_def.get('variables', {})
-        for k, v in variables.items():
-            self.options[k] = Option(
-                name=k,
-                value=v, # Default value from YAML
-                required=True, # Assume required?
-                description=f"Workflow variable: {k}"
+        # Vars -> Options
+        for name, config in self.schema.vars.items():
+            self.options[name] = Option(
+                name=name,
+                value=config.default,
+                required=config.required,
+                description=f"Workflow variable: {name}"
             )
 
     def run(self, context: 'Context'):
         # Create inputs dict from current options
         inputs = {k: opt.value for k, opt in self.options.items()}
         
-        # We need to run this specific workflow def.
-        # WorkflowRunner normally loads by name from manager.
-        # Here we have the definition directly.
-        
-        # We can bypass manager lookup by modifying runner or registering this temp?
-        # Actually, if we are here, we are "using" this module.
-        # Let's extend Runner to accept definition or ID.
-        
         runner = WorkflowRunner(context)
-        
-        # We need to inject our workflow definition into the runner or pass it.
-        # WorkflowRunner.run_workflow expects name and does: manager.get_workflow(name)
-        # So we can ensure this workflow is in the manager?
-        # OR we modify run_workflow to accept def.
-        
-        # Let's call internal method or modified public method
         print(f"[*] Executing Workflow Module: {self.meta['name']}")
         
-        # We'll use a slightly hacky way if we don't want to change Runner signature too much,
-        # but changing signature is better.
-        # Since I can't easily change Runner in this file, I'll access the internal logic
-        # by passing the definition to a new method I'll add to Runner or mimicking logic.
+        # Convert Schema back to dict for Runner
+        # Note: Runner expects 'modules', 'metadata', 'variables'.
+        # New Schema has 'workflow', 'info', 'vars'.
+        # We must adapt it here or update Runner. 
+        # Updating Runner is cleaner but might technically be "Phase 4". 
+        # But to keep it working, I'll adapt the dict here temporarily or update Runner to check both.
+        # Let's adapt here to minimize impact on Runner logic until Phase 4.
         
-        # Better: Since "use workflow/xxx" was loaded from manager, it IS in the manager? 
-        # Wait, if we register it as a module, it might not be in WorkflowManager unless we dual load.
-        # Let's assuming we dual load.
+        wf_data = self.schema.model_dump()
         
-        # Access ID
-        wf_id = self._wf_def.get('metadata', {}).get('id')
-        if not wf_id:
-            # If loaded from custom file, might not match ID in manager if filenames differ?
-            # Let's use the Runner's internal logic but adapted.
-            pass
+        # Compatibility Adapter
+        adapter = {
+            'metadata': wf_data.get('info', {}),
+            'variables': {k: v.get('default') for k, v in wf_data.get('vars', {}).items()},
+            'modules': []
+        }
+        
+        # Map steps from 'workflow' to 'modules'
+        # Schema step: name, module, depends_on, inputs
+        # Runner expects: id (name), module, depends_on, inputs
+        for step in wf_data.get('workflow', []):
+            adapter['modules'].append({
+                'id': step['name'],
+                'module': step['module'],
+                'depends_on': step['depends_on'],
+                'inputs': step['inputs']
+            })
 
-        # Re-implementing simplified runner call here to avoid dependency cycle or signature issues
-        # Or better: Add run_workflow_def to WorkflowRunner
-        runner.run_workflow_with_definition(self._wf_def, inputs)
+        runner.run_workflow_with_definition(adapter, inputs)
+

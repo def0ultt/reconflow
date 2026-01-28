@@ -54,10 +54,18 @@ class WorkflowRunner:
     def _execute_logic(self, wf_def, inputs, workflow_name):
         # 2. Initialize State
         wf_vars = wf_def.get('variables', {})
-        state = {
-            'input': inputs,
-            'workspace': '/tmp',
-        }
+        
+        # Base: Global Context
+        state = self.context.get_global_context()
+        
+        # Merge Inputs (User provided overrides)
+        state['input'] = inputs 
+        # Also merge inputs directly if they match known vars? 
+        # The engine logic below handles input overrides for specific workflow vars.
+        # But we might want inputs to be top level too?
+        # User spec doesn't explicitly say "inputs" namespace is required, but existing code used it.
+        # Let's keep 'input' namespace but also allow direct overrides.
+        
         for k, v in wf_vars.items():
             # Allow inputs to override workflow variables directly
             if k in inputs:
@@ -181,7 +189,7 @@ class WorkflowRunner:
             if isinstance(res, dict):
                 step_outputs.update(res)
 
-            outputs_store[mid] = {'outputs': step_outputs}
+            outputs_store[mid] = step_outputs
             print(f"    -> Step {mid} finished. Outputs: {list(step_outputs.keys())}")
             
         except Exception as e:

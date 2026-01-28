@@ -4,15 +4,18 @@ import subprocess
 import os
 from jinja2 import Template
 from core.base import BaseModule, Option
+from core.schema import validate_yaml, ModuleSchema
 
 class GenericYamlModule(BaseModule):
     """
     A generic module that runs CLI tools defined in a YAML file.
+    Strictly follows the new ModuleSchema.
     """
     def __init__(self, yaml_path: str = None):
         super().__init__()
         self.yaml_path = yaml_path
-        self._config = {}
+        self.schema: ModuleSchema = None
+        
         if yaml_path:
             self.load_from_yaml(yaml_path)
 
@@ -21,120 +24,187 @@ class GenericYamlModule(BaseModule):
             raise FileNotFoundError(f"YAML module definitions not found at {path}")
         
         with open(path, 'r') as f:
-            self._config = yaml.safe_load(f)
+            raw_data = yaml.safe_load(f)
+            
+        # Validate using Schema
+        model = validate_yaml(raw_data)
+        if not isinstance(model, ModuleSchema):
+            raise ValueError(f"File {path} is not a Module (type={getattr(model, 'type', 'unknown')})")
+        
+        self.schema = model
 
-        # 1. Parse Metadata
-        meta = self._config.get('metadata', {})
+        # 1. Parse Metadata (Info)
         self.meta.update({
-            'name': meta.get('name', 'Unknown YAML Module'),
-            'description': meta.get('description', ''),
-            'author': meta.get('author', 'Unknown'),
-            'id': meta.get('id', 'yaml-module')
+            'name': self.schema.info.name,
+            'description': self.schema.info.description,
+            'author': self.schema.info.author,
+            'id': self.schema.info.id
         })
 
-        # 2. Parse Inputs -> Options
-        # "inputs" in user example seems to be arguments provided at runtime
-        # "variables" (vars) are global defaults
-        
-        # We map 'inputs' key from YAML to self.options
-        inputs = self._config.get('inputs', {})
-        for name, default_val in inputs.items():
+        # 2. Parse Vars -> Options
+        for name, config in self.schema.vars.items():
             self.options[name] = Option(
                 name=name,
-                value=default_val,
-                required=True, # Assume inputs are required unless default is provided
-                description=f"Input for {name}"
+                value=config.default,
+                required=config.required,
+                description=f"Variable: {name}"
             )
-            
-        # Also map 'variables' as options but maybe hidden or pre-filled?
-        # For now, let's treat variables as internal context, but if user wants to override?
-        # The user example shows 'variables' as global in workflow, but modules also have 'inputs'.
-        # Let's stick to inputs for now.
 
     def run(self, context) -> Dict[str, Any]:
         """
-        Execute the steps defined in the YAML.
+        Execute the steps defined in the YAML Schema.
         Returns a dictionary of captured outputs.
         """
-        steps = self._config.get('steps', [])
+        if not self.schema:
+            print("[!] No schema check loaded.")
+            return {}
+
         outputs = {}
         
-        # Prepare context for Jinja2
-        # It includes options values + any previously captured outputs
-        # + global variables?
-        
         # 1. Build initial render context
-        render_ctx = {
-            'inputs': {k: v.value for k, v in self.options.items()},
-            # Add global context variables if needed, e.g. project_path
-            'project_path': context.current_project.path if context.current_project else '/tmp'
+        # Base: Global Context (Secrets, Global Vars, System Vars)
+        render_ctx = context.get_global_context()
+        
+        # Merge: Module Inputs (Options)
+        # Options override globals if names collide
+        inputs = {k: v.value for k, v in self.options.items()}
+        render_ctx.update(inputs)
+        
+        # Also expose inputs under 'inputs' namespace for backward compatibility/clarity
+        render_ctx['inputs'] = inputs
+        
+        runner_state = {
+            'last_stdout': None
         }
         
-        # Also process top-level variables if any, resolving them against themselves?
-        # simple resolution for now.
-        
-        for step in steps:
-            step_id = step.get('id', step.get('name', 'unknown'))
-            tool = step.get('tool')
-            args_template = step.get('args', '')
+        for step in self.schema.steps:
+            step_id = step.name
             
-            # Render arguments
-            tmpl = Template(args_template)
-            cmd_args = tmpl.render(render_ctx)
+            # --- Condition Check ---
+            if step.condition:
+                # Render condition first (to resolve vars)
+                cond_str = Template(step.condition).render(render_ctx)
+                try:
+                    # simplistic eval
+                    if not eval(cond_str):
+                        print(f"[*] Skipping step '{step_id}' (Condition met: {cond_str})")
+                        continue
+                except Exception as e:
+                    print(f"[!] condition evaluation failed for '{step_id}': {e}")
+                    continue
+
+            # --- Arguments ---
+            args_template = step.args
+            cmd_args = Template(args_template).render(render_ctx)
             
-            full_cmd = f"{tool} {cmd_args}"
+            full_cmd = f"{step.tool} {cmd_args}"
             print(f"[*] Executing step '{step_id}': {full_cmd}")
             
-            # Identify where to save output if 'path' is defined in 'output' block
-            output_def = step.get('output', {})
-            output_file = output_def.get('path')
+            # --- Output Path logic ---
+            output_path = None
+            copy_to_project = False
             
-            if output_file:
-                # Render output path as it might have {{variables}}
-                output_file = Template(output_file).render(render_ctx)
-                
-            # Execution
+            if step.output:
+                if step.output.path:
+                    output_path = Template(step.output.path).render(render_ctx)
+                    copy_to_project = True # Spec says if specific path, also take copy
+                elif step.output.filename:
+                     if context.current_project:
+                        output_path = os.path.join(context.current_project.path, step.output.filename)
+            
+            # --- Timeout Parsing ---
+            timeout_sec = None
+            if step.timeout:
+                try:
+                    val = step.timeout.lower()
+                    if val.endswith('m'):
+                        timeout_sec = int(val[:-1]) * 60
+                    elif val.endswith('h'):
+                        timeout_sec = int(val[:-1]) * 3600
+                    elif val.endswith('s'):
+                        timeout_sec = int(val[:-1])
+                    else:
+                        timeout_sec = int(val)
+                    
+                    if timeout_sec <= 0:
+                        print(f"[!] Invalid timeout value {timeout_sec} (must be > 0). Ignoring.")
+                        timeout_sec = None
+                except:
+                    print(f"[!] Invalid timeout format '{step.timeout}', ignoring.")
+
+            # --- Execution with Piping ---
+            input_data = None
+            if step.stdin and runner_state['last_stdout']:
+                input_data = runner_state['last_stdout']
+
             try:
-                # If pipe is true, we might need complex handling. 
-                # For now, standard subprocess run.
-                
-                # Check for stdin handling (not implemented yet for simplicity, or we can use input=...)
-                
                 proc = subprocess.run(
                     full_cmd,
                     shell=True,
                     check=True,
                     capture_output=True,
-                    text=True
+                    text=True,
+                    input=input_data,
+                    timeout=timeout_sec
                 )
                 
-                # stdout/stderr logging?
-                # context.logger.debug(proc.stdout)
+                # Update State
+                if step.capture:
+                     runner_state['last_stdout'] = proc.stdout
+                else:
+                     runner_state['last_stdout'] = None # Clear if not captured? Or keep? 
+                     # Spec says "If true, engine saves... for subsequent".
+                     # Implies if false, maybe not available for piping?
+                     # Let's keep it in 'last_stdout' only if capture=True.
+                     pass
                 
-                # Handle Output Extraction
-                # 1. If output is file:
-                if output_file:
-                    # Some tools don't write to file automatically, user might have used redirection > in args?
-                    # Or rely on tool flags.
-                    # If 'extract' is used, we might read the file or stdout.
-                    outputs[step_id] = output_file
+                # --- Output Saving ---
+                file_created_by_tool = False
+                if output_path and os.path.exists(output_path):
+                     # Tool seemingly created the file (or appended to it).
+                     # We do NOT overwrite it with proc.stdout (which might be empty).
+                     file_created_by_tool = True
+                
+                # 1. Write to specific path if tool didn't create it
+                if output_path and not file_created_by_tool:
+                    if proc.stdout:
+                         # Ensure dirs
+                         os.makedirs(os.path.dirname(output_path), exist_ok=True)
+                         with open(output_path, 'w') as f:
+                             f.write(proc.stdout)
+                    else:
+                         # Tool produced no output and no file?
+                         pass
+                
+                # 2. Copy to project if needed
+                if output_path and copy_to_project and context.current_project:
+                    # Construct project path filename
+                    fname = os.path.basename(output_path)
+                    proj_path = os.path.join(context.current_project.path, fname)
                     
-                # 2. If capture output (stdout) specific logic?
-                # Ensure we update render_ctx with this step's output so next steps can use it.
-                # Example: {{steps.subdomain.output}}
+                    # If output_path exists (either tool created it or we wrote it)
+                    if os.path.exists(output_path):
+                        if os.path.abspath(proj_path) != os.path.abspath(output_path):
+                             import shutil
+                             shutil.copy(output_path, proj_path)
+                    
+                outputs[step_id] = output_path
                 
-                # Let's map outputs generically
+                # Update Render Context
                 render_ctx[step_id] = {
                     'stdout': proc.stdout,
                     'stderr': proc.stderr,
-                    'output_file': output_file
+                    'output_file': output_path
                 }
                 
-                # Also generic "latest"?
-                
+            except subprocess.TimeoutExpired:
+                 print(f"[!] Step '{step_id}' timed out after {step.timeout}")
             except subprocess.CalledProcessError as e:
                 print(f"[!] Error executing step {step_id}: {e}")
                 print(e.stderr)
+                # Continue or raise? Spec validation phase usually implies strictness.
+                # But recon tools fail often (no results etc).
+                # Probably should raise or define 'ignore_errors' (not in spec yet).
                 raise e
 
         return outputs
