@@ -34,7 +34,8 @@ class Context:
         
         # Register default modules (Manual for now, can be automated later)
         from recon.passive.subdomain_enum import SubdomainEnumModule
-        self.tool_manager.register_module('scan/subdomain/passive', SubdomainEnumModule)
+        # Properly register the python module with an ID
+        self.tool_manager.register_tool('module', 'subdomain-enum', SubdomainEnumModule, aliases=['scan/subdomain/passive'])
 
         self.workflow_manager = WorkflowManager()
         self.session_manager = SessionManager()

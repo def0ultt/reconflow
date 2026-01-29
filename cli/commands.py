@@ -256,7 +256,7 @@ def cmd_import(ctx: Context, arg: str):
     
     try:
         shutil.copy(source_path, dest_path)
-        print(f"✅ Imported to {dest_path}")
+        print(f"[*] check if this file is imported {dest_path}")
         
         # Reload
         if type_ == 'workflow':

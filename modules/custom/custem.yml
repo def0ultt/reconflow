@@ -1,0 +1,50 @@
+type: module
+
+info:
+  id: full-recon
+  name: Full Reconnaissance
+  description: Complete recon pipeline with parallel execution
+  author: charlie
+
+vars:
+  target:
+    required: true
+  wordlist:
+    default: "/usr/share/wordlists/common.txt"
+  threads:
+    default: 50
+
+steps:
+  # Phase 1: Parallel discovery
+  - name: subdomain_enum
+    tool: subfinder
+    args: "-d {{target}} -t {{threads}}"
+    capture: true
+  
+  - name: dns_enum
+    tool: dnsenum
+    args: "{{target}}"
+  
+  - name: whois_lookup
+    tool: whois
+    args: "{{target}}"
+  
+  # Phase 2: Port scanning (depends on subdomains)
+  - name: port_scan
+    tool: nmap
+    args: "-iL {{subdomain_enum.output}} -p- -T4"
+    depends_on: [subdomain_enum]
+    timeout: "1h"
+    capture: true
+  
+  # Phase 3: Directory brute force (parallel with port scan)
+  - name: dir_brute
+    tool: ffuf
+    args: "-u https://{{target}}/FUZZ -w {{wordlist}}"
+    depends_on: []  # Independent
+  
+  # Phase 4: Vulnerability scanning (after port scan)
+  - name: vuln_scan
+    tool: nuclei
+    args: "-l {{port_scan.output}}"
+    depends_on: [port_scan]

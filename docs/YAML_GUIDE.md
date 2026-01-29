@@ -82,7 +82,6 @@ Each step represents an atomic execution unit.
 ### Output Handling (`output`)
 *   **`path`**: Location to save results (e.g., `{{output_dir}}/raw.txt`).
     *   *Note*: If a specific path is provided, the engine saves it there **AND** automatically creates a copy in the project's result folder to ensure data consistency.
-*   **`filename`**: Alternative to path, ensuring it saves in the default project directory.
 
 **Example Module:**
 ```yaml
@@ -146,19 +145,25 @@ workflow:
 The engine automatically populates these variables at runtime. They are globally available.
 
 1.  **`{{target}}`**: The main user-supplied global target (set via header/CLI once).
-2.  **`{{output_name}}`**: The default output name (usually derived from the module name).
-3.  **`{{tmp}}`**: Path to a temporary directory for intermediate files.
-4.  **`{{date}}`**: The current date in `YYYY-MM-DD` format.
+2.  **`{{output_name}}`**: The default output name (usually derived from the module name).save under projet folder
+3.  **`{{date}}`**: The current date in `YYYY-MM-DD` format.
+4. **`{{proxy}}`**: If the user wants to route traffic through Burp Suite or a SOCKS5 proxy, this variable can be passed to all tool flags. this work if user specifique proxy flag in tool and use {{proxy}} now user can set proxy 127.0.0.1:8080 and it will be applied to all tools that use {{proxy}}
+5. **`{{threads}}`**: Global concurrency (e.g., 50). Used for tools like subfinder -t {{threads}}.this work when user specifique threads flag in tool and use {{threads}}
+example args: -t {{threads}} now user can use set threads 50 and it will be applied to all tools that use {{threads}}
+6. **Integration Keys (The "Secrets" Bus)**: 
+{{github_token}}: For github-subdomains or trufflehog.
+{{discord_webhook}} / {{slack_webhook}}: For final reporting modules.
+{{shodan_key}}: For passive IP discovery.
 
+tool load this token from settings under API KEY this maen you can set it in settings and tool will use it 
 ---
 
 ## 7. Logic & Operators
 
 Standard operators available within `args` or `condition` fields:
 
-*   **Piping**: Use `|` within `args` (requires shell support).
-*   **Redirection**: Use `>` or `>>` to write to files manually.
-
+*  **stdin**: Use `stdin` to tell the tool to listen for piped data instead of reading a file.
+* **depends_on**: Use `depends_on` to specify the order of execution. This is useful when you have a module that depends on the output of another module.
 ---
 
 ## Comparison: Module vs. Workflow
