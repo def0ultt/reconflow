@@ -1,0 +1,36 @@
+type: module
+info:
+  id: demo-unified
+  name: Demo Unified Module
+  description: Verifies strict vars, path, and DAG
+  author: ant
+
+vars:
+  target:
+    required: true
+    default: "localhost"
+  sleep_time:
+    required: false
+    default: "1"
+
+steps:
+  - name: step1
+    tool: echo
+    args: "Starting scan on {{target}}"
+
+  - name: step2_parallel
+    tool: sleep
+    args: "{{sleep_time}}"
+    depends_on: []
+    parallel: true
+
+  - name: step3_parallel
+    tool: sleep
+    args: "{{sleep_time}}"
+    depends_on: []
+    parallel: true
+
+  - name: step4_end
+    tool: echo
+    args: "Finished"
+    depends_on: [step2_parallel, step3_parallel]

@@ -2,6 +2,8 @@ from core.context import Context
 from rich.console import Console
 from rich.table import Table
 import os
+from rich.text import Text
+from rich import box
 import shutil
 import yaml
 from utils.paths import get_project_root
@@ -72,47 +74,7 @@ def cmd_set(ctx: Context, arg: str):
         print(f"{opt} => {val}")
     else:
         print(f" Option '{opt}' not found.")
-from workflow.engine import WorkflowRunner
-
-def cmd_workflow(ctx: Context, arg: str):
-    """
-    Manage and run workflows.
-    Usage:
-      workflow list
-      workflow run <name> [var=value ...]
-    """
-    if not arg:
-        cmd_show(ctx, 'workflows')
-        return
-
-    args = arg.split()
-    subcmd = args[0]
-    
-    if subcmd == 'list':
-        cmd_show(ctx, 'workflows')
-    
-    elif subcmd == 'run':
-        if len(args) < 2:
-            print("Usage: workflow run <name> [key=value ...]")
-            return
         
-        wf_name = args[1]
-        
-        # Parse inputs
-        inputs = {}
-        for pair in args[2:]:
-            if '=' in pair:
-                k, v = pair.split('=', 1)
-                inputs[k] = v
-        
-        runner = WorkflowRunner(ctx)
-        try:
-            runner.run_workflow(wf_name, inputs)
-        except Exception as e:
-            print(f"Error executing workflow: {e}")
-            
-    else:
-        print("Unknown workflow command. Try 'list' or 'run'.")
 
 from cli.session_cmd import cmd_sessions
 from cli.startup import run_settings_flow
@@ -153,7 +115,7 @@ def cmd_run(ctx: Context, arg: str):
 
 def cmd_show(ctx: Context, arg: str):
     if not arg:
-        print("Usage: show [options|modules|sessions|projects|workflows]")
+        print("Usage: show [options|modules|sessions|projects]")
         return
         
     if arg == 'options':
@@ -174,9 +136,6 @@ def cmd_show(ctx: Context, arg: str):
     
     elif arg in ('modules', 'module'):
         cmd_list_modules(ctx, 'modules')
-
-    elif arg in ('workflows', 'workflow'):
-        cmd_list_modules(ctx, 'workflows')
 
     elif arg == 'sessions':
         cmd_sessions(ctx, "-a")
@@ -204,28 +163,28 @@ def cmd_show(ctx: Context, arg: str):
         console.print()
 
     else:
-        print("Usage: show [options|module|workflow|sessions|projects]")
+        print("Usage: show [options|module|sessions|projects]")
 
 def cmd_list(ctx: Context, arg: str):
     """
-    List command to show both workflows and modules summary.
+    List command to show modules summary.
     """
     cmd_list_modules(ctx, 'all')
 
 def cmd_import(ctx: Context, arg: str):
     """
-    Import a module or workflow from a YAML file.
-    Usage: import <workflow|module> <filepath>
+    Import a module from a YAML file.
+    Usage: import module <filepath>
     """
     args = arg.split(maxsplit=1)
     if len(args) != 2:
-        print("Usage: import <workflow|module> <filepath>")
+        print("Usage: import module <filepath>")
         return
 
     type_, source_path = args[0].lower(), args[1]
     
-    if type_ not in ['workflow', 'module']:
-        print("Invalid type. Use 'workflow' or 'module'.")
+    if type_ != 'module':
+        print("Invalid type. Use 'module'.")
         return
         
     if not os.path.exists(source_path):
@@ -244,36 +203,42 @@ def cmd_import(ctx: Context, arg: str):
 
     # Determine destination
     root = get_project_root()
-    if type_ == 'workflow':
-        dest_dir = root / "workflows" / "custom"
-    else:
-        dest_dir = root / "modules" / "custom"
+    dest_dir = root / "modules" / "custom"
         
     dest_dir.mkdir(parents=True, exist_ok=True)
     
     filename = os.path.basename(source_path)
     dest_path = dest_dir / filename
     
+    # Check if source is already in the destination
+    source_abs = os.path.abspath(source_path)
+    dest_abs = os.path.abspath(dest_path)
+    
+    if source_abs == dest_abs:
+        console.print(f"[yellow]Module is already in the modules directory: {dest_path}[/yellow]")
+        console.print("[yellow]Reloading modules...[/yellow]")
+        
+        # Just reload without copying
+        ctx.tool_manager.load_yaml_modules(root_dirs=[str(root / "modules"), str(root / "workflows")])
+        console.print("[green][+] Modules reloaded successfully.[/green]")
+        return
+    
     try:
         shutil.copy(source_path, dest_path)
-        print(f"[*] check if this file is imported {dest_path}")
+        console.print(f"[green][+] Module imported to: {dest_path}[/green]")
         
         # Reload
-        if type_ == 'workflow':
-             # Reload workflow manager and tool manager?
-             ctx.workflow_manager.load_yaml_workflows()
-             ctx.tool_manager.load_workflow_modules(root_dir=str(root / "workflows"))
-        else:
-             ctx.tool_manager.load_yaml_modules(root_dir=str(root / "modules"))
+        ctx.tool_manager.load_yaml_modules(root_dirs=[str(root / "modules"), str(root / "workflows")])
              
-        print("[+] Reloaded system configs.")
+        console.print("[green][+] Modules reloaded successfully.[/green]")
         
     except Exception as e:
-        print(f"Error importing file: {e}")
+        console.print(f"[red]Error importing file: {e}[/red]")
 
     else:
-        print("Usage: show [options|modules|sessions|projects|workflows]")
-from rich import box
+        # print("Usage: show [options|modules|sessions|projects]")
+        pass
+
 def cmd_help(ctx: Context, arg: str):
     table = Table(
     title="[red]Core Commands[/red]",
@@ -284,8 +249,12 @@ def cmd_help(ctx: Context, arg: str):
     border_style="white" # Makes the lines yellow
 )
     table.add_column("[red]Command[/red]", style="bold cyan", justify="center")
-    table.add_column("[red]Description[/red]", style="bold white", justify="left" )
-
+    table.add_column(
+    Text("Description", justify="center"), # Centers the header text
+    header_style="bold red",
+    style="bold white",
+    justify="left"                         # Aligns the column data left
+)
     help_data = [
         ("use", "Select a module by name"),
         ("back", "Move back from the current context"),
@@ -298,7 +267,7 @@ def cmd_help(ctx: Context, arg: str):
         ("sessions", "Manage background sessions"),
         ("ls", "List files for current project"),
         ("cat","view file contents in  current project "),
-        ("import","Import a module or workflow from a YAML file"),
+        ("import","Import a module from a YAML file"),
         ("help", "Help menu"),
         ("settings", "Open settings menu"),
         ("exit", "Exit the console"),
@@ -480,32 +449,21 @@ def cmd_cat(ctx: Context, arg: str):
 
 def cmd_list_modules(ctx: Context, mode: str):
     """
-    mode: 'modules' | 'workflows' | 'all'
+    mode: 'modules' | 'all'
     """
     if mode == 'all':
          # Just print summary, do NOT set context
-         mods = ctx.tool_manager.list_pure_modules()
-         wfs = ctx.tool_manager.list_workflow_modules()
+         mods = ctx.tool_manager.list_modules()
          
-         console.print(f"\n[bold cyan]Workflows ({len(wfs)}):[/bold cyan]")
-         for i, m in enumerate(wfs):
-             # We assume name-based display is allowed, but ID for referencing?
-             # User said: "List ... Output example: 1. workflow/live_subdomain"
-             console.print(f"{i+1}. {m}")
-             
-         console.print(f"\n[bold cyan]Modules ({len(mods)}):[/bold cyan]")
+         console.print(f"\n[bold cyan]Modules:[/bold cyan]")
          for i, m in enumerate(mods):
              console.print(f"{i+1}. {m}")
          console.print()
          return
 
     # Specific Mode -> Sets context
-    if mode == 'workflows':
-        items = ctx.tool_manager.list_workflow_modules()
-        title = "Workflows"
-    else:
-        items = ctx.tool_manager.list_pure_modules()
-        title = "Modules"
+    items = ctx.tool_manager.list_modules()
+    title = "Modules"
         
     if not items:
         print(f"No {title.lower()} found.")
@@ -514,7 +472,7 @@ def cmd_list_modules(ctx: Context, mode: str):
 
     # Set Context
     ctx.last_shown_map = items
-    ctx.last_shown_type = 'workflow' if mode == 'workflows' else 'module'
+    ctx.last_shown_type = 'module'
 
     table = Table(title=title, show_header=True, header_style="bold cyan")
     table.add_column("ID", style="cyan", justify="center")
@@ -523,14 +481,8 @@ def cmd_list_modules(ctx: Context, mode: str):
 
     for i, path in enumerate(items):
         try:
-            # We need to instantiate or peek class to get meta
-            # For performance, maybe Manager should cache meta separate from instance?
-            # Creating instance is okay for now.
             mod_cls = ctx.tool_manager.modules[path]
-            # If it's a class, check meta attr
             meta = getattr(mod_cls, 'meta', {})
-            # If it's generic yaml, meta might be on instance or class if we hacked it.
-            # In my previous implementation I set DynamicYamlModule.meta = temp.meta
             
             desc = meta.get('description', '')
             table.add_row(str(i+1), path, desc)
@@ -583,7 +535,6 @@ COMMANDS = {
     'options': cmd_options,
     'sessions': cmd_sessions,
     'settings': cmd_settings,
-    'workflow': cmd_workflow,
     'import': cmd_import,
     'list': cmd_list,
 }

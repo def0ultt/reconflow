@@ -2,7 +2,6 @@ from config.loader import load_config
 from utils.paths import get_project_root
 from projects.manager import ProjectManager
 from tools.manager import ToolManager
-from workflow.manager import WorkflowManager
 from core.session_manager import SessionManager
 from utils.logger import setup_logger
 from db.session import get_session
@@ -28,16 +27,18 @@ class Context:
         self.project_manager = ProjectManager() # Encapsulates some logic, but we might prefer repo
         self.tool_manager = ToolManager()
         
-        # Load YAML modules
-        self.tool_manager.load_yaml_modules(root_dir=str(get_project_root() / "modules"))
-        self.tool_manager.load_workflow_modules(root_dir=str(get_project_root() / "workflows"))
+        # Load YAML modules (Unified)
+        # Scan both 'modules' and 'workflows' folders for any valid modules
+        self.tool_manager.load_yaml_modules(root_dirs=[
+            str(get_project_root() / "modules"),
+        ])
         
         # Register default modules (Manual for now, can be automated later)
-        from recon.passive.subdomain_enum import SubdomainEnumModule
+        # from recon.passive.subdomain_enum import SubdomainEnumModule
         # Properly register the python module with an ID
-        self.tool_manager.register_tool('module', 'subdomain-enum', SubdomainEnumModule, aliases=['scan/subdomain/passive'])
+        # self.tool_manager.register_tool('module', 'subdomain-enum', SubdomainEnumModule, aliases=['scan/subdomain/passive'])
 
-        self.workflow_manager = WorkflowManager()
+        # self.workflow_manager = WorkflowManager() - Removed
         self.session_manager = SessionManager()
         
         # State
