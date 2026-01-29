@@ -31,7 +31,7 @@ class ModuleStep(BaseModel):
 
 class ModuleSchema(BaseModel):
     type: str = Field(pattern='^module$')
-    info: InfoBlock
+    info: InfoBlock = Field(alias="metadata")
     vars: Dict[str, VarConfig] = {}
     steps: List[ModuleStep] = []
 
@@ -45,7 +45,7 @@ class WorkflowStep(BaseModel):
 
 class WorkflowSchema(BaseModel):
     type: str = Field(pattern='^workflow$')
-    info: InfoBlock
+    info: InfoBlock = Field(alias="metadata")
     vars: Dict[str, VarConfig] = {}
     workflow: List[WorkflowStep] = []
 

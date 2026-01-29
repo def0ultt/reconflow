@@ -33,7 +33,7 @@ class WorkflowManager:
                          wf_id = os.path.splitext(os.path.basename(filepath))[0]
                      
                      self.workflows[wf_id] = data
-                     print(f"[+] Loaded YAML Workflow: {wf_id}")
+                     print(f"[*] Loaded YAML Workflow: {wf_id}")
              except Exception as e:
                  print(f"Error loading workflow {filepath}: {e}")
 

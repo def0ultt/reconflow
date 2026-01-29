@@ -1,4 +1,5 @@
 
+type: module
 metadata:
   id: mock-tool
   name: Mock Tool
@@ -9,5 +10,6 @@ inputs:
 
 steps:
   - id: write
+    name: Write to File
     tool: echo
     args: '"{{inputs.text}}" >> {{project_path}}/{{inputs.outfile}}'
