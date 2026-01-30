@@ -1,50 +1,34 @@
 type: module
-
 info:
-  id: full-recon
-  name: Full Reconnaissance
-  description: Complete recon pipeline with parallel execution
+  id: recon-openredirect
+  name: Open Redirect Detection
+  description: Crawl and test for open redirects
   author: charlie
-
 vars:
   target:
     required: true
-  wordlist:
-    default: "/usr/share/wordlists/common.txt"
+  payloads:
+    default: "/home/defaut/toolkit/web/loxs/payloads/or.txt"
   threads:
     default: 50
-
+  depth:
+    default: 3
+  header:
+    default: "User-Agent: Mozilla/5.0"
 steps:
-  # Phase 1: Parallel discovery
-  - name: subdomain_enum
-    tool: subfinder
-    args: "-d {{target}} -t {{threads}}"
-    capture: true
-  
-  - name: dns_enum
-    tool: dnsenum
-    args: "{{target}}"
-  
-  - name: whois_lookup
-    tool: whois
-    args: "{{target}}"
-  
-  # Phase 2: Port scanning (depends on subdomains)
-  - name: port_scan
-    tool: nmap
-    args: "-iL {{subdomain_enum.output}} -p- -T4"
-    depends_on: [subdomain_enum]
+  # Phase 1: Crawl URLs and save to file
+  - name: katana_enum
+    tool: katana
+    args: "-u {{target}} -d {{depth}} -aff -xhr -fx -sb -H '{{header}}' -cos '.*\\/logout.*' -silent"
+  # Phase 2: Inject payloads into each URL
+  - name: inject_payloads
+    tool: /bin/bash
+    args: "-c 'cat {{payloads}} | while read payload; do cat {{katana_enum.output}} | zap \"$payload\"; done'"
+    depends_on: [katana_enum]
     timeout: "1h"
-    capture: true
-  
-  # Phase 3: Directory brute force (parallel with port scan)
-  - name: dir_brute
-    tool: ffuf
-    args: "-u https://{{target}}/FUZZ -w {{wordlist}}"
-    depends_on: []  # Independent
-  
-  # Phase 4: Vulnerability scanning (after port scan)
-  - name: vuln_scan
-    tool: nuclei
-    args: "-l {{port_scan.output}}"
-    depends_on: [port_scan]
+  # Phase 3: Test with httpx
+  - name: httpx_test
+    tool: httpx
+    args: " -fr -mr 'google.com' -location -H '{{header}}' -random-agent -threads {{threads}}"
+    stdin: true
+    depends_on: [inject_payloads]

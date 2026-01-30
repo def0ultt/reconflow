@@ -10,8 +10,26 @@ class InfoBlock(BaseModel):
     description: str = ""
 
 class VarConfig(BaseModel):
+    type: str = "string"  # "string" or "boolean"
     default: Optional[Any] = None
     required: bool = False
+    flag: Optional[str] = None  # CLI flag for boolean variables
+    
+    @model_validator(mode='after')
+    def validate_boolean_config(self):
+        """Validate boolean variable configuration"""
+        if self.type == "boolean":
+            # Validate default is boolean or None
+            if self.default is not None and not isinstance(self.default, bool):
+                raise ValueError(f"Boolean variable must have boolean default, got {type(self.default).__name__}")
+        elif self.type != "string":
+            raise ValueError(f"Variable type must be 'string' or 'boolean', got '{self.type}'")
+        
+        # Only boolean variables can have flags
+        if self.flag and self.type != "boolean":
+            raise ValueError("Only boolean variables can have a 'flag' field")
+        
+        return self
 
 class OutputConfig(BaseModel):
     path: Optional[str] = None

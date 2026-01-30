@@ -6,6 +6,7 @@ class Option(BaseModel):
     value: Any = None
     required: bool = True
     description: str = ""
+    metadata: Dict[str, Any] = {}  # Store type, flag, etc.
 
 class BaseModule:
     """

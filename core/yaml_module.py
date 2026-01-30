@@ -5,9 +5,20 @@ import os
 import concurrent.futures
 import threading
 import time
+import json
+from datetime import datetime
 from jinja2 import Environment, StrictUndefined
 from core.base import BaseModule, Option
 from core.schema import validate_yaml, ModuleSchema
+from utils.progress import ProgressTracker
+from utils.output_formatter import (
+    format_tool_execution,
+    format_output_saved,
+    format_command_error,
+    format_deadlock_error,
+    format_step_skipped,
+    console
+)
 
 class GenericYamlModule(BaseModule):
     """
@@ -55,7 +66,11 @@ class GenericYamlModule(BaseModule):
                 name=name,
                 value=config.default,
                 required=config.required,
-                description=f"Variable: {name}"
+                description=f"Variable: {name}",
+                metadata={
+                    'type': config.type,
+                    'flag': config.flag
+                }
             )
 
     def run(self, context) -> Dict[str, Any]:
@@ -67,6 +82,11 @@ class GenericYamlModule(BaseModule):
             print("[!] No schema loaded.")
             return {}
 
+        # Initialize progress tracker
+        total_steps = len(self.schema.steps)
+        progress = ProgressTracker(total_steps)
+        progress.start()
+
         # 1. Prepare Context (Strict Scoping)
         render_ctx = {}
         
@@ -76,7 +96,19 @@ class GenericYamlModule(BaseModule):
                 raise ValueError(f"Variable '{name}' is required but has no value.")
             
             if opt.value is not None:
-                render_ctx[name] = opt.value
+                # Check if boolean variable
+                var_type = opt.metadata.get('type', 'string')
+                
+                if var_type == "boolean":
+                    # Inject flag if True, empty string if False
+                    if opt.value is True:
+                        flag = opt.metadata.get('flag', '')
+                        render_ctx[name] = flag
+                    else:
+                        render_ctx[name] = ""
+                else:
+                    # Regular string variable
+                    render_ctx[name] = opt.value
 
         # 2. Build Dependency Graph
         steps_map = {step.name: step for step in self.schema.steps}
@@ -96,65 +128,77 @@ class GenericYamlModule(BaseModule):
              except:
                  pass
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-            while pending_steps or running_futures:
-                # 1. Check for completed futures
-                done, _ = concurrent.futures.wait(
-                    running_futures.keys(), 
-                    timeout=0.5, 
-                    return_when=concurrent.futures.FIRST_COMPLETED
-                )
+        try:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                while pending_steps or running_futures:
+                    # 1. Check for completed futures
+                    done, _ = concurrent.futures.wait(
+                        running_futures.keys(), 
+                        timeout=0.5, 
+                        return_when=concurrent.futures.FIRST_COMPLETED
+                    )
 
-                for future in done:
-                    step_name = running_futures.pop(future)
-                    try:
-                        result = future.result()
-                        # Result logic (store output)
-                        with self._lock:
-                            self._execution_results[step_name] = result
-                            completed_steps.add(step_name)
-                            
-                            step_ctx = {
-                                'output': result.get('output_file'),
-                                'stdout': result.get('stdout'),
-                                'stderr': result.get('stderr')
-                            }
-                            render_ctx[step_name] = step_ctx
-                            
-                    except Exception as e:
-                        print(f"[!] Step '{step_name}' failed: {e}")
-                        failed_steps.add(step_name)
+                    for future in done:
+                        step_name = running_futures.pop(future)
+                        try:
+                            result = future.result()
+                            # Result logic (store output)
+                            with self._lock:
+                                self._execution_results[step_name] = result
+                                completed_steps.add(step_name)
+                                
+                                step_ctx = {
+                                    'output': result.get('output_file'),
+                                    'stdout': result.get('stdout'),
+                                    'stderr': result.get('stderr')
+                                }
+                                render_ctx[step_name] = step_ctx
+                                
+                                # Update progress
+                                progress.update(len(completed_steps))
+                                
+                        except Exception as e:
+                            # Format professional error message
+                            failed_steps.add(step_name)
+                            # Still count as progress (failed but completed)
+                            progress.update(len(completed_steps) + len(failed_steps))
 
-                # 2. Submit new steps
-                submission_list = []
-                for step_name in pending_steps[:]:
-                    deps = dependencies[step_name]
-                    if deps.issubset(completed_steps):
-                        # Ready to run!
-                        step = steps_map[step_name]
-                        
-                        can_run = True
-                        if not step.parallel and running_futures:
-                             can_run = len(running_futures) == 0
-                        
-                        if can_run:
-                            for running_step_name in running_futures.values():
-                                r_step = steps_map[running_step_name]
-                                if not r_step.parallel:
-                                    can_run = False
-                                    break
-                                    
-                        if can_run:
-                            pending_steps.remove(step_name)
-                            step_context = render_ctx.copy()
-                            future = executor.submit(self._execute_step, step, step_context, context)
-                            running_futures[future] = step_name
-                
-                if not running_futures and pending_steps:
-                    print("[!] Deadlock or Dependency Failure detected.")
-                    print(f"Pending: {pending_steps}")
-                    print(f"Failed: {failed_steps}")
-                    break
+                    # 2. Submit new steps
+                    submission_list = []
+                    for step_name in pending_steps[:]:
+                        deps = dependencies[step_name]
+                        if deps.issubset(completed_steps):
+                            # Ready to run!
+                            step = steps_map[step_name]
+                            
+                            can_run = True
+                            if not step.parallel and running_futures:
+                                 can_run = len(running_futures) == 0
+                            
+                            if can_run:
+                                for running_step_name in running_futures.values():
+                                    r_step = steps_map[running_step_name]
+                                    if not r_step.parallel:
+                                        can_run = False
+                                        break
+                                        
+                            if can_run:
+                                pending_steps.remove(step_name)
+                                step_context = render_ctx.copy()
+                                future = executor.submit(self._execute_step, step, step_context, context)
+                                running_futures[future] = step_name
+                    
+                    if not running_futures and pending_steps:
+                        format_deadlock_error(pending_steps, failed_steps)
+                        break
+
+            # Mark as complete
+            progress.complete()
+            
+        except Exception as e:
+            # Ensure progress tracker stops on error
+            progress.stop()
+            raise e
 
         return self._execution_results
 
@@ -169,17 +213,17 @@ class GenericYamlModule(BaseModule):
             try:
                 cond_str = self._render_template(step.condition, render_ctx)
                 if not eval(cond_str):
-                    print(f"[*] Skipping step '{step_id}' (Condition met: {cond_str})")
+                    format_step_skipped(step_id, cond_str)
                     return {'skipped': True, 'stdout': '', 'output_file': None}
             except Exception as e:
-                print(f"[!] Condition evaluation failed for '{step_id}': {e}")
+                console.print(f"[red]⚠️  Condition evaluation failed for '{step_id}': {e}[/red]")
                 return {'skipped': True, 'error': str(e)}
 
         # 2. Resolve Arguments
         try:
             cmd_args = self._render_template(step.args, render_ctx)
         except Exception as e:
-             print(f"[!] Template rendering failed for arguments in '{step_id}': {e}")
+             console.print(f"[red]❌ Template rendering failed for arguments in '{step_id}': {e}[/red]")
              raise e 
 
         # 3. Execute
@@ -206,7 +250,9 @@ class GenericYamlModule(BaseModule):
             tool_cmd = custom_path
             
         full_cmd = f"{tool_cmd} {cmd_args}"
-        print(f"[*] Executing Tool '{step_id}': {full_cmd}")
+        
+        # Format professional tool execution message
+        format_tool_execution(step_id, tool_cmd, full_cmd)
 
         # Output Path Logic
         output_path = None
@@ -230,6 +276,7 @@ class GenericYamlModule(BaseModule):
         # Timeout
         timeout_sec = self._parse_timeout(step.timeout)
 
+        start_time = time.time()
         try:
             proc = subprocess.run(
                 full_cmd,
@@ -240,25 +287,42 @@ class GenericYamlModule(BaseModule):
                 input=input_data,
                 timeout=timeout_sec
             )
+            duration = time.time() - start_time
             
-            # Handle Output
-            self._handle_output_file(output_path, proc.stdout, full_context)
+            # AUTOMATIC OUTPUT SAVING (ALWAYS)
+            auto_output_path = self._get_auto_output_path(step, full_context)
+            if auto_output_path:
+                self._save_step_output(
+                    auto_output_path, 
+                    proc.stdout, 
+                    proc.stderr, 
+                    step, 
+                    duration,
+                    full_cmd
+                )
+                # Show save confirmation
+                format_output_saved(auto_output_path)
+            
+            # Handle user-specified output (backward compatibility)
+            if output_path:
+                self._handle_output_file(output_path, proc.stdout, full_context)
 
             return {
                 'stdout': proc.stdout,
                 'stderr': proc.stderr,
-                'output_file': output_path,
+                'output_file': auto_output_path or output_path,
                 'return_code': proc.returncode
             }
 
         except subprocess.CalledProcessError as e:
-            print(f"[!] Error executing tool step {step_id}: {e}")
+            # Format professional error message
+            format_command_error(step_id, e, full_cmd)
             raise e 
 
     def _run_submodule(self, step, cmd_args, render_ctx, full_context):
         step_id = step.name
         mod_ref = step.module
-        print(f"[*] Executing Submodule '{step_id}': {mod_ref}")
+        console.print(f"\n🔧 [bold cyan]Running Submodule:[/bold cyan] [yellow]{mod_ref}[/yellow]")
         
         # 1. Resolve Module
         target_mod = None
@@ -314,7 +378,7 @@ class GenericYamlModule(BaseModule):
             with open(output_path, 'w') as f:
                 f.write(content)
         except Exception as e:
-            print(f"[!] Failed to write output to {output_path}: {e}")
+            console.print(f"[red]⚠️  Failed to write output to {output_path}: {e}[/red]")
 
         # Copy to project
         if context.current_project:
@@ -326,3 +390,66 @@ class GenericYamlModule(BaseModule):
                      shutil.copy(output_path, proj_path)
                  except:
                      pass
+
+    def _get_auto_output_path(self, step, context):
+        """Generate automatic output path for step execution"""
+        if not context or not hasattr(context, 'current_project') or not context.current_project:
+            return None
+        
+        project_path = context.current_project.path
+        module_id = self.meta.get('id', 'unknown')
+        step_name = step.name
+        
+        # Create module directory
+        module_dir = os.path.join(project_path, module_id)
+        os.makedirs(module_dir, exist_ok=True)
+        
+        # Generate output filename
+        output_file = f"{step_name}.txt"
+        return os.path.join(module_dir, output_file)
+    
+    def _save_step_output(self, path, stdout, stderr, step, duration, command):
+        """Save step output with metadata"""
+        try:
+            # Save main output
+            with open(path, 'w') as f:
+                if stdout:
+                    f.write(stdout)
+                if stderr:
+                    f.write("\n\n--- STDERR ---\n")
+                    f.write(stderr)
+            
+            # Calculate line count
+            line_count = 0
+            if stdout:
+                line_count = len(stdout.splitlines())
+            
+            # Save metadata
+            metadata = {
+                'step_name': step.name,
+                'module_id': self.meta.get('id', 'unknown'),
+                'module_name': self.meta.get('name', 'Unknown'),
+                'timestamp': datetime.now().isoformat(),
+                'duration_seconds': round(duration, 2),
+                'line_count': line_count,
+                'file_size': os.path.getsize(path),
+                'command': command,
+                'exit_code': 0
+            }
+            
+            meta_path = path.replace('.txt', '.meta.json')
+            with open(meta_path, 'w') as f:
+                json.dump(metadata, f, indent=2)
+                
+        except Exception as e:
+            # Retry once
+            try:
+                time.sleep(0.5)
+                with open(path, 'w') as f:
+                    if stdout:
+                        f.write(stdout)
+                    if stderr:
+                        f.write("\n\n--- STDERR ---\n")
+                        f.write(stderr)
+            except Exception as retry_error:
+                console.print(f"[red]⚠️  Failed to save output: {retry_error}[/red]")

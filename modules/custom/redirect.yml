@@ -1,0 +1,47 @@
+type: module
+
+info:
+  id: open-redirect-simple
+  name: Open Redirect Scanner (Simple)
+  description: Tests for open redirect vulnerabilities - no conditions
+  author: defaut
+
+vars:
+  input_file:
+    required: true
+  
+  payloads:
+    default: "/home/defaut/toolkit/web/loxs/payloads/or.txt"
+  
+  header:
+    default: "User-Agent: Mozilla/5.0"
+  
+  proxy:
+    default: ""
+    # Leave empty for no proxy, or set to http://127.0.0.1:8080
+  
+  output_file:
+    default: "open_redirect.txt"
+
+steps:
+  - name: open_redirect_scan
+    tool: bash
+    args: |
+      # Build the command dynamically
+      if [ -z "{{proxy}}" ]; then
+        # No proxy
+        cat {{input_file}} | zap | while read url; do
+          cat {{payloads}} | while read payload; do
+            echo "$url" | qsreplace "$payload"
+          done
+        done | httpx-toolkit -fr -mr 'google.com' -location -H '{{header}}' -random-agent | tee {{output_file}}
+      else
+        # With proxy
+        cat {{input_file}} | zap | while read url; do
+          cat {{payloads}} | while read payload; do
+            echo "$url" | qsreplace "$payload"
+          done
+        done | httpx-toolkit -fr -mr 'google.com' -location -H '{{header}}' -http-proxy={{proxy}} -random-agent | tee {{output_file}}
+      fi
+    timeout: "30m"
+    capture: true

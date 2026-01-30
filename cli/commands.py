@@ -45,9 +45,18 @@ def cmd_back(ctx: Context, arg: str):
     ctx.active_module = None
     ctx.active_module_path = None
 
+def parse_boolean(value: str):
+    """Parse string to boolean. Returns None if invalid."""
+    val_lower = value.lower().strip()
+    if val_lower in ('true', 'yes', '1', 'on'):
+        return True
+    elif val_lower in ('false', 'no', '0', 'off'):
+        return False
+    return None
+
 def cmd_set(ctx: Context, arg: str):
     if not ctx.active_module:
-        print(" No active module. Use 'use <module>' first.")
+        print("❌ No active module. Use 'use <module>' first.")
         return
 
     parts = arg.split(maxsplit=1)
@@ -57,8 +66,26 @@ def cmd_set(ctx: Context, arg: str):
     
     opt, val = parts[0].lower(), parts[1]
     
-    # Variable Substitution
-    if val.startswith('$'):
+    # Check if option exists
+    if opt not in ctx.active_module.options:
+        print(f"❌ Option '{opt}' not found.")
+        return
+    
+    option_obj = ctx.active_module.options[opt]
+    
+    # Get variable type from metadata
+    var_type = option_obj.metadata.get('type', 'string')
+    
+    # Handle boolean variables
+    if var_type == "boolean":
+        # Parse boolean value
+        bool_val = parse_boolean(val)
+        if bool_val is None:
+            console.print(f"[red]Error: '{val}' is not a valid boolean value. Use: true, false, yes, no, 1, 0[/red]")
+            return
+        val = bool_val
+    # Variable Substitution for string variables
+    elif val.startswith('$'):
         var_key = val
         project_id = ctx.current_project.id if ctx.current_project else None
         resolved = ctx.settings_manager.get_variable(var_key, project_id)
@@ -71,9 +98,9 @@ def cmd_set(ctx: Context, arg: str):
             return
 
     if ctx.active_module.update_option(opt, val):
-        print(f"{opt} => {val}")
+        print(f"✅ {opt} => {val}")
     else:
-        print(f" Option '{opt}' not found.")
+        print(f"❌ Option '{opt}' not found.")
         
 
 from cli.session_cmd import cmd_sessions
@@ -125,12 +152,30 @@ def cmd_show(ctx: Context, arg: str):
         
         table = Table(title=f"Module Options ({ctx.active_module.meta['name']})")
         table.add_column("Name", style="cyan")
+        table.add_column("Type", style="yellow")
         table.add_column("Current Setting", style="magenta")
         table.add_column("Required", style="green")
         table.add_column("Description", style="dim white")
 
         for name, opt in ctx.active_module.options.items():
-            table.add_row(name, str(opt.value), str(opt.required), opt.description)
+            var_type = opt.metadata.get('type', 'string')
+            
+            # Format current value
+            current_val = str(opt.value)
+            if var_type == "boolean":
+                flag = opt.metadata.get('flag')
+                if flag and opt.value:
+                    current_val = f"{opt.value} (flag: {flag})"
+                else:
+                    current_val = str(opt.value)
+            
+            table.add_row(
+                name, 
+                var_type,
+                current_val, 
+                str(opt.required), 
+                opt.description
+            )
         
         console.print(table)
     
@@ -379,73 +424,219 @@ def cmd_create_project(ctx: Context, arg: str):
         print(f"[-] Project '{target}' not found.")
 
 def cmd_ls(ctx: Context, arg: str):
+    """List files from current project organized by module"""
     if not ctx.current_project:
         console.print("[red][-] No active project. Use 'project <name>' first.[/red]")
         return
     
-    files = ctx.project_repo.get_files(ctx.current_project.id)
-    if not files:
-        console.print("[yellow]No files in this project.[/yellow]")
+    project_path = ctx.current_project.path
+    
+    if not os.path.exists(project_path):
+        console.print("[yellow]Project directory not found.[/yellow]")
         return
-
-    table = Table(title=f"Files in {ctx.current_project.name}",box=None,show_header=True, header_style="bold cyan")
-    table.add_column("[red]Path[/red]", style="bold blue", justify="center")
-    table.add_column("[red]Size (B)[/red]", style="bold white", justify="center")
-    table.add_column("[red]Date[/red]", style="bold white", justify="center")
-
-    project_root = ctx.current_project.path
-    for f in files:
-        # Calculate relative path
-        try:
-           rel_path = os.path.relpath(f.file_path, project_root)
-        except ValueError:
-           rel_path = f.file_path
+    
+    # Scan filesystem for module directories
+    files_data = []
+    
+    for item in os.listdir(project_path):
+        item_path = os.path.join(project_path, item)
         
-        table.add_row(rel_path, str(f.file_size_bytes), str(f.created_at))
+        # Skip hidden directories and non-directories
+        if item.startswith('.') or not os.path.isdir(item_path):
+            continue
+        
+        module_name = item
+        
+        # Scan for .txt files in module directory
+        for file in os.listdir(item_path):
+            if not file.endswith('.txt'):
+                continue
+            
+            file_path = os.path.join(item_path, file)
+            step_name = file.replace('.txt', '')
+            
+            # Get file stats
+            stat = os.stat(file_path)
+            file_size = stat.st_size
+            mtime = stat.st_mtime
+            
+            # Calculate line count
+            try:
+                with open(file_path, 'r') as f:
+                    line_count = sum(1 for _ in f)
+            except:
+                line_count = 0
+            
+            # Format time (HH:MM)
+            from datetime import datetime
+            scan_time = datetime.fromtimestamp(mtime).strftime("%H:%M")
+            
+            # Format size (human readable)
+            if file_size < 1024:
+                size_str = f"{file_size} B"
+            elif file_size < 1024 * 1024:
+                size_str = f"{file_size // 1024} KB"
+            else:
+                size_str = f"{file_size // (1024 * 1024)} MB"
+            
+            files_data.append({
+                'module': module_name,
+                'step': step_name,
+                'size': size_str,
+                'lines': line_count,
+                'time': scan_time
+            })
+    
+    if not files_data:
+        console.print("[yellow]No output files found in this project.[/yellow]")
+        return
+    
+    # Create table
+    table = Table(
+        title=f"Project: {ctx.current_project.name}",
+        show_header=True,
+        header_style="bold cyan"
+    )
+    
+    table.add_column("Module", style="green", justify="left")
+    table.add_column("Step", style="cyan", justify="left")
+    table.add_column("Size", style="yellow", justify="right")
+    table.add_column("Lines", style="magenta", justify="right")
+    table.add_column("Scan Time", style="blue", justify="center")
+    
+    # Add rows
+    for file_info in files_data:
+        table.add_row(
+            file_info['module'],
+            file_info['step'],
+            file_info['size'],
+            str(file_info['lines']),
+            file_info['time']
+        )
     
     console.print()
     console.print(table)
     console.print()
 
 def cmd_cat(ctx: Context, arg: str):
+    """Display file content with metadata header"""
     if not ctx.current_project:
         console.print("[red]No active project. Use 'project <name>' first.[/red]")
         return
     
     if not arg:
-        print("Usage: cat <filename>")
+        print("Usage: cat <module>/<file> or cat <file>")
         return
 
-    filename = arg
-    content = ctx.file_manager.get_file_content(ctx.current_project.id, filename)
+    project_path = ctx.current_project.path
+    file_path = None
     
-    if content:
-        console.print(f"[bold cyan][*] SQLite read file: {filename}[/bold cyan]")
+    # Parse argument: module/file or just file
+    if '/' in arg:
+        # Format: module/file
+        parts = arg.split('/', 1)
+        module_name = parts[0]
+        filename = parts[1]
         
-        # Display as Table as requested
-        # We try to detect structure. 
-        # If simple lines, single column. 
-        # If CSV-like (comma/tab), split it? 
-        # For complexity, let's treat it as single column lines for now, or raw if JSON.
+        if not filename.endswith('.txt'):
+            filename += '.txt'
         
-        lines = content.strip().splitlines()
+        file_path = os.path.join(project_path, module_name, filename)
+    else:
+        # Search all modules for the file
+        search_name = arg if arg.endswith('.txt') else f"{arg}.txt"
         
-        # JSON detection for pretty printing
-        if filename.endswith('.json') or (content.strip().startswith('{') and content.strip().endswith('}')):
-             syntax = Syntax(content, "json", theme="monokai", line_numbers=True)
-             console.print(syntax)
-             return
-
-        # Table display for text files
-        result_table = Table(box=None, show_header=False)
+        for item in os.listdir(project_path):
+            item_path = os.path.join(project_path, item)
+            if os.path.isdir(item_path) and not item.startswith('.'):
+                potential_path = os.path.join(item_path, search_name)
+                if os.path.exists(potential_path):
+                    file_path = potential_path
+                    break
+    
+    if not file_path or not os.path.exists(file_path):
+        console.print(f"[red]File not found: {arg}[/red]")
+        console.print("[dim]Usage: cat <module>/<file> or cat <filename>[/dim]")
+        return
+    
+    # Load metadata if available
+    meta_path = file_path.replace('.txt', '.meta.json')
+    metadata = {}
+    if os.path.exists(meta_path):
+        try:
+            with open(meta_path, 'r') as f:
+                metadata = json.load(f)
+        except:
+            pass
+    
+    # Read file content
+    try:
+        with open(file_path, 'r') as f:
+            content = f.read()
+    except Exception as e:
+        console.print(f"[red]Error reading file: {e}[/red]")
+        return
+    
+    # Display with metadata header
+    from rich.panel import Panel
+    from rich.syntax import Syntax
+    
+    # Build header info
+    header_lines = []
+    rel_path = os.path.relpath(file_path, project_path)
+    header_lines.append(f"[bold cyan]File:[/bold cyan] {rel_path}")
+    
+    if metadata:
+        if 'timestamp' in metadata:
+            from datetime import datetime
+            try:
+                dt = datetime.fromisoformat(metadata['timestamp'])
+                time_str = dt.strftime("%Y-%m-%d %H:%M:%S")
+                header_lines.append(f"[bold cyan]Executed:[/bold cyan] {time_str}")
+            except:
+                pass
+        
+        if 'duration_seconds' in metadata:
+            header_lines.append(f"[bold cyan]Duration:[/bold cyan] {metadata['duration_seconds']}s")
+        
+        if 'line_count' in metadata and 'file_size' in metadata:
+            size = metadata['file_size']
+            if size < 1024:
+                size_str = f"{size} B"
+            elif size < 1024 * 1024:
+                size_str = f"{size // 1024} KB"
+            else:
+                size_str = f"{size // (1024 * 1024)} MB"
+            header_lines.append(f"[bold cyan]Stats:[/bold cyan] {metadata['line_count']} lines | {size_str}")
+        
+        if 'command' in metadata:
+            header_lines.append(f"[bold cyan]Command:[/bold cyan] {metadata['command']}")
+    
+    # Display header
+    if header_lines:
+        header_text = "\n".join(header_lines)
+        console.print(Panel(header_text, border_style="cyan", padding=(0, 1)))
+        console.print()
+    
+    # Display content
+    lines = content.strip().splitlines()
+    
+    # Detect if JSON for syntax highlighting
+    if file_path.endswith('.json') or (content.strip().startswith('{') and content.strip().endswith('}')):
+        syntax = Syntax(content, "json", theme="monokai", line_numbers=True)
+        console.print(syntax)
+    else:
+        # Display as table for better readability
+        result_table = Table(box=None, show_header=False, padding=(0, 1))
         result_table.add_column("Content", style="white")
         
-        for line in lines:
+        for line in lines[:100]:  # Limit to first 100 lines
             result_table.add_row(line)
         
         console.print(result_table)
-    else:
-        console.print(f"[red]File '{filename}' not found in project.[/red]")
+        
+        if len(lines) > 100:
+            console.print(f"\n[dim]... {len(lines) - 100} more lines (showing first 100)[/dim]")
 
 def cmd_list_modules(ctx: Context, mode: str):
     """

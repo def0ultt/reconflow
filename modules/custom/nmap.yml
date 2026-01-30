@@ -1,0 +1,25 @@
+type: module
+
+info:
+  id: port-scan
+  name: Port Scan with Service Detection
+  description: Complete recon pipeline with parallel execution
+  author: charlie
+
+vars:
+  target:
+    required: true
+  
+  service_scan:
+    type: boolean
+    default: false
+    flag: "-sV"
+
+steps:
+  # Phase 1: Parallel discovery
+  - name: nmap-scan
+    tool: naabu 
+    args: "-host {{target}} -p - -silent -nmap-cli \"nmap {{service_scan}} --min-rate 1000 --max-retries 5 -oN nmap_scan.txt\""
+  
+  
+  
