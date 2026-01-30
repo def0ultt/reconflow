@@ -1,4 +1,6 @@
 from core.context import Context
+from core.file_reader import FileReader
+from utils.formatter import OutputFormatter
 from rich.console import Console
 from rich.table import Table
 import os
@@ -6,9 +8,13 @@ from rich.text import Text
 from rich import box
 import shutil
 import yaml
+import json
 from utils.paths import get_project_root
 
 console = Console()
+file_reader = FileReader()
+formatter = OutputFormatter()
+
 
 def cmd_use(ctx: Context, arg: str):
     if not arg:
@@ -311,7 +317,8 @@ def cmd_help(ctx: Context, arg: str):
         ("project", "Switch project(add -c for create and -d for delete )"),
         ("sessions", "Manage background sessions"),
         ("ls", "List files for current project"),
-        ("cat","view file contents in  current project "),
+        ("cat","view file contents in current project "),
+        ("bcat","view file as formatted table (JSON) or text"),
         ("import","Import a module from a YAML file"),
         ("help", "Help menu"),
         ("settings", "Open settings menu"),
@@ -519,7 +526,7 @@ def cmd_ls(ctx: Context, arg: str):
     console.print()
 
 def cmd_cat(ctx: Context, arg: str):
-    """Display file content with metadata header"""
+    """Display raw file content (no formatting)"""
     if not ctx.current_project:
         console.print("[red]No active project. Use 'project <name>' first.[/red]")
         return
@@ -559,34 +566,74 @@ def cmd_cat(ctx: Context, arg: str):
         console.print("[dim]Usage: cat <module>/<file> or cat <filename>[/dim]")
         return
     
-    # Load metadata if available
-    meta_path = file_path.replace('.txt', '.meta.json')
-    metadata = {}
-    if os.path.exists(meta_path):
-        try:
-            with open(meta_path, 'r') as f:
-                metadata = json.load(f)
-        except:
-            pass
-    
-    # Read file content
+    # Read and display raw content
     try:
         with open(file_path, 'r') as f:
             content = f.read()
+        
+        # Print raw content without any formatting
+        print(content)
     except Exception as e:
         console.print(f"[red]Error reading file: {e}[/red]")
+
+
+def cmd_bcat(ctx: Context, arg: str):
+    """Display file as formatted table (if JSON) or text - Beautiful Cat"""
+    if not ctx.current_project:
+        console.print("[red]No active project. Use 'project <name>' first.[/red]")
         return
     
-    # Display with metadata header
-    from rich.panel import Panel
-    from rich.syntax import Syntax
+    if not arg:
+        print("Usage: bcat <module>/<file> or bcat <file>")
+        return
+
+    project_path = ctx.current_project.path
+    file_path = None
     
-    # Build header info
+    # Parse argument: module/file or just file
+    if '/' in arg:
+        # Format: module/file
+        parts = arg.split('/', 1)
+        module_name = parts[0]
+        filename = parts[1]
+        
+        if not filename.endswith('.txt'):
+            filename += '.txt'
+        
+        file_path = os.path.join(project_path, module_name, filename)
+    else:
+        # Search all modules for the file
+        search_name = arg if arg.endswith('.txt') else f"{arg}.txt"
+        
+        for item in os.listdir(project_path):
+            item_path = os.path.join(project_path, item)
+            if os.path.isdir(item_path) and not item.startswith('.'):
+                potential_path = os.path.join(item_path, search_name)
+                if os.path.exists(potential_path):
+                    file_path = potential_path
+                    break
+    
+    if not file_path or not os.path.exists(file_path):
+        console.print(f"[red]File not found: {arg}[/red]")
+        console.print("[dim]Usage: bcat <module>/<file> or bcat <filename>[/dim]")
+        return
+    
+    # Use server-side file reader
+    data = file_reader.read_output_file(file_path)
+    
+    if not data['exists']:
+        console.print(f"[red]File not found: {arg}[/red]")
+        return
+    
+    # Display metadata header
+    from rich.panel import Panel
     header_lines = []
     rel_path = os.path.relpath(file_path, project_path)
     header_lines.append(f"[bold cyan]File:[/bold cyan] {rel_path}")
     
-    if metadata:
+    if data['metadata']:
+        metadata = data['metadata']
+        
         if 'timestamp' in metadata:
             from datetime import datetime
             try:
@@ -599,34 +646,54 @@ def cmd_cat(ctx: Context, arg: str):
         if 'duration_seconds' in metadata:
             header_lines.append(f"[bold cyan]Duration:[/bold cyan] {metadata['duration_seconds']}s")
         
-        if 'line_count' in metadata and 'file_size' in metadata:
-            size = metadata['file_size']
-            if size < 1024:
-                size_str = f"{size} B"
-            elif size < 1024 * 1024:
-                size_str = f"{size // 1024} KB"
-            else:
-                size_str = f"{size // (1024 * 1024)} MB"
-            header_lines.append(f"[bold cyan]Stats:[/bold cyan] {metadata['line_count']} lines | {size_str}")
+        if 'tool' in metadata:
+            header_lines.append(f"[bold cyan]Tool:[/bold cyan] {metadata['tool']}")
         
-        if 'command' in metadata:
-            header_lines.append(f"[bold cyan]Command:[/bold cyan] {metadata['command']}")
+        if 'has_json' in metadata and metadata['has_json']:
+            header_lines.append(f"[bold green]✓ JSON:[/bold green] {metadata.get('record_count', 0)} records")
+        else:
+            header_lines.append(f"[bold yellow]⚠ JSON:[/bold yellow] Not available (showing raw text)")
     
-    # Display header
     if header_lines:
         header_text = "\n".join(header_lines)
         console.print(Panel(header_text, border_style="cyan", padding=(0, 1)))
         console.print()
     
-    # Display content
-    lines = content.strip().splitlines()
-    
-    # Detect if JSON for syntax highlighting
-    if file_path.endswith('.json') or (content.strip().startswith('{') and content.strip().endswith('}')):
-        syntax = Syntax(content, "json", theme="monokai", line_numbers=True)
-        console.print(syntax)
+    # Check if JSON available
+    if data['has_json'] and data['json_data']:
+        # Use server-side formatter
+        table_data = formatter.format_as_table_data(data['json_data'])
+        
+        if table_data['total'] == 0:
+            console.print("[yellow]No data to display[/yellow]")
+            return
+        
+        # Render table (CLI-specific rendering)
+        result_table = Table(show_header=True, header_style="bold cyan", box=box.ROUNDED)
+        
+        # Add columns
+        for col in table_data['columns']:
+            result_table.add_column(col.title(), style="white")
+        
+        # Add rows (limit to 100 for display)
+        display_limit = 100
+        for i, row in enumerate(table_data['rows']):
+            if i >= display_limit:
+                break
+            result_table.add_row(*row)
+        
+        console.print(result_table)
+        
+        # Show summary
+        if table_data['total'] > display_limit:
+            console.print(f"\n[dim]Showing {display_limit} of {table_data['total']} records[/dim]")
+        else:
+            console.print(f"\n[dim]Total: {table_data['total']} records[/dim]")
     else:
-        # Display as table for better readability
+        # Fallback to raw text display
+        console.print("[yellow]No JSON data available. Displaying raw text:[/yellow]\n")
+        
+        lines = data['raw_text'].strip().splitlines()
         result_table = Table(box=None, show_header=False, padding=(0, 1))
         result_table.add_column("Content", style="white")
         
@@ -637,6 +704,7 @@ def cmd_cat(ctx: Context, arg: str):
         
         if len(lines) > 100:
             console.print(f"\n[dim]... {len(lines) - 100} more lines (showing first 100)[/dim]")
+
 
 def cmd_list_modules(ctx: Context, mode: str):
     """
@@ -721,6 +789,7 @@ COMMANDS = {
     'project': cmd_create_project,
     'ls': cmd_ls,
     'cat': cmd_cat,
+    'bcat': cmd_bcat,
     'help': cmd_help,
     'search': cmd_search,
     'options': cmd_options,

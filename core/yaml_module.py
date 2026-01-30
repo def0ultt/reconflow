@@ -10,6 +10,8 @@ from datetime import datetime
 from jinja2 import Environment, StrictUndefined
 from core.base import BaseModule, Option
 from core.schema import validate_yaml, ModuleSchema
+from core.parser import OutputParser
+from parsers.builtin import BUILTIN_PARSERS
 from utils.progress import ProgressTracker
 from utils.output_formatter import (
     format_tool_execution,
@@ -31,6 +33,10 @@ class GenericYamlModule(BaseModule):
         self.schema: ModuleSchema = None
         self._execution_results = {} # Stores output of executed steps: {step_name: output_data}
         self._lock = threading.Lock() # For thread-safe updates to results
+        
+        # Initialize parser with built-in parsers
+        self.parser = OutputParser()
+        self.parser.builtin_parsers = BUILTIN_PARSERS.copy()
         
         if yaml_path:
             self.load_from_yaml(yaml_path)
@@ -409,9 +415,9 @@ class GenericYamlModule(BaseModule):
         return os.path.join(module_dir, output_file)
     
     def _save_step_output(self, path, stdout, stderr, step, duration, command):
-        """Save step output with metadata"""
+        """Save step output with metadata and JSON parsing"""
         try:
-            # Save main output
+            # 1. Save raw text output
             with open(path, 'w') as f:
                 if stdout:
                     f.write(stdout)
@@ -419,14 +425,36 @@ class GenericYamlModule(BaseModule):
                     f.write("\n\n--- STDERR ---\n")
                     f.write(stderr)
             
-            # Calculate line count
+            # 2. Parse output to JSON (server-side)
+            tool_name = step.tool if step.tool else 'unknown'
+            json_data = None
+            
+            if stdout and stdout.strip():
+                json_data = self.parser.parse_to_json(stdout, tool_name)
+            
+            # 3. Save JSON if parsing successful
+            has_json = False
+            record_count = 0
+            
+            if json_data:
+                json_path = path.replace('.txt', '.json')
+                try:
+                    with open(json_path, 'w') as f:
+                        json.dump(json_data, f, indent=2)
+                    has_json = True
+                    record_count = len(json_data)
+                except Exception as e:
+                    console.print(f"[yellow]⚠️  Failed to save JSON: {e}[/yellow]")
+            
+            # 4. Calculate line count
             line_count = 0
             if stdout:
                 line_count = len(stdout.splitlines())
             
-            # Save metadata
+            # 5. Save enhanced metadata
             metadata = {
                 'step_name': step.name,
+                'tool': tool_name,
                 'module_id': self.meta.get('id', 'unknown'),
                 'module_name': self.meta.get('name', 'Unknown'),
                 'timestamp': datetime.now().isoformat(),
@@ -434,7 +462,10 @@ class GenericYamlModule(BaseModule):
                 'line_count': line_count,
                 'file_size': os.path.getsize(path),
                 'command': command,
-                'exit_code': 0
+                'exit_code': 0,
+                'has_json': has_json,
+                'record_count': record_count,
+                'parser_used': tool_name if has_json else None
             }
             
             meta_path = path.replace('.txt', '.meta.json')
@@ -453,3 +484,4 @@ class GenericYamlModule(BaseModule):
                         f.write(stderr)
             except Exception as retry_error:
                 console.print(f"[red]⚠️  Failed to save output: {retry_error}[/red]")
+

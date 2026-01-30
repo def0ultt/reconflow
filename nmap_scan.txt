@@ -1,153 +1,85 @@
-# Nmap 7.94SVN scan initiated Fri Jan 30 10:53:55 2026 as: /usr/bin/nmap -p 41729,36311,3306,33060,38649,631,5432,41887,1716,34239 -sV --min-rate 1000 --max-retries 5 -oN nmap_scan.txt -oX - 127.0.0.1
-Nmap scan report for crapi.local (127.0.0.1)
-Host is up (0.00041s latency).
+# Nmap 7.94SVN scan initiated Fri Jan 30 16:07:38 2026 as: /usr/bin/nmap -p 1716,38235,8443,3000 -sV --min-rate 1000 --max-retries 5 -oN nmap_scan.txt -oX - 127.0.0.2
+Nmap scan report for defaut-IdeaPad-L340-15IRH-Gaming (127.0.0.2)
+Host is up (0.000076s latency).
 
-PORT      STATE SERVICE     VERSION
-631/tcp   open  ipp         CUPS 2.4
+PORT      STATE SERVICE    VERSION
 1716/tcp  open  tcpwrapped
-3306/tcp  open  mysql       MySQL 8.0.44-0ubuntu0.24.04.2
-5432/tcp  open  postgresql  PostgreSQL DB 9.6.0 or later
-33060/tcp open  mysqlx?
-34239/tcp open  ssl/unknown
-36311/tcp open  unknown
-38649/tcp open  unknown
-41729/tcp open  unknown
-41887/tcp open  unknown
-6 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
+3000/tcp  open  ppp?
+8443/tcp  open  https-alt  uvicorn
+38235/tcp open  unknown
+3 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
 ==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
-SF-Port5432-TCP:V=7.94SVN%I=7%D=1/30%Time=697C7FBA%P=x86_64-pc-linux-gnu%r
-SF:(SMBProgNeg,8C,"E\0\0\0\x8bSFATAL\0VFATAL\0C0A000\0Munsupported\x20fron
-SF:tend\x20protocol\x2065363\.19778:\x20server\x20supports\x203\.0\x20to\x
-SF:203\.0\0Fpostmaster\.c\0L2149\0RProcessStartupPacket\0\0");
+SF-Port3000-TCP:V=7.94SVN%I=7%D=1/30%Time=697CC945%P=x86_64-pc-linux-gnu%r
+SF:(GetRequest,3B5,"HTTP/1\.1\x20200\x20OK\r\nContent-Length:\x20666\r\nCo
+SF:ntent-Disposition:\x20inline;\x20filename=\"index\.html\"\r\nAccept-Ran
+SF:ges:\x20bytes\r\nETag:\x20\"78c036184c43b555c1eebe32e333ddb294a34866\"\
+SF:r\nContent-Type:\x20text/html;\x20charset=utf-8\r\nVary:\x20Accept-Enco
+SF:ding\r\nDate:\x20Fri,\x2030\x20Jan\x202026\x2015:07:49\x20GMT\r\nConnec
+SF:tion:\x20close\r\n\r\n<!doctype\x20html><html\x20lang=\"en\"><head><met
+SF:a\x20charset=\"utf-8\"/><link\x20rel=\"icon\"\x20href=\"images/logo\.av
+SF:if\"/><meta\x20name=\"viewport\"\x20content=\"width=device-width,initia
+SF:l-scale=1\"/><meta\x20name=\"theme-color\"\x20content=\"#000000\"/><met
+SF:a\x20name=\"description\"\x20content=\"Web\x20site\x20created\x20using\
+SF:x20create-react-app\"/><link\x20rel=\"apple-touch-icon\"\x20href=\"/log
+SF:o192\.png\"/><link\x20rel=\"manifest\"\x20href=\"/manifest\.json\"/><ti
+SF:tle>The\x20Ars0n\x20Framework\x20v2\x20Beta</title><script\x20defer=\"d
+SF:efer\"\x20src=\"/static/js/main\.ba7422c6\.js\"></script><link\x20href=
+SF:\"/static/css/main\.098f4c3a\.css\"\x20rel=\"stylesheet\"></head><body>
+SF:<noscript>You\x20need\x20to\x20enable\x20JavaScript\x20to\x20run\x20thi
+SF:s\x20a")%r(Help,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConnection:\x
+SF:20close\r\n\r\n")%r(NCP,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConne
+SF:ction:\x20close\r\n\r\n")%r(HTTPOptions,3B5,"HTTP/1\.1\x20200\x20OK\r\n
+SF:Content-Length:\x20666\r\nContent-Disposition:\x20inline;\x20filename=\
+SF:"index\.html\"\r\nAccept-Ranges:\x20bytes\r\nETag:\x20\"78c036184c43b55
+SF:5c1eebe32e333ddb294a34866\"\r\nContent-Type:\x20text/html;\x20charset=u
+SF:tf-8\r\nVary:\x20Accept-Encoding\r\nDate:\x20Fri,\x2030\x20Jan\x202026\
+SF:x2015:07:49\x20GMT\r\nConnection:\x20close\r\n\r\n<!doctype\x20html><ht
+SF:ml\x20lang=\"en\"><head><meta\x20charset=\"utf-8\"/><link\x20rel=\"icon
+SF:\"\x20href=\"images/logo\.avif\"/><meta\x20name=\"viewport\"\x20content
+SF:=\"width=device-width,initial-scale=1\"/><meta\x20name=\"theme-color\"\
+SF:x20content=\"#000000\"/><meta\x20name=\"description\"\x20content=\"Web\
+SF:x20site\x20created\x20using\x20create-react-app\"/><link\x20rel=\"apple
+SF:-touch-icon\"\x20href=\"/logo192\.png\"/><link\x20rel=\"manifest\"\x20h
+SF:ref=\"/manifest\.json\"/><title>The\x20Ars0n\x20Framework\x20v2\x20Beta
+SF:</title><script\x20defer=\"defer\"\x20src=\"/static/js/main\.ba7422c6\.
+SF:js\"></script><link\x20href=\"/static/css/main\.098f4c3a\.css\"\x20rel=
+SF:\"stylesheet\"></head><body><noscript>You\x20need\x20to\x20enable\x20Ja
+SF:vaScript\x20to\x20run\x20this\x20a");
 ==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
-SF-Port33060-TCP:V=7.94SVN%I=7%D=1/30%Time=697C7FBA%P=x86_64-pc-linux-gnu%
-SF:r(NULL,9,"\x05\0\0\0\x0b\x08\x05\x1a\0")%r(GenericLines,9,"\x05\0\0\0\x
-SF:0b\x08\x05\x1a\0")%r(GetRequest,9,"\x05\0\0\0\x0b\x08\x05\x1a\0")%r(HTT
-SF:POptions,9,"\x05\0\0\0\x0b\x08\x05\x1a\0")%r(RTSPRequest,9,"\x05\0\0\0\
-SF:x0b\x08\x05\x1a\0")%r(RPCCheck,9,"\x05\0\0\0\x0b\x08\x05\x1a\0")%r(DNSV
-SF:ersionBindReqTCP,9,"\x05\0\0\0\x0b\x08\x05\x1a\0")%r(DNSStatusRequestTC
-SF:P,2B,"\x05\0\0\0\x0b\x08\x05\x1a\0\x1e\0\0\0\x01\x08\x01\x10\x88'\x1a\x
-SF:0fInvalid\x20message\"\x05HY000")%r(Help,9,"\x05\0\0\0\x0b\x08\x05\x1a\
-SF:0")%r(SSLSessionReq,2B,"\x05\0\0\0\x0b\x08\x05\x1a\0\x1e\0\0\0\x01\x08\
-SF:x01\x10\x88'\x1a\x0fInvalid\x20message\"\x05HY000")%r(TerminalServerCoo
-SF:kie,9,"\x05\0\0\0\x0b\x08\x05\x1a\0")%r(TLSSessionReq,2B,"\x05\0\0\0\x0
-SF:b\x08\x05\x1a\0\x1e\0\0\0\x01\x08\x01\x10\x88'\x1a\x0fInvalid\x20messag
-SF:e\"\x05HY000")%r(Kerberos,9,"\x05\0\0\0\x0b\x08\x05\x1a\0")%r(SMBProgNe
-SF:g,9,"\x05\0\0\0\x0b\x08\x05\x1a\0")%r(X11Probe,2B,"\x05\0\0\0\x0b\x08\x
-SF:05\x1a\0\x1e\0\0\0\x01\x08\x01\x10\x88'\x1a\x0fInvalid\x20message\"\x05
-SF:HY000")%r(FourOhFourRequest,9,"\x05\0\0\0\x0b\x08\x05\x1a\0")%r(LPDStri
-SF:ng,9,"\x05\0\0\0\x0b\x08\x05\x1a\0")%r(LDAPSearchReq,2B,"\x05\0\0\0\x0b
-SF:\x08\x05\x1a\0\x1e\0\0\0\x01\x08\x01\x10\x88'\x1a\x0fInvalid\x20message
-SF:\"\x05HY000")%r(LDAPBindReq,46,"\x05\0\0\0\x0b\x08\x05\x1a\x009\0\0\0\x
-SF:01\x08\x01\x10\x88'\x1a\*Parse\x20error\x20unserializing\x20protobuf\x2
-SF:0message\"\x05HY000")%r(SIPOptions,9,"\x05\0\0\0\x0b\x08\x05\x1a\0")%r(
-SF:LANDesk-RC,9,"\x05\0\0\0\x0b\x08\x05\x1a\0")%r(TerminalServer,9,"\x05\0
-SF:\0\0\x0b\x08\x05\x1a\0")%r(NCP,9,"\x05\0\0\0\x0b\x08\x05\x1a\0")%r(Note
-SF:sRPC,2B,"\x05\0\0\0\x0b\x08\x05\x1a\0\x1e\0\0\0\x01\x08\x01\x10\x88'\x1
-SF:a\x0fInvalid\x20message\"\x05HY000")%r(JavaRMI,9,"\x05\0\0\0\x0b\x08\x0
-SF:5\x1a\0")%r(WMSRequest,9,"\x05\0\0\0\x0b\x08\x05\x1a\0")%r(oracle-tns,3
-SF:2,"\x05\0\0\0\x0b\x08\x05\x1a\0%\0\0\0\x01\x08\x01\x10\x88'\x1a\x16Inva
-SF:lid\x20message-frame\.\"\x05HY000")%r(ms-sql-s,9,"\x05\0\0\0\x0b\x08\x0
-SF:5\x1a\0")%r(afp,2B,"\x05\0\0\0\x0b\x08\x05\x1a\0\x1e\0\0\0\x01\x08\x01\
-SF:x10\x88'\x1a\x0fInvalid\x20message\"\x05HY000");
+SF-Port8443-TCP:V=7.94SVN%I=7%D=1/30%Time=697CC940%P=x86_64-pc-linux-gnu%r
+SF:(SSLSessionReq,76,"HTTP/1\.1\x20400\x20Bad\x20Request\r\ncontent-type:\
+SF:x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\nInvalid\
+SF:x20HTTP\x20request\x20received\.")%r(TLSSessionReq,76,"HTTP/1\.1\x20400
+SF:\x20Bad\x20Request\r\ncontent-type:\x20text/plain;\x20charset=utf-8\r\n
+SF:Connection:\x20close\r\n\r\nInvalid\x20HTTP\x20request\x20received\.")%
+SF:r(GenericLines,76,"HTTP/1\.1\x20400\x20Bad\x20Request\r\ncontent-type:\
+SF:x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\nInvalid\
+SF:x20HTTP\x20request\x20received\.")%r(GetRequest,C6,"HTTP/1\.1\x20200\x2
+SF:0OK\r\ndate:\x20Fri,\x2030\x20Jan\x202026\x2015:07:48\x20GMT\r\nserver:
+SF:\x20uvicorn\r\ncontent-length:\x2054\r\ncontent-type:\x20application/js
+SF:on\r\nConnection:\x20close\r\n\r\n{\"message\":\"Ars0n\x20Framework\x20
+SF:API\x20is\x20running\x20\(MongoDB\)\"}")%r(HTTPOptions,CB,"HTTP/1\.1\x2
+SF:0405\x20Method\x20Not\x20Allowed\r\ndate:\x20Fri,\x2030\x20Jan\x202026\
+SF:x2015:07:48\x20GMT\r\nserver:\x20uvicorn\r\nallow:\x20GET\r\ncontent-le
+SF:ngth:\x2031\r\ncontent-type:\x20application/json\r\nConnection:\x20clos
+SF:e\r\n\r\n{\"detail\":\"Method\x20Not\x20Allowed\"}")%r(RTSPRequest,76,"
+SF:HTTP/1\.1\x20400\x20Bad\x20Request\r\ncontent-type:\x20text/plain;\x20c
+SF:harset=utf-8\r\nConnection:\x20close\r\n\r\nInvalid\x20HTTP\x20request\
+SF:x20received\.")%r(DNSVersionBindReqTCP,76,"HTTP/1\.1\x20400\x20Bad\x20R
+SF:equest\r\ncontent-type:\x20text/plain;\x20charset=utf-8\r\nConnection:\
+SF:x20close\r\n\r\nInvalid\x20HTTP\x20request\x20received\.")%r(DNSStatusR
+SF:equestTCP,76,"HTTP/1\.1\x20400\x20Bad\x20Request\r\ncontent-type:\x20te
+SF:xt/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\nInvalid\x20HT
+SF:TP\x20request\x20received\.")%r(TerminalServerCookie,76,"HTTP/1\.1\x204
+SF:00\x20Bad\x20Request\r\ncontent-type:\x20text/plain;\x20charset=utf-8\r
+SF:\nConnection:\x20close\r\n\r\nInvalid\x20HTTP\x20request\x20received\."
+SF:)%r(Kerberos,76,"HTTP/1\.1\x20400\x20Bad\x20Request\r\ncontent-type:\x2
+SF:0text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\nInvalid\x2
+SF:0HTTP\x20request\x20received\.");
 ==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
-SF-Port34239-TCP:V=7.94SVN%T=SSL%I=7%D=1/30%Time=697C7FC5%P=x86_64-pc-linu
-SF:x-gnu%r(GenericLines,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-
-SF:Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n40
-SF:0\x20Bad\x20Request")%r(GetRequest,BE,"HTTP/1\.0\x20404\x20Not\x20Found
-SF:\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nVary:\x20Origin\r\
-SF:nX-Content-Type-Options:\x20nosniff\r\nDate:\x20Fri,\x2030\x20Jan\x2020
-SF:26\x2009:54:13\x20GMT\r\nContent-Length:\x2019\r\n\r\n404\x20page\x20no
-SF:t\x20found\n")%r(HTTPOptions,BE,"HTTP/1\.0\x20404\x20Not\x20Found\r\nCo
-SF:ntent-Type:\x20text/plain;\x20charset=utf-8\r\nVary:\x20Origin\r\nX-Con
-SF:tent-Type-Options:\x20nosniff\r\nDate:\x20Fri,\x2030\x20Jan\x202026\x20
-SF:09:54:13\x20GMT\r\nContent-Length:\x2019\r\n\r\n404\x20page\x20not\x20f
-SF:ound\n")%r(RTSPRequest,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConten
-SF:t-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n
-SF:400\x20Bad\x20Request")%r(Help,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r
-SF:\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close
-SF:\r\n\r\n400\x20Bad\x20Request")%r(SSLSessionReq,67,"HTTP/1\.1\x20400\x2
-SF:0Bad\x20Request\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nCon
-SF:nection:\x20close\r\n\r\n400\x20Bad\x20Request")%r(TerminalServerCookie
-SF:,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text/plain;
-SF:\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Request"
-SF:)%r(TLSSessionReq,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Typ
-SF:e:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x
-SF:20Bad\x20Request")%r(Kerberos,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\
-SF:nContent-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\
-SF:r\n\r\n400\x20Bad\x20Request")%r(FourOhFourRequest,BE,"HTTP/1\.0\x20404
-SF:\x20Not\x20Found\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nVa
-SF:ry:\x20Origin\r\nX-Content-Type-Options:\x20nosniff\r\nDate:\x20Fri,\x2
-SF:030\x20Jan\x202026\x2009:54:38\x20GMT\r\nContent-Length:\x2019\r\n\r\n4
-SF:04\x20page\x20not\x20found\n")%r(LPDString,67,"HTTP/1\.1\x20400\x20Bad\
-SF:x20Request\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nConnecti
-SF:on:\x20close\r\n\r\n400\x20Bad\x20Request");
-==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
-SF-Port36311-TCP:V=7.94SVN%I=7%D=1/30%Time=697C7FBF%P=x86_64-pc-linux-gnu%
-SF:r(GetRequest,BE,"HTTP/1\.0\x20404\x20Not\x20Found\r\nContent-Type:\x20t
-SF:ext/plain;\x20charset=utf-8\r\nVary:\x20Origin\r\nX-Content-Type-Option
-SF:s:\x20nosniff\r\nDate:\x20Fri,\x2030\x20Jan\x202026\x2009:54:07\x20GMT\
-SF:r\nContent-Length:\x2019\r\n\r\n404\x20page\x20not\x20found\n")%r(HTTPO
-SF:ptions,BE,"HTTP/1\.0\x20404\x20Not\x20Found\r\nContent-Type:\x20text/pl
-SF:ain;\x20charset=utf-8\r\nVary:\x20Origin\r\nX-Content-Type-Options:\x20
-SF:nosniff\r\nDate:\x20Fri,\x2030\x20Jan\x202026\x2009:54:07\x20GMT\r\nCon
-SF:tent-Length:\x2019\r\n\r\n404\x20page\x20not\x20found\n")%r(RTSPRequest
-SF:,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text/plain;
-SF:\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Request"
-SF:)%r(SSLSessionReq,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Typ
-SF:e:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x
-SF:20Bad\x20Request")%r(TerminalServerCookie,67,"HTTP/1\.1\x20400\x20Bad\x
-SF:20Request\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nConnectio
-SF:n:\x20close\r\n\r\n400\x20Bad\x20Request")%r(TLSSessionReq,67,"HTTP/1\.
-SF:1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text/plain;\x20charset=u
-SF:tf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Request")%r(Kerberos,
-SF:67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text/plain;\
-SF:x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Request")
-SF:%r(FourOhFourRequest,BE,"HTTP/1\.0\x20404\x20Not\x20Found\r\nContent-Ty
-SF:pe:\x20text/plain;\x20charset=utf-8\r\nVary:\x20Origin\r\nX-Content-Typ
-SF:e-Options:\x20nosniff\r\nDate:\x20Fri,\x2030\x20Jan\x202026\x2009:54:39
-SF:\x20GMT\r\nContent-Length:\x2019\r\n\r\n404\x20page\x20not\x20found\n")
-SF:%r(LDAPSearchReq,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type
-SF::\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x2
-SF:0Bad\x20Request")%r(SIPOptions,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r
-SF:\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close
-SF:\r\n\r\n400\x20Bad\x20Request");
-==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
-SF-Port38649-TCP:V=7.94SVN%I=7%D=1/30%Time=697C7FBF%P=x86_64-pc-linux-gnu%
-SF:r(GetRequest,7E,"HTTP/1\.1\x20403\x20Forbidden\r\nContent-Type:\x20text
-SF:/plain\r\nDate:\x20Fri,\x2030\x20Jan\x202026\x2009:54:07\x20GMT\r\nConn
-SF:ection:\x20close\r\n\r\nInvalid\x20CSRF\x20token")%r(HTTPOptions,7E,"HT
-SF:TP/1\.1\x20403\x20Forbidden\r\nContent-Type:\x20text/plain\r\nDate:\x20
-SF:Fri,\x2030\x20Jan\x202026\x2009:54:07\x20GMT\r\nConnection:\x20close\r\
-SF:n\r\nInvalid\x20CSRF\x20token")%r(RTSPRequest,7E,"HTTP/1\.1\x20403\x20F
-SF:orbidden\r\nContent-Type:\x20text/plain\r\nDate:\x20Fri,\x2030\x20Jan\x
-SF:202026\x2009:54:07\x20GMT\r\nConnection:\x20close\r\n\r\nInvalid\x20CSR
-SF:F\x20token")%r(RPCCheck,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConne
-SF:ction:\x20close\r\n\r\n")%r(DNSVersionBindReqTCP,2F,"HTTP/1\.1\x20400\x
-SF:20Bad\x20Request\r\nConnection:\x20close\r\n\r\n")%r(DNSStatusRequestTC
-SF:P,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConnection:\x20close\r\n\r\
-SF:n")%r(Help,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConnection:\x20clo
-SF:se\r\n\r\n")%r(SSLSessionReq,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\n
-SF:Connection:\x20close\r\n\r\n")%r(TerminalServerCookie,2F,"HTTP/1\.1\x20
-SF:400\x20Bad\x20Request\r\nConnection:\x20close\r\n\r\n")%r(TLSSessionReq
-SF:,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConnection:\x20close\r\n\r\n
-SF:")%r(Kerberos,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConnection:\x20
-SF:close\r\n\r\n")%r(SMBProgNeg,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\n
-SF:Connection:\x20close\r\n\r\n")%r(X11Probe,2F,"HTTP/1\.1\x20400\x20Bad\x
-SF:20Request\r\nConnection:\x20close\r\n\r\n")%r(FourOhFourRequest,7E,"HTT
-SF:P/1\.1\x20403\x20Forbidden\r\nContent-Type:\x20text/plain\r\nDate:\x20F
-SF:ri,\x2030\x20Jan\x202026\x2009:54:07\x20GMT\r\nConnection:\x20close\r\n
-SF:\r\nInvalid\x20CSRF\x20token")%r(LPDString,2F,"HTTP/1\.1\x20400\x20Bad\
-SF:x20Request\r\nConnection:\x20close\r\n\r\n")%r(LDAPSearchReq,2F,"HTTP/1
-SF:\.1\x20400\x20Bad\x20Request\r\nConnection:\x20close\r\n\r\n")%r(LDAPBi
-SF:ndReq,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConnection:\x20close\r\
-SF:n\r\n")%r(SIPOptions,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConnecti
-SF:on:\x20close\r\n\r\n")%r(LANDesk-RC,2F,"HTTP/1\.1\x20400\x20Bad\x20Requ
-SF:est\r\nConnection:\x20close\r\n\r\n");
-==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
-SF-Port41729-TCP:V=7.94SVN%I=7%D=1/30%Time=697C7FBF%P=x86_64-pc-linux-gnu%
+SF-Port38235-TCP:V=7.94SVN%I=7%D=1/30%Time=697CC945%P=x86_64-pc-linux-gnu%
 SF:r(GetRequest,D84,"HTTP/1\.1\x20200\x20OK\r\nContent-Type:\x20text/html\
-SF:r\nDate:\x20Fri,\x2030\x20Jan\x202026\x2009:54:07\x20GMT\r\nConnection:
+SF:r\nDate:\x20Fri,\x2030\x20Jan\x202026\x2015:07:49\x20GMT\r\nConnection:
 SF:\x20close\r\n\r\n<!DOCTYPE\x20html>\n<html>\n\n<head>\n\t<link\x20rel=\
 SF:"stylesheet\"\x20href=\"browser\.css\">\n\t<link\x20rel=\"icon\"\x20typ
 SF:e=\"image/svg\+xml\"\x20href=\"antigravity\.svg\">\n\t<title>Browser</t
@@ -164,7 +96,7 @@ SF:\t\t\t<p\x20class=\"preview-pill\">Preview</p>\n\t\t\t</div>\n\t\t\t<hr
 SF:\x20class=\"title-divider\">\n\n\t\t\t<h2\x20class=\"hero-title\">Getti
 SF:ng\x20Started</h2>\n\n\t\t\t<p\x20class")%r(HTTPOptions,D84,"HTTP/1\.1\
 SF:x20200\x20OK\r\nContent-Type:\x20text/html\r\nDate:\x20Fri,\x2030\x20Ja
-SF:n\x202026\x2009:54:07\x20GMT\r\nConnection:\x20close\r\n\r\n<!DOCTYPE\x
+SF:n\x202026\x2015:07:49\x20GMT\r\nConnection:\x20close\r\n\r\n<!DOCTYPE\x
 SF:20html>\n<html>\n\n<head>\n\t<link\x20rel=\"stylesheet\"\x20href=\"brow
 SF:ser\.css\">\n\t<link\x20rel=\"icon\"\x20type=\"image/svg\+xml\"\x20href
 SF:=\"antigravity\.svg\">\n\t<title>Browser</title>\n</head>\n\n<body>\n\t
@@ -182,4 +114,4 @@ SF:\n\n\t\t\t<h2\x20class=\"hero-title\">Getting\x20Started</h2>\n\n\t\t\t
 SF:<p\x20class");
 
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-# Nmap done at Fri Jan 30 10:55:41 2026 -- 1 IP address (1 host up) scanned in 105.99 seconds
+# Nmap done at Fri Jan 30 16:08:44 2026 -- 1 IP address (1 host up) scanned in 66.22 seconds
