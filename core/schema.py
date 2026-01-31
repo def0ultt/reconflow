@@ -6,8 +6,17 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 class InfoBlock(BaseModel):
     id: str
     name: str = "Unknown"
+    tag: str = ""
     author: str = "Unknown"
     description: str = ""
+    
+    @field_validator('id')
+    @classmethod
+    def validate_id_no_whitespace(cls, v):
+        """Ensure ID doesn't contain any whitespace characters"""
+        if ' ' in v or '\t' in v or '\n' in v or '\r' in v:
+            raise ValueError(f"Module ID cannot contain whitespace characters. Got: '{v}'")
+        return v
 
 class VarConfig(BaseModel):
     type: str = "string"  # "string" or "boolean"

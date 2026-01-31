@@ -63,7 +63,8 @@ class GenericYamlModule(BaseModule):
             'name': self.schema.info.name,
             'description': self.schema.info.description,
             'author': self.schema.info.author,
-            'id': self.schema.info.id
+            'id': self.schema.info.id,
+            'tag': self.schema.info.tag if self.schema.info.tag else ''
         })
 
         # 2. Parse Vars -> Options

@@ -314,6 +314,7 @@ def cmd_help(ctx: Context, arg: str):
         ("show", "Displays options, modules, projects, etc."),
         ("options", "Displays options for the active module"),
         ("search", "Search modules (regex)"),
+        ("info", "Display YAML configuration for a module"),
         ("project", "Switch project(add -c for create and -d for delete )"),
         ("sessions", "Manage background sessions"),
         ("ls", "List files for current project"),
@@ -733,24 +734,28 @@ def cmd_list_modules(ctx: Context, mode: str):
     ctx.last_shown_map = items
     ctx.last_shown_type = 'module'
 
-    table = Table(title=title, show_header=True, header_style="bold cyan")
-    table.add_column("ID", style="cyan", justify="center")
-    table.add_column("Path/Name", style="green", justify="left")
-    table.add_column("Description", style="white", justify="left")
+    table = Table(title="[red]"+title+"[/red]", show_header=True)
+    table.add_column("[bold cyan]ID[/bold cyan]", style="bold cyan", justify="center")
+    table.add_column("[bold green]Name[/bold green]", style="bold green", justify="left")
+    table.add_column("[bold yellow]Tag[/bold yellow]", style="bold yellow", justify="left")
+    table.add_column("[bold white]Description[/bold white]", style="bold white", justify="left")
 
     for i, path in enumerate(items):
         try:
             mod_cls = ctx.tool_manager.modules[path]
             meta = getattr(mod_cls, 'meta', {})
             
+            module_id = meta.get('id', 'Unknown')
+            tag = meta.get('tag', '')
             desc = meta.get('description', '')
-            table.add_row(str(i+1), path, desc)
+            table.add_row(str(i+1), module_id, tag, desc)
         except Exception:
-             table.add_row(str(i+1), path, "Error loading metadata")
+             table.add_row(str(i+1), "Error", "", "Error loading metadata")
 
     console.print()
     console.print(table)
     console.print()
+
 
 def cmd_search(ctx: Context, arg: str):
     if not arg:
@@ -764,20 +769,137 @@ def cmd_search(ctx: Context, arg: str):
     
     table = Table(title=f"Search Results: {arg}", show_header=True, header_style="bold cyan")
     table.add_column("[red]ID[/red]", style="bold blue", justify="right")
-    table.add_column("[red]Path[/red]", style="bold blue")
     table.add_column("[red]Name[/red]", style="bold white")
+    table.add_column("[red]Tag[/red]", style="bold yellow")
     table.add_column("[red]Description[/red]", style="dim white")
     
     for idx, path, meta in results:
-        table.add_row(str(idx+1), path, meta.get('name', 'Unknown'), meta.get('description', ''))
+        table.add_row(
+            str(idx+1), 
+            meta.get('id', 'Unknown'), 
+            meta.get('tag', ''),
+            meta.get('description', '')
+        )
     
     console.print()
     console.print(table)
     console.print()
 
+
 def cmd_options(ctx: Context, arg: str):
     """Alias for 'show options'"""
     cmd_show(ctx, 'options')
+
+def cmd_info(ctx: Context, arg: str):
+    """Display YAML configuration for a module to understand what happens behind the scenes
+    Usage: info <module-name>
+    """
+    if not arg:
+        console.print("\n[bold red]❌ Usage:[/bold red] [cyan]info <module-name>[/cyan]")
+        console.print("[dim]💡 Example: info port-scan[/dim]\n")
+        return
+    
+    # Resolve module
+    target_path = arg
+    
+    # Check if arg is an ID
+    if arg.isdigit():
+        idx = int(arg) - 1
+        
+        if not ctx.last_shown_map:
+            console.print("[yellow]⚠️  Please run 'show module' or 'search' first (IDs change depending on context).[/yellow]")
+            return
+            
+        if 0 <= idx < len(ctx.last_shown_map):
+            target_path = ctx.last_shown_map[idx]
+        else:
+            console.print(f"[red]❌ Invalid ID: {arg}. Range is 1-{len(ctx.last_shown_map)}[/red]")
+            return
+    
+    # Get module
+    module = ctx.tool_manager.get_module(target_path)
+    if not module:
+        console.print(f"\n[red]❌ Module '{arg}' not found.[/red]")
+        console.print("[dim]💡 Use 'show module' or 'search <pattern>' to find modules.[/dim]\n")
+        return
+    
+    # Check if module has yaml_path
+    if not hasattr(module, 'yaml_path') or not module.yaml_path:
+        console.print(f"[yellow]⚠️  Module '{arg}' does not have a YAML configuration file.[/yellow]")
+        return
+    
+    yaml_path = module.yaml_path
+    
+    # Check if file exists
+    if not os.path.exists(yaml_path):
+        console.print(f"[red]❌ YAML file not found: {yaml_path}[/red]")
+        return
+    
+    # Read and display YAML content
+    try:
+        with open(yaml_path, 'r') as f:
+            yaml_content = f.read()
+        
+        # Get module metadata
+        from rich.panel import Panel
+        from rich.text import Text
+        module_name = module.meta.get('name', 'Unknown')
+        module_id = module.meta.get('id', 'Unknown')
+        module_desc = module.meta.get('description', 'No description')
+        module_author = module.meta.get('author', 'Unknown')
+        module_tag = module.meta.get('tag', 'general')
+        
+       
+        
+        # Create info table
+        info_table = Table(show_header=False, box=box.ROUNDED, border_style="cyan", padding=(0, 2))
+        info_table.add_column("Key", style="bold yellow", width=15)
+        info_table.add_column("Value", style="white")
+        
+        info_table.add_row("📦 Module", f"[bold green]{module_name}[/bold green]")
+        info_table.add_row("🆔 ID", f"[bold cyan]{module_id}[/bold cyan]")
+        info_table.add_row("🏷️  Tag", f"[bold magenta]{module_tag}[/bold magenta]")
+        info_table.add_row("👤 Author", f"[bold blue]{module_author}[/bold blue]")
+        info_table.add_row("📝 Description", f"[dim white]{module_desc}[/dim white]")
+        info_table.add_row("📂 Path", f"[dim cyan]{yaml_path}[/dim cyan]")
+        
+        # Center the table
+        from rich.align import Align
+        console.print(Align.center(info_table))
+        console.print()
+
+        
+        # Create YAML content panel with custom styling
+        console.print(Panel(
+            "",
+            title="[bold yellow]⚙️  YAML Configuration[/bold yellow]",
+            border_style="yellow",
+            padding=(0, 0)
+        ))
+        
+        # Display YAML with enhanced syntax highlighting
+        from rich.syntax import Syntax
+        syntax = Syntax(
+            yaml_content, 
+            "yaml", 
+            theme="dracula",  # Changed to dracula for better colors
+            line_numbers=True,
+            word_wrap=True,
+            background_color="default"
+        )
+        console.print(syntax)
+        
+        # Footer with helpful tips
+        console.print()
+        console.print(Panel(
+            "[dim]💡 Tip: Use [cyan]'use " + module_id + "'[/cyan] to load this module, then [cyan]'show options'[/cyan] to see available settings[/dim]",
+            border_style="dim white",
+            padding=(0, 1)
+        ))
+        console.print()
+        
+    except Exception as e:
+        console.print(f"\n[red]❌ Error reading YAML file: {e}[/red]\n")
 
 COMMANDS = {
     'use': cmd_use,
@@ -797,4 +919,5 @@ COMMANDS = {
     'settings': cmd_settings,
     'import': cmd_import,
     'list': cmd_list,
+    'info': cmd_info,
 }

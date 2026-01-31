@@ -3,6 +3,7 @@ type: module
 info:
   id: open-redirect-simple
   name: Open Redirect Scanner (Simple)
+  tag: web
   description: Tests for open redirect vulnerabilities - no conditions
   author: defaut
 

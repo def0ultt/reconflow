@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Dict, Optional, List
 from sqlalchemy.orm import Session
 from db.models import SessionModel, Project
-from db.session import get_session
+from db.session import get_session, create_new_session
 from core.base import BaseModule
 
 class SessionManager:
@@ -20,8 +20,8 @@ class SessionManager:
             print("❌ No active project. Cannot create session.")
             return None
 
-        # Create DB Entry
-        db: Session = get_session()
+        # Create DB Entry - Use isolated session
+        db: Session = create_new_session()
         try:
             new_session = SessionModel(
                 project_id=context.current_project.id,
@@ -59,7 +59,7 @@ class SessionManager:
         return new_session
 
     def _update_status(self, session_id: int, status: str, info: str = None):
-        db: Session = get_session()
+        db: Session = create_new_session()
         try:
             sess = db.query(SessionModel).filter(SessionModel.id == session_id).first()
             if sess:
@@ -78,7 +78,7 @@ class SessionManager:
                 del self.active_sessions[session_id]
 
     def list_sessions(self, project_id: int = None) -> List[SessionModel]:
-        db: Session = get_session()
+        db: Session = create_new_session()
         try:
             query = db.query(SessionModel)
             if project_id:
