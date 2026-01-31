@@ -1,0 +1,20 @@
+--- Starting Integration Test ---
+Failed to load YAML module /home/defaut/reconflow/reconflow/modules/test/echo.yml: 1 validation error for ModuleSchema
+info
+  Field required [type=missing, input_value={'type': 'module', 'metad...{{inputs.filename}}'}}]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+[+] Registered module: /module/demo-ping
+[+] Registered module: /module/mock-tool
+Failed to load YAML module /home/defaut/reconflow/reconflow/modules/custom/mock_tool.yml: 1 validation error for ModuleSchema
+info
+  Field required [type=missing, input_value={'type': 'module', 'metad...}/{{inputs.outfile}}'}]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+Loading examples/demo_unified.yml...
+Running module options check...
+Executing run()...
+[*] Executing Tool 'step1': echo Starting scan on localhost
+[*] Executing Tool 'step2_parallel': sleep 1
+[*] Executing Tool 'step3_parallel': sleep 1
+[*] Executing Tool 'step4_end': echo Finished
+Results: {'step1': {'stdout': 'Starting scan on localhost\n', 'stderr': '', 'output_file': None, 'return_code': 0}, 'step2_parallel': {'stdout': '', 'stderr': '', 'output_file': None, 'return_code': 0}, 'step3_parallel': {'stdout': '', 'stderr': '', 'output_file': None, 'return_code': 0}, 'step4_end': {'stdout': 'Finished\n', 'stderr': '', 'output_file': None, 'return_code': 0}}
+✅ Integration Test PASSED

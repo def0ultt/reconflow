@@ -1,0 +1,117 @@
+# Nmap 7.94SVN scan initiated Fri Jan 30 16:07:38 2026 as: /usr/bin/nmap -p 1716,38235,8443,3000 -sV --min-rate 1000 --max-retries 5 -oN nmap_scan.txt -oX - 127.0.0.2
+Nmap scan report for defaut-IdeaPad-L340-15IRH-Gaming (127.0.0.2)
+Host is up (0.000076s latency).
+
+PORT      STATE SERVICE    VERSION
+1716/tcp  open  tcpwrapped
+3000/tcp  open  ppp?
+8443/tcp  open  https-alt  uvicorn
+38235/tcp open  unknown
+3 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port3000-TCP:V=7.94SVN%I=7%D=1/30%Time=697CC945%P=x86_64-pc-linux-gnu%r
+SF:(GetRequest,3B5,"HTTP/1\.1\x20200\x20OK\r\nContent-Length:\x20666\r\nCo
+SF:ntent-Disposition:\x20inline;\x20filename=\"index\.html\"\r\nAccept-Ran
+SF:ges:\x20bytes\r\nETag:\x20\"78c036184c43b555c1eebe32e333ddb294a34866\"\
+SF:r\nContent-Type:\x20text/html;\x20charset=utf-8\r\nVary:\x20Accept-Enco
+SF:ding\r\nDate:\x20Fri,\x2030\x20Jan\x202026\x2015:07:49\x20GMT\r\nConnec
+SF:tion:\x20close\r\n\r\n<!doctype\x20html><html\x20lang=\"en\"><head><met
+SF:a\x20charset=\"utf-8\"/><link\x20rel=\"icon\"\x20href=\"images/logo\.av
+SF:if\"/><meta\x20name=\"viewport\"\x20content=\"width=device-width,initia
+SF:l-scale=1\"/><meta\x20name=\"theme-color\"\x20content=\"#000000\"/><met
+SF:a\x20name=\"description\"\x20content=\"Web\x20site\x20created\x20using\
+SF:x20create-react-app\"/><link\x20rel=\"apple-touch-icon\"\x20href=\"/log
+SF:o192\.png\"/><link\x20rel=\"manifest\"\x20href=\"/manifest\.json\"/><ti
+SF:tle>The\x20Ars0n\x20Framework\x20v2\x20Beta</title><script\x20defer=\"d
+SF:efer\"\x20src=\"/static/js/main\.ba7422c6\.js\"></script><link\x20href=
+SF:\"/static/css/main\.098f4c3a\.css\"\x20rel=\"stylesheet\"></head><body>
+SF:<noscript>You\x20need\x20to\x20enable\x20JavaScript\x20to\x20run\x20thi
+SF:s\x20a")%r(Help,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConnection:\x
+SF:20close\r\n\r\n")%r(NCP,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConne
+SF:ction:\x20close\r\n\r\n")%r(HTTPOptions,3B5,"HTTP/1\.1\x20200\x20OK\r\n
+SF:Content-Length:\x20666\r\nContent-Disposition:\x20inline;\x20filename=\
+SF:"index\.html\"\r\nAccept-Ranges:\x20bytes\r\nETag:\x20\"78c036184c43b55
+SF:5c1eebe32e333ddb294a34866\"\r\nContent-Type:\x20text/html;\x20charset=u
+SF:tf-8\r\nVary:\x20Accept-Encoding\r\nDate:\x20Fri,\x2030\x20Jan\x202026\
+SF:x2015:07:49\x20GMT\r\nConnection:\x20close\r\n\r\n<!doctype\x20html><ht
+SF:ml\x20lang=\"en\"><head><meta\x20charset=\"utf-8\"/><link\x20rel=\"icon
+SF:\"\x20href=\"images/logo\.avif\"/><meta\x20name=\"viewport\"\x20content
+SF:=\"width=device-width,initial-scale=1\"/><meta\x20name=\"theme-color\"\
+SF:x20content=\"#000000\"/><meta\x20name=\"description\"\x20content=\"Web\
+SF:x20site\x20created\x20using\x20create-react-app\"/><link\x20rel=\"apple
+SF:-touch-icon\"\x20href=\"/logo192\.png\"/><link\x20rel=\"manifest\"\x20h
+SF:ref=\"/manifest\.json\"/><title>The\x20Ars0n\x20Framework\x20v2\x20Beta
+SF:</title><script\x20defer=\"defer\"\x20src=\"/static/js/main\.ba7422c6\.
+SF:js\"></script><link\x20href=\"/static/css/main\.098f4c3a\.css\"\x20rel=
+SF:\"stylesheet\"></head><body><noscript>You\x20need\x20to\x20enable\x20Ja
+SF:vaScript\x20to\x20run\x20this\x20a");
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port8443-TCP:V=7.94SVN%I=7%D=1/30%Time=697CC940%P=x86_64-pc-linux-gnu%r
+SF:(SSLSessionReq,76,"HTTP/1\.1\x20400\x20Bad\x20Request\r\ncontent-type:\
+SF:x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\nInvalid\
+SF:x20HTTP\x20request\x20received\.")%r(TLSSessionReq,76,"HTTP/1\.1\x20400
+SF:\x20Bad\x20Request\r\ncontent-type:\x20text/plain;\x20charset=utf-8\r\n
+SF:Connection:\x20close\r\n\r\nInvalid\x20HTTP\x20request\x20received\.")%
+SF:r(GenericLines,76,"HTTP/1\.1\x20400\x20Bad\x20Request\r\ncontent-type:\
+SF:x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\nInvalid\
+SF:x20HTTP\x20request\x20received\.")%r(GetRequest,C6,"HTTP/1\.1\x20200\x2
+SF:0OK\r\ndate:\x20Fri,\x2030\x20Jan\x202026\x2015:07:48\x20GMT\r\nserver:
+SF:\x20uvicorn\r\ncontent-length:\x2054\r\ncontent-type:\x20application/js
+SF:on\r\nConnection:\x20close\r\n\r\n{\"message\":\"Ars0n\x20Framework\x20
+SF:API\x20is\x20running\x20\(MongoDB\)\"}")%r(HTTPOptions,CB,"HTTP/1\.1\x2
+SF:0405\x20Method\x20Not\x20Allowed\r\ndate:\x20Fri,\x2030\x20Jan\x202026\
+SF:x2015:07:48\x20GMT\r\nserver:\x20uvicorn\r\nallow:\x20GET\r\ncontent-le
+SF:ngth:\x2031\r\ncontent-type:\x20application/json\r\nConnection:\x20clos
+SF:e\r\n\r\n{\"detail\":\"Method\x20Not\x20Allowed\"}")%r(RTSPRequest,76,"
+SF:HTTP/1\.1\x20400\x20Bad\x20Request\r\ncontent-type:\x20text/plain;\x20c
+SF:harset=utf-8\r\nConnection:\x20close\r\n\r\nInvalid\x20HTTP\x20request\
+SF:x20received\.")%r(DNSVersionBindReqTCP,76,"HTTP/1\.1\x20400\x20Bad\x20R
+SF:equest\r\ncontent-type:\x20text/plain;\x20charset=utf-8\r\nConnection:\
+SF:x20close\r\n\r\nInvalid\x20HTTP\x20request\x20received\.")%r(DNSStatusR
+SF:equestTCP,76,"HTTP/1\.1\x20400\x20Bad\x20Request\r\ncontent-type:\x20te
+SF:xt/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\nInvalid\x20HT
+SF:TP\x20request\x20received\.")%r(TerminalServerCookie,76,"HTTP/1\.1\x204
+SF:00\x20Bad\x20Request\r\ncontent-type:\x20text/plain;\x20charset=utf-8\r
+SF:\nConnection:\x20close\r\n\r\nInvalid\x20HTTP\x20request\x20received\."
+SF:)%r(Kerberos,76,"HTTP/1\.1\x20400\x20Bad\x20Request\r\ncontent-type:\x2
+SF:0text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\nInvalid\x2
+SF:0HTTP\x20request\x20received\.");
+==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)==============
+SF-Port38235-TCP:V=7.94SVN%I=7%D=1/30%Time=697CC945%P=x86_64-pc-linux-gnu%
+SF:r(GetRequest,D84,"HTTP/1\.1\x20200\x20OK\r\nContent-Type:\x20text/html\
+SF:r\nDate:\x20Fri,\x2030\x20Jan\x202026\x2015:07:49\x20GMT\r\nConnection:
+SF:\x20close\r\n\r\n<!DOCTYPE\x20html>\n<html>\n\n<head>\n\t<link\x20rel=\
+SF:"stylesheet\"\x20href=\"browser\.css\">\n\t<link\x20rel=\"icon\"\x20typ
+SF:e=\"image/svg\+xml\"\x20href=\"antigravity\.svg\">\n\t<title>Browser</t
+SF:itle>\n</head>\n\n<body>\n\t<div\x20class=\"animated-background\">\n\t\
+SF:t<div\x20class=\"gradient-orb\x20orb-1\"></div>\n\t\t<div\x20class=\"gr
+SF:adient-orb\x20orb-2\"></div>\n\t\t<div\x20class=\"gradient-orb\x20orb-3
+SF:\"></div>\n\t</div>\n\n\t<div\x20class=\"landing-container\">\n\t\t<div
+SF:\x20class=\"onboarding-card\">\n\t\t\t<div\x20class=\"icon-container\">
+SF:\n\t\t\t\t<img\x20src=\"antigravity\.svg\"\x20alt=\"Antigravity\"\x20cl
+SF:ass=\"browser-icon\">\n\t\t\t</div>\n\t\t\t<h3\x20class=\"welcome-text\
+SF:">Welcome\x20to</h3>\n\t\t\t<div\x20class=\"title-container\">\n\t\t\t\
+SF:t<h1\x20class=\"main-title\">Antigravity\x20Browser\x20Control</h1>\n\t
+SF:\t\t\t<p\x20class=\"preview-pill\">Preview</p>\n\t\t\t</div>\n\t\t\t<hr
+SF:\x20class=\"title-divider\">\n\n\t\t\t<h2\x20class=\"hero-title\">Getti
+SF:ng\x20Started</h2>\n\n\t\t\t<p\x20class")%r(HTTPOptions,D84,"HTTP/1\.1\
+SF:x20200\x20OK\r\nContent-Type:\x20text/html\r\nDate:\x20Fri,\x2030\x20Ja
+SF:n\x202026\x2015:07:49\x20GMT\r\nConnection:\x20close\r\n\r\n<!DOCTYPE\x
+SF:20html>\n<html>\n\n<head>\n\t<link\x20rel=\"stylesheet\"\x20href=\"brow
+SF:ser\.css\">\n\t<link\x20rel=\"icon\"\x20type=\"image/svg\+xml\"\x20href
+SF:=\"antigravity\.svg\">\n\t<title>Browser</title>\n</head>\n\n<body>\n\t
+SF:<div\x20class=\"animated-background\">\n\t\t<div\x20class=\"gradient-or
+SF:b\x20orb-1\"></div>\n\t\t<div\x20class=\"gradient-orb\x20orb-2\"></div>
+SF:\n\t\t<div\x20class=\"gradient-orb\x20orb-3\"></div>\n\t</div>\n\n\t<di
+SF:v\x20class=\"landing-container\">\n\t\t<div\x20class=\"onboarding-card\
+SF:">\n\t\t\t<div\x20class=\"icon-container\">\n\t\t\t\t<img\x20src=\"anti
+SF:gravity\.svg\"\x20alt=\"Antigravity\"\x20class=\"browser-icon\">\n\t\t\
+SF:t</div>\n\t\t\t<h3\x20class=\"welcome-text\">Welcome\x20to</h3>\n\t\t\t
+SF:<div\x20class=\"title-container\">\n\t\t\t\t<h1\x20class=\"main-title\"
+SF:>Antigravity\x20Browser\x20Control</h1>\n\t\t\t\t<p\x20class=\"preview-
+SF:pill\">Preview</p>\n\t\t\t</div>\n\t\t\t<hr\x20class=\"title-divider\">
+SF:\n\n\t\t\t<h2\x20class=\"hero-title\">Getting\x20Started</h2>\n\n\t\t\t
+SF:<p\x20class");
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Fri Jan 30 16:08:44 2026 -- 1 IP address (1 host up) scanned in 66.22 seconds

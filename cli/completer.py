@@ -71,7 +71,7 @@ class ReconCompleter(PTCompleter):
                     pass
 
             elif cmd == 'show':
-                subcmds = ['options', 'modules', 'sessions', 'projects', 'workflows']
+                subcmds = ['options', 'modules', 'sessions', 'projects']
                 for s in subcmds:
                     if s.startswith(current_word):
                         yield Completion(s, start_position=-len(current_word))

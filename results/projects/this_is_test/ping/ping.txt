@@ -1,0 +1,8 @@
+PING facebook.com (31.13.69.35) 56(84) bytes of data.
+64 bytes from edge-star-mini-shv-01-pmo1.facebook.com (31.13.69.35): icmp_seq=1 ttl=52 time=190 ms
+64 bytes from edge-star-mini-shv-01-pmo1.facebook.com (31.13.69.35): icmp_seq=2 ttl=52 time=1045 ms
+64 bytes from edge-star-mini-shv-01-pmo1.facebook.com (31.13.69.35): icmp_seq=3 ttl=52 time=30.6 ms
+
+--- facebook.com ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2045ms
+rtt min/avg/max/mdev = 30.640/421.812/1044.994/445.420 ms, pipe 2
