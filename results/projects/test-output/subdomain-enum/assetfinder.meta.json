@@ -1,0 +1,15 @@
+{
+  "step_name": "assetfinder",
+  "tool": "assetfinder",
+  "module_id": "subdomain-enum",
+  "module_name": "Subdomain Enumeration",
+  "timestamp": "2026-02-01T13:23:33.513252",
+  "duration_seconds": 1.19,
+  "line_count": 81,
+  "file_size": 1849,
+  "command": "assetfinder -subs-only evil.com",
+  "exit_code": 0,
+  "has_json": true,
+  "record_count": 81,
+  "parser_used": "assetfinder"
+}

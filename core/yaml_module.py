@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Set, Optional
+import sys
 import yaml
 import subprocess
 import os
@@ -334,6 +335,25 @@ class GenericYamlModule(BaseModule):
         
         # Custom Path Logic
         tool_cmd = step.tool
+        
+        # Built-in Tool Aliases
+        # Allow usage of "json_parser" -> "python3 {root}/tools/json_parser.py"
+        builtin_tools = {
+            'json_parser': 'tools/json_parser.py',
+            'xml_parser': 'tools/xml_parser.py'
+        }
+        
+        if tool_cmd in builtin_tools:
+            # Resolve absolute path relative to project root
+            # Assuming file is in reconflow/core/yaml_module.py -> root is ../..
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            tool_path = os.path.join(base_dir, builtin_tools[tool_cmd])
+            
+            if os.path.exists(tool_path):
+                tool_cmd = f"{sys.executable} {tool_path}"
+            else:
+                 console.print(f"[yellow]⚠️  Built-in tool alias '{tool_cmd}' found but file missing at {tool_path}[/yellow]")
+        
         if step.path:
             try:
                 custom_path = self._render_template(step.path, render_ctx)
@@ -365,9 +385,16 @@ class GenericYamlModule(BaseModule):
         # Stdin Logic
         input_data = None
         if step.stdin and step.depends_on:
-             last_dep = step.depends_on[-1] 
-             if last_dep in render_ctx and 'stdout' in render_ctx[last_dep]:
-                 input_data = render_ctx[last_dep]['stdout']
+             # Aggregate stdout from ALL dependencies
+             combined_input = []
+             for dep_name in step.depends_on:
+                 if dep_name in render_ctx and 'stdout' in render_ctx[dep_name]:
+                     out = render_ctx[dep_name]['stdout']
+                     if out:
+                         combined_input.append(out)
+             
+             if combined_input:
+                 input_data = "\n".join(combined_input)
 
         # Timeout
         timeout_sec = self._parse_timeout(step.timeout)

@@ -1,0 +1,15 @@
+{
+  "step_name": "findomain",
+  "tool": "findomain",
+  "module_id": "subdomain-enum",
+  "module_name": "Subdomain Enumeration",
+  "timestamp": "2026-02-01T13:23:33.526692",
+  "duration_seconds": 1.2,
+  "line_count": 58,
+  "file_size": 1315,
+  "command": "findomain -t evil.com -q",
+  "exit_code": 0,
+  "has_json": true,
+  "record_count": 58,
+  "parser_used": "findomain"
+}

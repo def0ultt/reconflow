@@ -28,9 +28,10 @@ vars:
 steps:
   - name: naabu_scan
     tool: naabu 
-    args: "{-l {{targets}} || -h {{target}} } -p {{ports}} -verify -rate 1500 -silent"
+    args: "{-l {{targets}} || -host {{target}} } -p {{ports}} -verify -rate 1500 -silent  "
   
   - name: naabutonmap
     tool: python3 tools/naabutonmap.py
     args: "-i {{naabu_scan.output}} {{use_sudo}}"
     depends_on: [naabu_scan]
+
