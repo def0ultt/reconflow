@@ -6,6 +6,7 @@ class Option(BaseModel):
     value: Any = None
     required: bool = True
     description: str = ""
+    metadata: Dict[str, Any] = {}  # Store type, flag, etc.
 
 class BaseModule:
     """
@@ -39,5 +40,5 @@ class BaseModule:
                      missing.append(key)
         return missing
 
-    def run(self, context):
+    def run(self, context, background=False):
         raise NotImplementedError

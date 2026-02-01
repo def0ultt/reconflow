@@ -1,0 +1,11 @@
+{
+  "step_name": "test_echo",
+  "module_id": "test-auto-save",
+  "module_name": "Test Auto Save",
+  "timestamp": "2026-01-29T16:33:01.354291",
+  "duration_seconds": 0.0,
+  "line_count": 1,
+  "file_size": 23,
+  "command": "echo Testing automatic save",
+  "exit_code": 0
+}

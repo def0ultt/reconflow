@@ -1,0 +1,24 @@
+type: module
+
+info:
+  id: test-auto-save
+  name: Test Auto Save
+  description: Tests automatic output saving
+  author: system
+
+vars:
+  message:
+    default: "Testing automatic save"
+
+steps:
+  - name: test_echo
+    tool: echo
+    args: "{{message}}"
+  
+  - name: test_date
+    tool: date
+    args: ""
+  
+  - name: test_ls
+    tool: ls
+    args: "-la /tmp | head -5"

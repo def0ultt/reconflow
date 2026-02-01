@@ -1,0 +1,34 @@
+type: module
+
+info:
+  id: boolean-test
+  name: Boolean Variable Test
+  tag: testing
+  description: Test boolean variable support with flag injection
+  author: test
+
+vars:
+  target:
+    required: true
+    default: "example.com"
+  
+  service_scan:
+    type: boolean
+    default: false
+    flag: "-sV"
+  
+  verbose:
+    type: boolean
+    default: false
+    flag: "-v"
+  
+  aggressive:
+    type: boolean
+    default: false
+    flag: "-A"
+
+steps:
+  - name: test-scan
+    tool: echo
+    args: "nmap {{service_scan}} {{verbose}} {{aggressive}} {{target}}"
+

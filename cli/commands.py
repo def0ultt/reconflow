@@ -1,12 +1,20 @@
 from core.context import Context
+from core.file_reader import FileReader
+from utils.formatter import OutputFormatter
 from rich.console import Console
 from rich.table import Table
 import os
+from rich.text import Text
+from rich import box
 import shutil
 import yaml
+import json
 from utils.paths import get_project_root
 
 console = Console()
+file_reader = FileReader()
+formatter = OutputFormatter()
+
 
 def cmd_use(ctx: Context, arg: str):
     if not arg:
@@ -43,9 +51,18 @@ def cmd_back(ctx: Context, arg: str):
     ctx.active_module = None
     ctx.active_module_path = None
 
+def parse_boolean(value: str):
+    """Parse string to boolean. Returns None if invalid."""
+    val_lower = value.lower().strip()
+    if val_lower in ('true', 'yes', '1', 'on'):
+        return True
+    elif val_lower in ('false', 'no', '0', 'off'):
+        return False
+    return None
+
 def cmd_set(ctx: Context, arg: str):
     if not ctx.active_module:
-        print(" No active module. Use 'use <module>' first.")
+        print("❌ No active module. Use 'use <module>' first.")
         return
 
     parts = arg.split(maxsplit=1)
@@ -55,8 +72,26 @@ def cmd_set(ctx: Context, arg: str):
     
     opt, val = parts[0].lower(), parts[1]
     
-    # Variable Substitution
-    if val.startswith('$'):
+    # Check if option exists
+    if opt not in ctx.active_module.options:
+        print(f"❌ Option '{opt}' not found.")
+        return
+    
+    option_obj = ctx.active_module.options[opt]
+    
+    # Get variable type from metadata
+    var_type = option_obj.metadata.get('type', 'string')
+    
+    # Handle boolean variables
+    if var_type == "boolean":
+        # Parse boolean value
+        bool_val = parse_boolean(val)
+        if bool_val is None:
+            console.print(f"[red]Error: '{val}' is not a valid boolean value. Use: true, false, yes, no, 1, 0[/red]")
+            return
+        val = bool_val
+    # Variable Substitution for string variables
+    elif val.startswith('$'):
         var_key = val
         project_id = ctx.current_project.id if ctx.current_project else None
         resolved = ctx.settings_manager.get_variable(var_key, project_id)
@@ -69,50 +104,10 @@ def cmd_set(ctx: Context, arg: str):
             return
 
     if ctx.active_module.update_option(opt, val):
-        print(f"{opt} => {val}")
+        print(f"✅ {opt} => {val}")
     else:
-        print(f" Option '{opt}' not found.")
-from workflow.engine import WorkflowRunner
-
-def cmd_workflow(ctx: Context, arg: str):
-    """
-    Manage and run workflows.
-    Usage:
-      workflow list
-      workflow run <name> [var=value ...]
-    """
-    if not arg:
-        cmd_show(ctx, 'workflows')
-        return
-
-    args = arg.split()
-    subcmd = args[0]
-    
-    if subcmd == 'list':
-        cmd_show(ctx, 'workflows')
-    
-    elif subcmd == 'run':
-        if len(args) < 2:
-            print("Usage: workflow run <name> [key=value ...]")
-            return
+        print(f"❌ Option '{opt}' not found.")
         
-        wf_name = args[1]
-        
-        # Parse inputs
-        inputs = {}
-        for pair in args[2:]:
-            if '=' in pair:
-                k, v = pair.split('=', 1)
-                inputs[k] = v
-        
-        runner = WorkflowRunner(ctx)
-        try:
-            runner.run_workflow(wf_name, inputs)
-        except Exception as e:
-            print(f"Error executing workflow: {e}")
-            
-    else:
-        print("Unknown workflow command. Try 'list' or 'run'.")
 
 from cli.session_cmd import cmd_sessions
 from cli.startup import run_settings_flow
@@ -144,7 +139,8 @@ def cmd_run(ctx: Context, arg: str):
         
         session = ctx.session_manager.create_session(ctx.active_module, ctx, target_val)
         if session:
-            print(f"[*] Module running in background as session {session.id}")
+            console.print(f"[green]✓ Module '{ctx.active_module.meta['name']}' started in background (Session {session.id})[/green]")
+            console.print(f"[dim]Type 'sessions' to view status.[/dim]")
     else:
         try:
             ctx.active_module.run(ctx)
@@ -153,7 +149,7 @@ def cmd_run(ctx: Context, arg: str):
 
 def cmd_show(ctx: Context, arg: str):
     if not arg:
-        print("Usage: show [options|modules|sessions|projects|workflows]")
+        print("Usage: show [options|modules|sessions|projects]")
         return
         
     if arg == 'options':
@@ -163,20 +159,35 @@ def cmd_show(ctx: Context, arg: str):
         
         table = Table(title=f"Module Options ({ctx.active_module.meta['name']})")
         table.add_column("Name", style="cyan")
+        table.add_column("Type", style="yellow")
         table.add_column("Current Setting", style="magenta")
         table.add_column("Required", style="green")
         table.add_column("Description", style="dim white")
 
         for name, opt in ctx.active_module.options.items():
-            table.add_row(name, str(opt.value), str(opt.required), opt.description)
+            var_type = opt.metadata.get('type', 'string')
+            
+            # Format current value
+            current_val = str(opt.value)
+            if var_type == "boolean":
+                flag = opt.metadata.get('flag')
+                if flag and opt.value:
+                    current_val = f"{opt.value} (flag: {flag})"
+                else:
+                    current_val = str(opt.value)
+            
+            table.add_row(
+                name, 
+                var_type,
+                current_val, 
+                str(opt.required), 
+                opt.description
+            )
         
         console.print(table)
     
     elif arg in ('modules', 'module'):
         cmd_list_modules(ctx, 'modules')
-
-    elif arg in ('workflows', 'workflow'):
-        cmd_list_modules(ctx, 'workflows')
 
     elif arg == 'sessions':
         cmd_sessions(ctx, "-a")
@@ -204,28 +215,28 @@ def cmd_show(ctx: Context, arg: str):
         console.print()
 
     else:
-        print("Usage: show [options|module|workflow|sessions|projects]")
+        print("Usage: show [options|module|sessions|projects]")
 
 def cmd_list(ctx: Context, arg: str):
     """
-    List command to show both workflows and modules summary.
+    List command to show modules summary.
     """
     cmd_list_modules(ctx, 'all')
 
 def cmd_import(ctx: Context, arg: str):
     """
-    Import a module or workflow from a YAML file.
-    Usage: import <workflow|module> <filepath>
+    Import a module from a YAML file.
+    Usage: import module <filepath>
     """
     args = arg.split(maxsplit=1)
     if len(args) != 2:
-        print("Usage: import <workflow|module> <filepath>")
+        print("Usage: import module <filepath>")
         return
 
     type_, source_path = args[0].lower(), args[1]
     
-    if type_ not in ['workflow', 'module']:
-        print("Invalid type. Use 'workflow' or 'module'.")
+    if type_ != 'module':
+        print("Invalid type. Use 'module'.")
         return
         
     if not os.path.exists(source_path):
@@ -233,48 +244,53 @@ def cmd_import(ctx: Context, arg: str):
         return
 
     # Validate YAML
+    from core.schema import validate_yaml
     try:
         with open(source_path, 'r') as f:
             data = yaml.safe_load(f)
-            if not data or 'metadata' not in data:
-                 print("Invalid format: Missing 'metadata' block.")
-                 return
+            validate_yaml(data)
     except Exception as e:
         print(f"Invalid YAML file: {e}")
         return
 
     # Determine destination
     root = get_project_root()
-    if type_ == 'workflow':
-        dest_dir = root / "workflows" / "custom"
-    else:
-        dest_dir = root / "modules" / "custom"
+    dest_dir = root / "modules" / "custom"
         
     dest_dir.mkdir(parents=True, exist_ok=True)
     
     filename = os.path.basename(source_path)
     dest_path = dest_dir / filename
     
+    # Check if source is already in the destination
+    source_abs = os.path.abspath(source_path)
+    dest_abs = os.path.abspath(dest_path)
+    
+    if source_abs == dest_abs:
+        console.print(f"[yellow]Module is already in the modules directory: {dest_path}[/yellow]")
+        console.print("[yellow]Reloading modules...[/yellow]")
+        
+        # Just reload without copying
+        ctx.tool_manager.load_yaml_modules(root_dirs=[str(root / "modules"), str(root / "workflows")])
+        console.print("[green][+] Modules reloaded successfully.[/green]")
+        return
+    
     try:
         shutil.copy(source_path, dest_path)
-        print(f"✅ Imported to {dest_path}")
+        console.print(f"[green][+] Module imported to: {dest_path}[/green]")
         
         # Reload
-        if type_ == 'workflow':
-             # Reload workflow manager and tool manager?
-             ctx.workflow_manager.load_yaml_workflows()
-             ctx.tool_manager.load_workflow_modules(root_dir=str(root / "workflows"))
-        else:
-             ctx.tool_manager.load_yaml_modules(root_dir=str(root / "modules"))
+        ctx.tool_manager.load_yaml_modules(root_dirs=[str(root / "modules"), str(root / "workflows")])
              
-        print("[+] Reloaded system configs.")
+        console.print("[green][+] Modules reloaded successfully.[/green]")
         
     except Exception as e:
-        print(f"Error importing file: {e}")
+        console.print(f"[red]Error importing file: {e}[/red]")
 
     else:
-        print("Usage: show [options|modules|sessions|projects|workflows]")
-from rich import box
+        # print("Usage: show [options|modules|sessions|projects]")
+        pass
+
 def cmd_help(ctx: Context, arg: str):
     table = Table(
     title="[red]Core Commands[/red]",
@@ -285,8 +301,12 @@ def cmd_help(ctx: Context, arg: str):
     border_style="white" # Makes the lines yellow
 )
     table.add_column("[red]Command[/red]", style="bold cyan", justify="center")
-    table.add_column("[red]Description[/red]", style="bold white", justify="left" )
-
+    table.add_column(
+    Text("Description", justify="center"), # Centers the header text
+    header_style="bold red",
+    style="bold white",
+    justify="left"                         # Aligns the column data left
+)
     help_data = [
         ("use", "Select a module by name"),
         ("back", "Move back from the current context"),
@@ -295,11 +315,13 @@ def cmd_help(ctx: Context, arg: str):
         ("show", "Displays options, modules, projects, etc."),
         ("options", "Displays options for the active module"),
         ("search", "Search modules (regex)"),
+        ("info", "Display YAML configuration for a module"),
         ("project", "Switch project(add -c for create and -d for delete )"),
         ("sessions", "Manage background sessions"),
         ("ls", "List files for current project"),
-        ("cat","view file contents in  current project "),
-        ("import","Import a module or workflow from a YAML file"),
+        ("cat","view file contents in current project "),
+        ("bcat","view file as formatted table (JSON) or text"),
+        ("import","Import a module from a YAML file"),
         ("help", "Help menu"),
         ("settings", "Open settings menu"),
         ("exit", "Exit the console"),
@@ -411,102 +433,298 @@ def cmd_create_project(ctx: Context, arg: str):
         print(f"[-] Project '{target}' not found.")
 
 def cmd_ls(ctx: Context, arg: str):
+    """List files from current project organized by module"""
     if not ctx.current_project:
         console.print("[red][-] No active project. Use 'project <name>' first.[/red]")
         return
     
-    files = ctx.project_repo.get_files(ctx.current_project.id)
-    if not files:
-        console.print("[yellow]No files in this project.[/yellow]")
+    project_path = ctx.current_project.path
+    
+    if not os.path.exists(project_path):
+        console.print("[yellow]Project directory not found.[/yellow]")
         return
-
-    table = Table(title=f"Files in {ctx.current_project.name}",box=None,show_header=True, header_style="bold cyan")
-    table.add_column("[red]Path[/red]", style="bold blue", justify="center")
-    table.add_column("[red]Size (B)[/red]", style="bold white", justify="center")
-    table.add_column("[red]Date[/red]", style="bold white", justify="center")
-
-    project_root = ctx.current_project.path
-    for f in files:
-        # Calculate relative path
-        try:
-           rel_path = os.path.relpath(f.file_path, project_root)
-        except ValueError:
-           rel_path = f.file_path
+    
+    # Scan filesystem for module directories
+    files_data = []
+    
+    for item in os.listdir(project_path):
+        item_path = os.path.join(project_path, item)
         
-        table.add_row(rel_path, str(f.file_size_bytes), str(f.created_at))
+        # Skip hidden directories and non-directories
+        if item.startswith('.') or not os.path.isdir(item_path):
+            continue
+        
+        module_name = item
+        
+        # Scan for .txt files in module directory
+        for file in os.listdir(item_path):
+            if not file.endswith('.txt'):
+                continue
+            
+            file_path = os.path.join(item_path, file)
+            step_name = file.replace('.txt', '')
+            
+            # Get file stats
+            stat = os.stat(file_path)
+            file_size = stat.st_size
+            mtime = stat.st_mtime
+            
+            # Calculate line count
+            try:
+                with open(file_path, 'r') as f:
+                    line_count = sum(1 for _ in f)
+            except:
+                line_count = 0
+            
+            # Format time (HH:MM)
+            from datetime import datetime
+            scan_time = datetime.fromtimestamp(mtime).strftime("%H:%M")
+            
+            # Format size (human readable)
+            if file_size < 1024:
+                size_str = f"{file_size} B"
+            elif file_size < 1024 * 1024:
+                size_str = f"{file_size // 1024} KB"
+            else:
+                size_str = f"{file_size // (1024 * 1024)} MB"
+            
+            files_data.append({
+                'module': module_name,
+                'step': step_name,
+                'size': size_str,
+                'lines': line_count,
+                'time': scan_time
+            })
+    
+    if not files_data:
+        console.print("[yellow]No output files found in this project.[/yellow]")
+        return
+    
+    # Create table
+    table = Table(
+        title=f"Project: {ctx.current_project.name}",
+        show_header=True,
+        header_style="bold cyan"
+    )
+    
+    table.add_column("Module", style="green", justify="left")
+    table.add_column("Step", style="cyan", justify="left")
+    table.add_column("Size", style="yellow", justify="right")
+    table.add_column("Lines", style="magenta", justify="right")
+    table.add_column("Scan Time", style="blue", justify="center")
+    
+    # Add rows
+    for file_info in files_data:
+        table.add_row(
+            file_info['module'],
+            file_info['step'],
+            file_info['size'],
+            str(file_info['lines']),
+            file_info['time']
+        )
     
     console.print()
     console.print(table)
     console.print()
 
 def cmd_cat(ctx: Context, arg: str):
+    """Display raw file content (no formatting)"""
     if not ctx.current_project:
         console.print("[red]No active project. Use 'project <name>' first.[/red]")
         return
     
     if not arg:
-        print("Usage: cat <filename>")
+        print("Usage: cat <module>/<file> or cat <file>")
         return
 
-    filename = arg
-    content = ctx.file_manager.get_file_content(ctx.current_project.id, filename)
+    project_path = ctx.current_project.path
+    file_path = None
     
-    if content:
-        console.print(f"[bold cyan][*] SQLite read file: {filename}[/bold cyan]")
+    # Parse argument: module/file or just file
+    if '/' in arg:
+        # Format: module/file
+        parts = arg.split('/', 1)
+        module_name = parts[0]
+        filename = parts[1]
         
-        # Display as Table as requested
-        # We try to detect structure. 
-        # If simple lines, single column. 
-        # If CSV-like (comma/tab), split it? 
-        # For complexity, let's treat it as single column lines for now, or raw if JSON.
+        if not filename.endswith('.txt'):
+            filename += '.txt'
         
-        lines = content.strip().splitlines()
+        file_path = os.path.join(project_path, module_name, filename)
+    else:
+        # Search all modules for the file
+        search_name = arg if arg.endswith('.txt') else f"{arg}.txt"
         
-        # JSON detection for pretty printing
-        if filename.endswith('.json') or (content.strip().startswith('{') and content.strip().endswith('}')):
-             syntax = Syntax(content, "json", theme="monokai", line_numbers=True)
-             console.print(syntax)
-             return
+        for item in os.listdir(project_path):
+            item_path = os.path.join(project_path, item)
+            if os.path.isdir(item_path) and not item.startswith('.'):
+                potential_path = os.path.join(item_path, search_name)
+                if os.path.exists(potential_path):
+                    file_path = potential_path
+                    break
+    
+    if not file_path or not os.path.exists(file_path):
+        console.print(f"[red]File not found: {arg}[/red]")
+        console.print("[dim]Usage: cat <module>/<file> or cat <filename>[/dim]")
+        return
+    
+    # Read and display raw content
+    try:
+        with open(file_path, 'r') as f:
+            content = f.read()
+        
+        # Print raw content without any formatting
+        print(content)
+    except Exception as e:
+        console.print(f"[red]Error reading file: {e}[/red]")
 
-        # Table display for text files
-        result_table = Table(box=None, show_header=False)
+
+def cmd_bcat(ctx: Context, arg: str):
+    """Display file as formatted table (if JSON) or text - Beautiful Cat"""
+    if not ctx.current_project:
+        console.print("[red]No active project. Use 'project <name>' first.[/red]")
+        return
+    
+    if not arg:
+        print("Usage: bcat <module>/<file> or bcat <file>")
+        return
+
+    project_path = ctx.current_project.path
+    file_path = None
+    
+    # Parse argument: module/file or just file
+    if '/' in arg:
+        # Format: module/file
+        parts = arg.split('/', 1)
+        module_name = parts[0]
+        filename = parts[1]
+        
+        if not filename.endswith('.txt'):
+            filename += '.txt'
+        
+        file_path = os.path.join(project_path, module_name, filename)
+    else:
+        # Search all modules for the file
+        search_name = arg if arg.endswith('.txt') else f"{arg}.txt"
+        
+        for item in os.listdir(project_path):
+            item_path = os.path.join(project_path, item)
+            if os.path.isdir(item_path) and not item.startswith('.'):
+                potential_path = os.path.join(item_path, search_name)
+                if os.path.exists(potential_path):
+                    file_path = potential_path
+                    break
+    
+    if not file_path or not os.path.exists(file_path):
+        console.print(f"[red]File not found: {arg}[/red]")
+        console.print("[dim]Usage: bcat <module>/<file> or bcat <filename>[/dim]")
+        return
+    
+    # Use server-side file reader
+    data = file_reader.read_output_file(file_path)
+    
+    if not data['exists']:
+        console.print(f"[red]File not found: {arg}[/red]")
+        return
+    
+    # Display metadata header
+    from rich.panel import Panel
+    header_lines = []
+    rel_path = os.path.relpath(file_path, project_path)
+    header_lines.append(f"[bold cyan]File:[/bold cyan] {rel_path}")
+    
+    if data['metadata']:
+        metadata = data['metadata']
+        
+        if 'timestamp' in metadata:
+            from datetime import datetime
+            try:
+                dt = datetime.fromisoformat(metadata['timestamp'])
+                time_str = dt.strftime("%Y-%m-%d %H:%M:%S")
+                header_lines.append(f"[bold cyan]Executed:[/bold cyan] {time_str}")
+            except:
+                pass
+        
+        if 'duration_seconds' in metadata:
+            header_lines.append(f"[bold cyan]Duration:[/bold cyan] {metadata['duration_seconds']}s")
+        
+        if 'tool' in metadata:
+            header_lines.append(f"[bold cyan]Tool:[/bold cyan] {metadata['tool']}")
+        
+        if 'has_json' in metadata and metadata['has_json']:
+            header_lines.append(f"[bold green]✓ JSON:[/bold green] {metadata.get('record_count', 0)} records")
+        else:
+            header_lines.append(f"[bold yellow]⚠ JSON:[/bold yellow] Not available (showing raw text)")
+    
+    if header_lines:
+        header_text = "\n".join(header_lines)
+        console.print(Panel(header_text, border_style="cyan", padding=(0, 1)))
+        console.print()
+    
+    # Check if JSON available
+    if data['has_json'] and data['json_data']:
+        # Use server-side formatter
+        table_data = formatter.format_as_table_data(data['json_data'])
+        
+        if table_data['total'] == 0:
+            console.print("[yellow]No data to display[/yellow]")
+            return
+        
+        # Render table (CLI-specific rendering)
+        result_table = Table(show_header=True, header_style="bold cyan", box=box.ROUNDED)
+        
+        # Add columns
+        for col in table_data['columns']:
+            result_table.add_column(col.title(), style="white")
+        
+        # Add rows (limit to 100 for display)
+        display_limit = 100
+        for i, row in enumerate(table_data['rows']):
+            if i >= display_limit:
+                break
+            result_table.add_row(*row)
+        
+        console.print(result_table)
+        
+        # Show summary
+        if table_data['total'] > display_limit:
+            console.print(f"\n[dim]Showing {display_limit} of {table_data['total']} records[/dim]")
+        else:
+            console.print(f"\n[dim]Total: {table_data['total']} records[/dim]")
+    else:
+        # Fallback to raw text display
+        console.print("[yellow]No JSON data available. Displaying raw text:[/yellow]\n")
+        
+        lines = data['raw_text'].strip().splitlines()
+        result_table = Table(box=None, show_header=False, padding=(0, 1))
         result_table.add_column("Content", style="white")
         
-        for line in lines:
+        for line in lines[:100]:  # Limit to first 100 lines
             result_table.add_row(line)
         
         console.print(result_table)
-    else:
-        console.print(f"[red]File '{filename}' not found in project.[/red]")
+        
+        if len(lines) > 100:
+            console.print(f"\n[dim]... {len(lines) - 100} more lines (showing first 100)[/dim]")
+
 
 def cmd_list_modules(ctx: Context, mode: str):
     """
-    mode: 'modules' | 'workflows' | 'all'
+    mode: 'modules' | 'all'
     """
     if mode == 'all':
          # Just print summary, do NOT set context
-         mods = ctx.tool_manager.list_pure_modules()
-         wfs = ctx.tool_manager.list_workflow_modules()
+         mods = ctx.tool_manager.list_modules()
          
-         console.print(f"\n[bold cyan]Workflows ({len(wfs)}):[/bold cyan]")
-         for i, m in enumerate(wfs):
-             # We assume name-based display is allowed, but ID for referencing?
-             # User said: "List ... Output example: 1. workflow/live_subdomain"
-             console.print(f"{i+1}. {m}")
-             
-         console.print(f"\n[bold cyan]Modules ({len(mods)}):[/bold cyan]")
+         console.print(f"\n[bold cyan]Modules:[/bold cyan]")
          for i, m in enumerate(mods):
              console.print(f"{i+1}. {m}")
          console.print()
          return
 
     # Specific Mode -> Sets context
-    if mode == 'workflows':
-        items = ctx.tool_manager.list_workflow_modules()
-        title = "Workflows"
-    else:
-        items = ctx.tool_manager.list_pure_modules()
-        title = "Modules"
+    items = ctx.tool_manager.list_modules()
+    title = "Modules"
         
     if not items:
         print(f"No {title.lower()} found.")
@@ -515,32 +733,30 @@ def cmd_list_modules(ctx: Context, mode: str):
 
     # Set Context
     ctx.last_shown_map = items
-    ctx.last_shown_type = 'workflow' if mode == 'workflows' else 'module'
+    ctx.last_shown_type = 'module'
 
-    table = Table(title=title, show_header=True, header_style="bold cyan")
-    table.add_column("ID", style="cyan", justify="center")
-    table.add_column("Path/Name", style="green", justify="left")
-    table.add_column("Description", style="white", justify="left")
+    table = Table(title="[red]"+title+"[/red]", show_header=True)
+    table.add_column("[bold cyan]ID[/bold cyan]", style="bold cyan", justify="center")
+    table.add_column("[bold green]Name[/bold green]", style="bold green", justify="left")
+    table.add_column("[bold yellow]Tag[/bold yellow]", style="bold yellow", justify="left")
+    table.add_column("[bold white]Description[/bold white]", style="bold white", justify="left")
 
     for i, path in enumerate(items):
         try:
-            # We need to instantiate or peek class to get meta
-            # For performance, maybe Manager should cache meta separate from instance?
-            # Creating instance is okay for now.
             mod_cls = ctx.tool_manager.modules[path]
-            # If it's a class, check meta attr
             meta = getattr(mod_cls, 'meta', {})
-            # If it's generic yaml, meta might be on instance or class if we hacked it.
-            # In my previous implementation I set DynamicYamlModule.meta = temp.meta
             
+            module_id = meta.get('id', 'Unknown')
+            tag = meta.get('tag', '')
             desc = meta.get('description', '')
-            table.add_row(str(i+1), path, desc)
+            table.add_row(str(i+1), module_id, tag, desc)
         except Exception:
-             table.add_row(str(i+1), path, "Error loading metadata")
+             table.add_row(str(i+1), "Error", "", "Error loading metadata")
 
     console.print()
     console.print(table)
     console.print()
+
 
 def cmd_search(ctx: Context, arg: str):
     if not arg:
@@ -554,20 +770,137 @@ def cmd_search(ctx: Context, arg: str):
     
     table = Table(title=f"Search Results: {arg}", show_header=True, header_style="bold cyan")
     table.add_column("[red]ID[/red]", style="bold blue", justify="right")
-    table.add_column("[red]Path[/red]", style="bold blue")
     table.add_column("[red]Name[/red]", style="bold white")
+    table.add_column("[red]Tag[/red]", style="bold yellow")
     table.add_column("[red]Description[/red]", style="dim white")
     
     for idx, path, meta in results:
-        table.add_row(str(idx+1), path, meta.get('name', 'Unknown'), meta.get('description', ''))
+        table.add_row(
+            str(idx+1), 
+            meta.get('id', 'Unknown'), 
+            meta.get('tag', ''),
+            meta.get('description', '')
+        )
     
     console.print()
     console.print(table)
     console.print()
 
+
 def cmd_options(ctx: Context, arg: str):
     """Alias for 'show options'"""
     cmd_show(ctx, 'options')
+
+def cmd_info(ctx: Context, arg: str):
+    """Display YAML configuration for a module to understand what happens behind the scenes
+    Usage: info <module-name>
+    """
+    if not arg:
+        console.print("\n[bold red]❌ Usage:[/bold red] [cyan]info <module-name>[/cyan]")
+        console.print("[dim]💡 Example: info port-scan[/dim]\n")
+        return
+    
+    # Resolve module
+    target_path = arg
+    
+    # Check if arg is an ID
+    if arg.isdigit():
+        idx = int(arg) - 1
+        
+        if not ctx.last_shown_map:
+            console.print("[yellow]⚠️  Please run 'show module' or 'search' first (IDs change depending on context).[/yellow]")
+            return
+            
+        if 0 <= idx < len(ctx.last_shown_map):
+            target_path = ctx.last_shown_map[idx]
+        else:
+            console.print(f"[red]❌ Invalid ID: {arg}. Range is 1-{len(ctx.last_shown_map)}[/red]")
+            return
+    
+    # Get module
+    module = ctx.tool_manager.get_module(target_path)
+    if not module:
+        console.print(f"\n[red]❌ Module '{arg}' not found.[/red]")
+        console.print("[dim]💡 Use 'show module' or 'search <pattern>' to find modules.[/dim]\n")
+        return
+    
+    # Check if module has yaml_path
+    if not hasattr(module, 'yaml_path') or not module.yaml_path:
+        console.print(f"[yellow]⚠️  Module '{arg}' does not have a YAML configuration file.[/yellow]")
+        return
+    
+    yaml_path = module.yaml_path
+    
+    # Check if file exists
+    if not os.path.exists(yaml_path):
+        console.print(f"[red]❌ YAML file not found: {yaml_path}[/red]")
+        return
+    
+    # Read and display YAML content
+    try:
+        with open(yaml_path, 'r') as f:
+            yaml_content = f.read()
+        
+        # Get module metadata
+        from rich.panel import Panel
+        from rich.text import Text
+        module_name = module.meta.get('name', 'Unknown')
+        module_id = module.meta.get('id', 'Unknown')
+        module_desc = module.meta.get('description', 'No description')
+        module_author = module.meta.get('author', 'Unknown')
+        module_tag = module.meta.get('tag', 'general')
+        
+       
+        
+        # Create info table
+        info_table = Table(show_header=False, box=box.ROUNDED, border_style="cyan", padding=(0, 2))
+        info_table.add_column("Key", style="bold yellow", width=15)
+        info_table.add_column("Value", style="white")
+        
+        info_table.add_row("📦 Module", f"[bold green]{module_name}[/bold green]")
+        info_table.add_row("🆔 ID", f"[bold cyan]{module_id}[/bold cyan]")
+        info_table.add_row("🏷️  Tag", f"[bold magenta]{module_tag}[/bold magenta]")
+        info_table.add_row("👤 Author", f"[bold blue]{module_author}[/bold blue]")
+        info_table.add_row("📝 Description", f"[dim white]{module_desc}[/dim white]")
+        info_table.add_row("📂 Path", f"[dim cyan]{yaml_path}[/dim cyan]")
+        
+        # Center the table
+        from rich.align import Align
+        console.print(Align.center(info_table))
+        console.print()
+
+        
+        # Create YAML content panel with custom styling
+        console.print(Panel(
+            "",
+            title="[bold yellow]⚙️  YAML Configuration[/bold yellow]",
+            border_style="yellow",
+            padding=(0, 0)
+        ))
+        
+        # Display YAML with enhanced syntax highlighting
+        from rich.syntax import Syntax
+        syntax = Syntax(
+            yaml_content, 
+            "yaml", 
+            theme="dracula",  # Changed to dracula for better colors
+            line_numbers=True,
+            word_wrap=True,
+            background_color="default"
+        )
+        console.print(syntax)
+        
+        # Footer with helpful tips
+        console.print()
+        console.print(Panel(
+            "[dim]💡 Tip: Use [cyan]'use " + module_id + "'[/cyan] to load this module, then [cyan]'show options'[/cyan] to see available settings[/dim]",
+            border_style="dim white",
+            padding=(0, 1)
+        ))
+        console.print()
+        
+    except Exception as e:
+        console.print(f"\n[red]❌ Error reading YAML file: {e}[/red]\n")
 
 COMMANDS = {
     'use': cmd_use,
@@ -579,12 +912,13 @@ COMMANDS = {
     'project': cmd_create_project,
     'ls': cmd_ls,
     'cat': cmd_cat,
+    'bcat': cmd_bcat,
     'help': cmd_help,
     'search': cmd_search,
     'options': cmd_options,
     'sessions': cmd_sessions,
     'settings': cmd_settings,
-    'workflow': cmd_workflow,
     'import': cmd_import,
     'list': cmd_list,
+    'info': cmd_info,
 }

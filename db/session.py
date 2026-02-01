@@ -36,6 +36,17 @@ def get_session():
         init_db()
     return _SessionLocal()
 
+def create_new_session():
+    """
+    Return a fresh, non-scoped session.
+    Useful for background threads to avoid closing the main scoped session.
+    """
+    if _engine is None:
+        init_db()
+    
+    Session = sessionmaker(autocommit=False, autoflush=False, bind=_engine)
+    return Session()
+
 @contextmanager
 def db_session():
     """

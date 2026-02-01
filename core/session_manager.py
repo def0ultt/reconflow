@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Dict, Optional, List
 from sqlalchemy.orm import Session
 from db.models import SessionModel, Project
-from db.session import get_session
+from db.session import get_session, create_new_session
 from core.base import BaseModule
 
 class SessionManager:
@@ -20,8 +20,8 @@ class SessionManager:
             print("❌ No active project. Cannot create session.")
             return None
 
-        # Create DB Entry
-        db: Session = get_session()
+        # Create DB Entry - Use isolated session
+        db: Session = create_new_session()
         try:
             new_session = SessionModel(
                 project_id=context.current_project.id,
@@ -45,7 +45,7 @@ class SessionManager:
         def run_wrapper(sess_id, mod, ctx):
             # Update status logic could go here
             try:
-                mod.run(ctx)
+                mod.run(ctx, background=True)
                 self._update_status(sess_id, "completed")
             except Exception as e:
                 print(f"Session {sess_id} failed: {e}")
@@ -59,7 +59,7 @@ class SessionManager:
         return new_session
 
     def _update_status(self, session_id: int, status: str, info: str = None):
-        db: Session = get_session()
+        db: Session = create_new_session()
         try:
             sess = db.query(SessionModel).filter(SessionModel.id == session_id).first()
             if sess:
@@ -78,7 +78,7 @@ class SessionManager:
                 del self.active_sessions[session_id]
 
     def list_sessions(self, project_id: int = None) -> List[SessionModel]:
-        db: Session = get_session()
+        db: Session = create_new_session()
         try:
             query = db.query(SessionModel)
             if project_id:
@@ -93,6 +93,13 @@ class SessionManager:
             # Ideally modules should check a 'stop' flag.
             # For now, we just mark it as stopped in DB and remove from active list.
             # The thread might continue running until completion.
+            self._update_status(session_id, "stopped")
+            return True
+        else:
+            # If not in active_sessions (e.g. from previous crash), still mark as stopped in DB
+            # We first check if it's 'running' in DB to avoid stopping already completed ones unnecessarily,
+            # but _update_status logic is simple enough.
+            # Let's just force update it if it exists.
             self._update_status(session_id, "stopped")
             return True
         return False

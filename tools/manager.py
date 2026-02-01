@@ -1,6 +1,5 @@
 from core.base import BaseModule
 from core.yaml_module import GenericYamlModule
-from core.workflow_module import WorkflowModule
 import os
 import glob
 import re
@@ -11,111 +10,136 @@ class ToolManager:
     """
     def __init__(self):
         self.modules = {}
+        self.aliases = {} # Maps legacy paths or custom aliases to full names
 
-    def register_module(self, path: str, module_class):
-        """Register a module class with a path (e.g., 'scan/subdomain/passive')."""
-        self.modules[path] = module_class
+    def _generate_full_name(self, tool_id: str) -> str:
+        """
+        Generates the full name for a tool.
+        Format: /module/{id}
+        """
+        # We unified everything to 'module'
+        return f"/module/{tool_id}"
 
-    def load_yaml_modules(self, root_dir="modules"):
-        """Scans for .yml files in modules/ directory and registers them."""
-        # Recursive glob
-        patterns = [
-            os.path.join(root_dir, "**", "*.yml"),
-            os.path.join(root_dir, "**", "*.yaml")
-        ]
+    def register_tool(self, tool_type: str, tool_id: str, module_class, aliases: list = None):
+        """
+        Registers a tool (module) with a unique ID.
+        Enforces naming convention and checks for duplicates.
+        Can optionally register aliases (pointers to the full name).
+        """
+        # Force type to 'module' for internal consistency
+        tool_type = "module"
+        full_name = self._generate_full_name(tool_id)
+        
+        if full_name in self.modules:
+            print(f"[-]Error: module with id '{tool_id}' already exists.")
+            return
+
+        self.modules[full_name] = module_class
+        print(f"[+] Registered module: {full_name}")
+        
+        # Register Aliases
+        if aliases:
+            for alias in aliases:
+                # Avoid overwriting modules with aliases if collision? 
+                # Prioritize explicit registration.
+                if alias not in self.modules and alias not in self.aliases:
+                    self.aliases[alias] = full_name
+                    # print(f"    (Alias: {alias})")
+
+    def load_yaml_modules(self, root_dirs: list = None):
+        """Scans for .yml files in specified directories and registers them."""
+        if not root_dirs:
+            root_dirs = ["modules", "workflows"] # default dirs
+            
+        patterns = []
+        for d in root_dirs:
+             patterns.append(os.path.join(d, "**", "*.yml"))
+             patterns.append(os.path.join(d, "**", "*.yaml"))
         
         for pattern in patterns:
             for filepath in glob.glob(pattern, recursive=True):
-                # Determine virtual path from file structure
-                # e.g. modules/recon/passive/subdomain.yml -> recon/passive/subdomain
+                # Calculate legacy path for alias
+                # We want to support 'modules/x/y' and 'workflows/x/y' as aliases?
+                # Let's derive a relative identifier.
+                # Find which root dir this file belongs to.
                 
-                rel_path = os.path.relpath(filepath, root_dir)
-                base, _ = os.path.splitext(rel_path)
-                
-                # Normalize path separators
-                module_path = base.replace(os.path.sep, "/")
-                
-                # Create a flexible factory/class for this specifics YAML
-                # We need a unique class or instance factory. 
-                # Registering the GenericYamlModule class directly wouldn't work because it needs the file path.
-                
-                # Solution: Create a closure/factory or use a lambda that returns the configured instance?
-                # But our get_module() expects a CLASS that it instantiates.
-                # So we create a dynamic subclass.
-                
-                class DynamicYamlModule(GenericYamlModule):
-                    def __init__(self_inner):
-                        super().__init__(yaml_path=filepath)
-                
-                # Copy meta from YAML without full parse? 
-                # Ideally we parse it once to get the proper ID/Name for registration if we wanted to use ID.
-                # But context.tool_manager uses filesystem-like paths.
-                
-                # Let's peek into the file to set meta on the class?
+                legacy_path = None
+                for d in root_dirs:
+                     if filepath.startswith(d):
+                         rel_path = os.path.relpath(filepath, d)
+                         base, _ = os.path.splitext(rel_path)
+                         legacy_path = f"{d}/{base}".replace(os.path.sep, "/")
+                         
+                         # Also support just the relative path inside the dir (e.g. 'custom/mytool')
+                         # But collision risk.
+                         break
+
                 try:
-                    # Temporary instantiation to read meta
-                    temp = GenericYamlModule(filepath)
-                    DynamicYamlModule.meta = temp.meta
+                     temp = GenericYamlModule(filepath)
+                     mod_meta = temp.meta.copy()
+                     tool_id = mod_meta.get('id')
+                     
+                     if not tool_id:
+                         print(f"Skipping {filepath}: Missing metadata.id")
+                         continue
+
+                     # Create a unique Dynamic Class for this specific YAML
+                     # We use type() to create a new class type dynamically
+                     # This ensures class attributes like 'meta' don't collide.
+                     
+                     # Closure to capture 'filepath'
+                     def make_init(path):
+                        def __init__(self_inner):
+                             super(GenericYamlModule, self_inner).__init__()
+                             GenericYamlModule.__init__(self_inner, yaml_path=path)
+                        return __init__
+
+                     # Unique class name
+                     safe_name = "DynamicMod_" + "".join(x for x in tool_id if x.isalnum())
+                     
+                     # Create class
+                     DynamicModuleClass = type(safe_name, (GenericYamlModule,), {
+                        '__init__': make_init(filepath)
+                     })
+                     
+                     # Set meta on the new class
+                     DynamicModuleClass.meta = mod_meta
+
                 except Exception as e:
                      print(f"Failed to load YAML module {filepath}: {e}")
                      continue
 
-                self.modules[module_path] = DynamicYamlModule
-                print(f"[+] Registered YAML module: {module_path}")
-
-    def load_workflow_modules(self, root_dir="workflows"):
-        """
-        Scans for .yml workflows and registers them as modules under 'workflow/xxx'.
-        This allows 'use workflow/my_flow'.
-        """
-        patterns = [
-            os.path.join(root_dir, "**", "*.yml"),
-            os.path.join(root_dir, "**", "*.yaml")
-        ]
-        
-        for pattern in patterns:
-            for filepath in glob.glob(pattern, recursive=True):
-                # virtual path: workflows/custom/my_flow.yml -> workflow/custom/my_flow
-                rel_path = os.path.relpath(filepath, root_dir)
-                base, _ = os.path.splitext(rel_path)
-                
-                # Prefix with 'workflow/'
-                module_path = "workflow/" + base.replace(os.path.sep, "/")
-                
-                if module_path in self.modules:
-                    continue # Already registered?
-
-                # Create Dynamic WorkflowModule
-                class DynamicWorkflowModule(WorkflowModule):
-                    def __init__(self_inner):
-                         super().__init__(yaml_path=filepath)
-                         
-                try:
-                     temp = WorkflowModule(filepath)
-                     DynamicWorkflowModule.meta = temp.meta
-                except Exception as e:
-                     print(f"Failed to load Workflow module {filepath}: {e}")
-                     continue
-
-                self.modules[module_path] = DynamicWorkflowModule
-                print(f"[+] Registered Workflow module: {module_path}")
+                aliases = []
+                if legacy_path:
+                    aliases.append(legacy_path)
+                    
+                self.register_tool("module", tool_id, DynamicModuleClass, aliases=aliases)
 
     def get_module(self, path: str):
-        module_cls = self.modules.get(path)
-        if module_cls:
-            return module_cls() # Return a new instance
+        # 1. Exact match
+        if path in self.modules:
+            return self.modules[path]()
+        
+        # 2. Alias match
+        if path in self.aliases:
+            real_name = self.aliases[path]
+            return self.modules[real_name]()
+            
+        # 3. Smart Lookup (User typed 'nmap' but we have '/module/nmap')
+        # Try prepending /module/
+        check_mod = f"/module/{path}"
+        if check_mod in self.modules:
+            return self.modules[check_mod]()
+            
+        # Try prepending /workflow/ (legacy support for lookup)
+        # Even though we register as module, maybe alias was registered as workflow/xxx?
+        # Our loader registers legacy_path which includes the directory name ('workflow/xxx'). 
+        # So alias match above covers it.
+            
         return None
 
     def list_modules(self):
         return sorted(list(self.modules.keys()))
-
-    def list_pure_modules(self):
-        """Returns only standard modules (not workflows)."""
-        return sorted([k for k in self.modules.keys() if not k.startswith("workflow/")])
-
-    def list_workflow_modules(self):
-        """Returns only workflow modules."""
-        return sorted([k for k in self.modules.keys() if k.startswith("workflow/")])
 
     def get_module_by_id(self, idx: int):
         modules = self.list_modules()

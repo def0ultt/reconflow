@@ -1,14 +1,20 @@
-metadata:
+type: module
+info:
   id: demo-ping
   name: Demo Ping Tool
   description: A specific ping tool imported from examples
   author: User
 
-inputs:
-  target: google.com
-  count: 3
+vars:
+  target: 
+    default: "google.com"
+    required: true
+  count: 
+    default: 3
 
 steps:
-  - id: ping
+  - name: ping
     tool: ping
-    args: "-c {{inputs.count}} {{inputs.target}}"
+    args: "-c {{count}} {{target}}"
+    output:
+      filename: "ping_results.txt"
