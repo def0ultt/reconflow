@@ -45,7 +45,7 @@ class SessionManager:
         def run_wrapper(sess_id, mod, ctx):
             # Update status logic could go here
             try:
-                mod.run(ctx)
+                mod.run(ctx, background=True)
                 self._update_status(sess_id, "completed")
             except Exception as e:
                 print(f"Session {sess_id} failed: {e}")
@@ -93,6 +93,13 @@ class SessionManager:
             # Ideally modules should check a 'stop' flag.
             # For now, we just mark it as stopped in DB and remove from active list.
             # The thread might continue running until completion.
+            self._update_status(session_id, "stopped")
+            return True
+        else:
+            # If not in active_sessions (e.g. from previous crash), still mark as stopped in DB
+            # We first check if it's 'running' in DB to avoid stopping already completed ones unnecessarily,
+            # but _update_status logic is simple enough.
+            # Let's just force update it if it exists.
             self._update_status(session_id, "stopped")
             return True
         return False

@@ -128,4 +128,6 @@ BUILTIN_PARSERS = {
     'nmap': parse_nmap,
     'nuclei': parse_nuclei,
     'naabu': parse_naabu,
+    'naabutonmap.py': parse_nmap,
+    'python3 tools/naabutonmap.py': parse_nmap,
 }

@@ -139,7 +139,8 @@ def cmd_run(ctx: Context, arg: str):
         
         session = ctx.session_manager.create_session(ctx.active_module, ctx, target_val)
         if session:
-            print(f"[*] Module running in background as session {session.id}")
+            console.print(f"[green]✓ Module '{ctx.active_module.meta['name']}' started in background (Session {session.id})[/green]")
+            console.print(f"[dim]Type 'sessions' to view status.[/dim]")
     else:
         try:
             ctx.active_module.run(ctx)

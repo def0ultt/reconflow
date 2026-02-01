@@ -53,20 +53,16 @@ def cmd_sessions(ctx: Context, arg: str):
     table = Table(title=f"Active Sessions" if not args.all else "All Sessions", box=None, show_header=True, header_style="bold cyan")
     table.add_column("Id", style="blue", justify="right")
     table.add_column("Name", style="magenta")
-    table.add_column("Type", style="green") # Module name?
+    table.add_column("Target", style="bold blue") # Replaced 'Type' and 'Connection'
     table.add_column("Status", style="yellow")
-    table.add_column("Information", style="white")
-    table.add_column("Connection", style="bold blue") # Target
-
+    # Removed 'Information' column
+    
     for s in sessions:
-        info = s.info if s.info else ""
         table.add_row(
             str(s.id), 
-            "", # Name (placeholder)
-            s.module, 
-            s.status, 
-            info,
-            s.target or ""
+            s.module,  # Module Name
+            s.target or "", # User option set
+            s.status
         )
     
     console.print()
