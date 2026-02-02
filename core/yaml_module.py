@@ -128,6 +128,54 @@ class GenericYamlModule(BaseModule):
             
         return "".join(result)
 
+    def _evaluate_condition(self, condition: str, context: Dict[str, Any]) -> bool:
+        """
+        Evaluate condition with support for simplified syntax:
+        - {var}        -> True if var exists and is truthy
+        - {!var}       -> True if var is falsy or missing
+        - {var == val} -> Equality check
+        - {var != val} -> Inequality check
+        """
+        condition = condition.strip()
+        
+        # Check for simplified syntax { ... } but make sure it's not Jinja {{ ... }}
+        if condition.startswith('{') and condition.endswith('}') and not condition.startswith('{{'):
+            inner = condition[1:-1].strip()
+            
+            # Equality Check
+            if '==' in inner:
+                parts = inner.split('==')
+                if len(parts) == 2:
+                    var_name = parts[0].strip()
+                    target_val = parts[1].strip().strip("'").strip('"') # Remove quotes
+                    actual_val = str(context.get(var_name, ''))
+                    return actual_val == target_val
+            
+            # Inequality Check
+            elif '!=' in inner:
+                parts = inner.split('!=')
+                if len(parts) == 2:
+                    var_name = parts[0].strip()
+                    target_val = parts[1].strip().strip("'").strip('"')
+                    actual_val = str(context.get(var_name, ''))
+                    return actual_val != target_val
+            
+            # Negation (Strictly Falsy or Missing)
+            elif inner.startswith('!'):
+                var_name = inner[1:].strip()
+                val = context.get(var_name)
+                return not val # Returns True if None, False, Empty String, etc.
+
+            # Simple Truthiness
+            else:
+                var_name = inner
+                val = context.get(var_name)
+                return bool(val)
+
+        # Fallback to standard Jinja + Eval
+        cond_str = self._render_template(condition, context)
+        return bool(eval(cond_str))
+
     def load_from_yaml(self, path: str):
         if not os.path.exists(path):
             raise FileNotFoundError(f"YAML module definitions not found at {path}")
@@ -307,9 +355,9 @@ class GenericYamlModule(BaseModule):
         # 1. Condition Check
         if step.condition:
             try:
-                cond_str = self._render_template(step.condition, render_ctx)
-                if not eval(cond_str):
-                    format_step_skipped(step_id, cond_str)
+                should_run = self._evaluate_condition(step.condition, render_ctx)
+                if not should_run:
+                    format_step_skipped(step_id, step.condition)
                     return {'skipped': True, 'stdout': '', 'output_file': None}
             except Exception as e:
                 console.print(f"[red]⚠️  Condition evaluation failed for '{step_id}': {e}[/red]")

@@ -580,132 +580,148 @@ def cmd_cat(ctx: Context, arg: str):
 
 
 def cmd_bcat(ctx: Context, arg: str):
-    """Display file as formatted table (if JSON) or text - Beautiful Cat"""
+    """
+    Display generic JSON output as text with optional search.
+    Usage: bcat <query> <file> OR bcat <file>
+    """
     if not ctx.current_project:
         console.print("[red]No active project. Use 'project <name>' first.[/red]")
         return
     
     if not arg:
-        print("Usage: bcat <module>/<file> or bcat <file>")
+        print("Usage: bcat <query string> <filename> or bcat <filename>")
+        print("Example: bcat 'status_code==200' httpx-output")
         return
 
+    # Parse arguments
+    # We support two formats:
+    # 1. bcat <query> <filename>
+    # 2. bcat <filename>
+    
+    import shlex
+    try:
+        parts = shlex.split(arg)
+    except:
+        parts = arg.split()
+        
+    query = None
+    filename = None
+    
+    if len(parts) >= 2:
+        # Heuristic: if first arg contains operators or is quoted, it's likely a query
+        # But shlex removes quotes, so checking for operators is safer
+        # Or simple assumption: first arg is query if 2 args provided
+        query = parts[0]
+        filename = parts[1]
+    else:
+        filename = parts[0]
+        query = None
+        
+    # Resolve file path
     project_path = ctx.current_project.path
     file_path = None
     
-    # Parse argument: module/file or just file
-    if '/' in arg:
-        # Format: module/file
-        parts = arg.split('/', 1)
-        module_name = parts[0]
-        filename = parts[1]
-        
-        if not filename.endswith('.txt'):
-            filename += '.txt'
-        
-        file_path = os.path.join(project_path, module_name, filename)
+    # Check if filename has extension (heuristic)
+    if filename.endswith('.json') or filename.endswith('.jsonl') or filename.endswith('.txt'):
+        search_name = filename
     else:
-        # Search all modules for the file
-        search_name = arg if arg.endswith('.txt') else f"{arg}.txt"
-        
-        for item in os.listdir(project_path):
-            item_path = os.path.join(project_path, item)
-            if os.path.isdir(item_path) and not item.startswith('.'):
-                potential_path = os.path.join(item_path, search_name)
-                if os.path.exists(potential_path):
-                    file_path = potential_path
-                    break
+        search_name = f"{filename}.json"
+    
+    # Try direct path first
+    if '/' in filename:
+        mod, name = filename.split('/', 1)
+        if not name.endswith('.json') and not name.endswith('.txt') and not name.endswith('.jsonl'):
+             name += '.json'
+        # Check if that exists
+        p = os.path.join(project_path, mod, name)
+        if os.path.exists(p):
+            file_path = p
+        else:
+             # Try txt extension
+             p_txt = p.replace('.json', '.txt')
+             if os.path.exists(p_txt):
+                 file_path = p_txt
+             else:
+                 # Try jsonl extension
+                 p_jsonl = p.replace('.json', '.jsonl')
+                 if os.path.exists(p_jsonl):
+                     file_path = p_jsonl
+    else:
+        # Search recursively
+        for root, dirs, files in os.walk(project_path):
+             # Skip hidden
+             if '/.' in root: continue
+             
+             if search_name in files:
+                 file_path = os.path.join(root, search_name)
+                 break
+             # Try .txt version if .json not found
+             elif search_name.replace('.json', '.txt') in files:
+                  file_path = os.path.join(root, search_name.replace('.json', '.txt'))
+                  break
+             # Try .jsonl version if .json not found
+             elif search_name.replace('.json', '.jsonl') in files:
+                  file_path = os.path.join(root, search_name.replace('.json', '.jsonl'))
+                  break
     
     if not file_path or not os.path.exists(file_path):
-        console.print(f"[red]File not found: {arg}[/red]")
-        console.print("[dim]Usage: bcat <module>/<file> or bcat <filename>[/dim]")
+        console.print(f"[red]File '{filename}' not found.[/red]")
         return
-    
-    # Use server-side file reader
-    data = file_reader.read_output_file(file_path)
-    
-    if not data['exists']:
-        console.print(f"[red]File not found: {arg}[/red]")
-        return
-    
-    # Display metadata header
-    from rich.panel import Panel
-    header_lines = []
-    rel_path = os.path.relpath(file_path, project_path)
-    header_lines.append(f"[bold cyan]File:[/bold cyan] {rel_path}")
-    
-    if data['metadata']:
-        metadata = data['metadata']
         
-        if 'timestamp' in metadata:
-            from datetime import datetime
-            try:
-                dt = datetime.fromisoformat(metadata['timestamp'])
-                time_str = dt.strftime("%Y-%m-%d %H:%M:%S")
-                header_lines.append(f"[bold cyan]Executed:[/bold cyan] {time_str}")
-            except:
-                pass
+    # Read file
+    try:
+        data = []
+        is_json = False
         
-        if 'duration_seconds' in metadata:
-            header_lines.append(f"[bold cyan]Duration:[/bold cyan] {metadata['duration_seconds']}s")
+        # First, try to parse as JSON array
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = json.load(f)
+                if isinstance(content, list):
+                    data = content
+                    is_json = True
+                elif isinstance(content, dict):
+                    data = [content]
+                    is_json = True
+        except (json.JSONDecodeError, ValueError):
+            # Not a JSON array, will try JSONL below
+            pass
         
-        if 'tool' in metadata:
-            header_lines.append(f"[bold cyan]Tool:[/bold cyan] {metadata['tool']}")
+        # If JSON array parsing didn't work, try JSONL
+        if not is_json:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line: continue
+                    try:
+                        js = json.loads(line)
+                        data.append(js)
+                        is_json = True
+                    except:
+                        pass
         
-        if 'has_json' in metadata and metadata['has_json']:
-            header_lines.append(f"[bold green]✓ JSON:[/bold green] {metadata.get('record_count', 0)} records")
-        else:
-            header_lines.append(f"[bold yellow]⚠ JSON:[/bold yellow] Not available (showing raw text)")
-    
-    if header_lines:
-        header_text = "\n".join(header_lines)
-        console.print(Panel(header_text, border_style="cyan", padding=(0, 1)))
-        console.print()
-    
-    # Check if JSON available
-    if data['has_json'] and data['json_data']:
-        # Use server-side formatter
-        table_data = formatter.format_as_table_data(data['json_data'])
-        
-        if table_data['total'] == 0:
-            console.print("[yellow]No data to display[/yellow]")
+        if not is_json:
+            console.print(f"[yellow]File '{os.path.basename(file_path)}' does not contain valid JSON lines.[/yellow]")
+            console.print("[dim]Use 'cat' command to view raw text files.[/dim]")
             return
+            
+        # Use Generic Viewer
+        from utils.json_viewer import JsonLogViewer
+        viewer = JsonLogViewer(data)
         
-        # Render table (CLI-specific rendering)
-        result_table = Table(show_header=True, header_style="bold cyan", box=box.ROUNDED)
-        
-        # Add columns
-        for col in table_data['columns']:
-            result_table.add_column(col.title(), style="white")
-        
-        # Add rows (limit to 100 for display)
-        display_limit = 100
-        for i, row in enumerate(table_data['rows']):
-            if i >= display_limit:
-                break
-            result_table.add_row(*row)
-        
-        console.print(result_table)
-        
-        # Show summary
-        if table_data['total'] > display_limit:
-            console.print(f"\n[dim]Showing {display_limit} of {table_data['total']} records[/dim]")
+        if query:
+            results = viewer.advanced_search(query)
+            console.print(f"\n[green][+] Results for query: {query} ({len(results)} records)[/green]\n")
+            for entry in results:
+                viewer.print_entry(entry)
         else:
-            console.print(f"\n[dim]Total: {table_data['total']} records[/dim]")
-    else:
-        # Fallback to raw text display
-        console.print("[yellow]No JSON data available. Displaying raw text:[/yellow]\n")
-        
-        lines = data['raw_text'].strip().splitlines()
-        result_table = Table(box=None, show_header=False, padding=(0, 1))
-        result_table.add_column("Content", style="white")
-        
-        for line in lines[:100]:  # Limit to first 100 lines
-            result_table.add_row(line)
-        
-        console.print(result_table)
-        
-        if len(lines) > 100:
-            console.print(f"\n[dim]... {len(lines) - 100} more lines (showing first 100)[/dim]")
+            console.print(f"\n[green][+] Showing all {len(data)} records[/green]\n")
+            for entry in data:
+                viewer.print_entry(entry)
+                
+    except Exception as e:
+        console.print(f"[red]Error processing file: {e}[/red]")
+
 
 
 def cmd_list_modules(ctx: Context, mode: str):

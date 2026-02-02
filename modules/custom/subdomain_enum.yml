@@ -21,38 +21,39 @@ vars:
 steps:
   - name: subfinder
     tool: subfinder 
+    tool: subfinder
     args: "-d {{target}} -all -silent"
-  
+
   - name: assetfinder
     tool: assetfinder
     args: "-subs-only {{target}}"
 
-  # Chaos often requires API key, might fail if not configured but we include it as requested
+  # Chaos often requires API key, run only if provided
   - name: chaos
     tool: chaos
     args: "-d {{target}} -silent -key {{chaos_api_key}}"
-    condition: "{{ chaos_api_key }}"
+    # Check if variable is defined AND not empty (Simple Syntax)
+    condition: "{chaos_api_key}"
 
   - name: findomain
     tool: findomain
     args: "-t {{target}} -q"
 
-
-
   - name: anew # Consolidate unique subdomains
     tool: anew
     args: ""
     stdin: true # ENABLE STDIN PIPING from all dependencies
-    depends_on: [subfinder, assetfinder, findomain]
-  -name: httpx
+    depends_on: [subfinder, assetfinder, chaos, findomain]
+  - name: httpx
     tool: httpx
-    args: "-l {{anew.output}} -title -status-code -content-length -location  -p {{ports}} -j"
+    args: "-l {{anew.output}} -title -status-code -content-length -location  -p {{ports}} "
     depends_on: [anew]
   - name: show_results
     tool: json_parser
-    args: "-i {{httpx.output}}" # anew output usually just text, let's see if plain text displays well
+    args: "-i {{httpx.output}}"
     depends_on: [httpx]
   - name: rm_file
     tool: rm
-    args: "{{subfinder.output}} {{assetfinder.output}} {{findomain.output}}"
-    depends_on: [subfinder, assetfinder, findomain, anew, httpx]
+    args: "{{subfinder.output}} {{assetfinder.output}} {{findomain.output}} {{Chaos.output}}"
+    # Only remove files if they ran (best effort)
+    depends_on: [anew]

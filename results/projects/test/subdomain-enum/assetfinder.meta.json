@@ -3,13 +3,13 @@
   "tool": "assetfinder",
   "module_id": "subdomain-enum",
   "module_name": "Subdomain Enumeration",
-  "timestamp": "2026-02-02T10:12:15.937720",
-  "duration_seconds": 35.49,
-  "line_count": 65,
-  "file_size": 1504,
+  "timestamp": "2026-02-02T10:26:37.189008",
+  "duration_seconds": 217.36,
+  "line_count": 63,
+  "file_size": 1486,
   "command": "assetfinder -subs-only evil.com",
   "exit_code": 0,
   "has_json": true,
-  "record_count": 65,
+  "record_count": 63,
   "parser_used": "assetfinder"
 }

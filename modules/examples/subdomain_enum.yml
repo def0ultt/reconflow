@@ -32,8 +32,8 @@ steps:
   - name: chaos
     tool: chaos
     args: "-d {{target}} -silent -key {{chaos_api_key}}"
-    # Check if variable is defined AND not empty
-    condition: "{% if chaos_api_key is defined and chaos_api_key %}True{% else %}False{% endif %}"
+    # Check if variable is defined AND not empty (Simple Syntax)
+    condition: "{chaos_api_key}"
 
   - name: findomain
     tool: findomain
@@ -46,7 +46,7 @@ steps:
     depends_on: [subfinder, assetfinder, chaos, findomain]
   - name: httpx
     tool: httpx
-    args: "-l {{anew.output}} -title -status-code -content-length -location  -p {{ports}} -j"
+    args: "-l {{anew.output}} -title -status-code -content-length -location  -p {{ports}} "
     depends_on: [anew]
   - name: show_results
     tool: json_parser
@@ -54,6 +54,6 @@ steps:
     depends_on: [httpx]
   - name: rm_file
     tool: rm
-    args: "{{subfinder.output}} {{assetfinder.output}} {{findomain.output}}"
+    args: "{{subfinder.output}} {{assetfinder.output}} {{findomain.output}} {{Chaos.output}}"
     # Only remove files if they ran (best effort)
     depends_on: [anew]

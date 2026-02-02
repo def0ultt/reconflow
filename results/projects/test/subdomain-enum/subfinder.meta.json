@@ -3,13 +3,13 @@
   "tool": "subfinder",
   "module_id": "subdomain-enum",
   "module_name": "Subdomain Enumeration",
-  "timestamp": "2026-02-02T10:12:15.928085",
-  "duration_seconds": 35.48,
-  "line_count": 50,
-  "file_size": 1095,
+  "timestamp": "2026-02-02T10:24:03.692695",
+  "duration_seconds": 63.88,
+  "line_count": 52,
+  "file_size": 1120,
   "command": "subfinder -d evil.com -all -silent",
   "exit_code": 0,
   "has_json": true,
-  "record_count": 50,
+  "record_count": 52,
   "parser_used": "subfinder"
 }

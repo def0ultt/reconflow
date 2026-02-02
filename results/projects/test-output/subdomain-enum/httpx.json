@@ -1,0 +1,496 @@
+[
+  {
+    "timestamp": "2026-02-02T10:12:43.256188608+01:00",
+    "port": "80",
+    "url": "http://2fclient.evil.com:80",
+    "input": "2fclient.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "http",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "2fclient.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "7.447453358s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "8.8.8.8:53",
+      "1.0.0.1:53"
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T10:13:09.685104653+01:00",
+    "port": "80",
+    "url": "http://api.evil.com:80",
+    "input": "api.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "http",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "api.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "5.491864309s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "1.1.1.1:53",
+      "8.8.8.8:53"
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T10:13:22.143016478+01:00",
+    "port": "80",
+    "url": "http://bad.evil.com:80",
+    "input": "bad.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "http",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "bad.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "6.345659141s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "1.0.0.1:53"
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T10:13:22.145604039+01:00",
+    "port": "80",
+    "url": "http://b.evil.com:80",
+    "input": "b.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "http",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "b.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "7.359425223s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "127.0.0.53:53",
+      "8.8.8.8:53"
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T10:13:37.722252214+01:00",
+    "port": "80",
+    "url": "http://baidu.com.evil.com:80",
+    "input": "baidu.com.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "http",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "baidu.com.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "9.08276306s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "1.1.1.1:53",
+      "127.0.0.53:53"
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T10:13:39.968828483+01:00",
+    "port": "80",
+    "url": "http://churches.are.evil.com:80",
+    "input": "churches.are.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "http",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "churches.are.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "4.803966245s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "1.0.0.1:53",
+      "1.1.1.1:53"
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T10:14:12.463903641+01:00",
+    "port": "80",
+    "url": "http://facebook.com.facebook.com.evil.com:80",
+    "input": "facebook.com.facebook.com.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "http",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "facebook.com.facebook.com.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "7.181711717s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "1.1.1.1:53",
+      "1.0.0.1:53"
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T10:14:50.534500637+01:00",
+    "port": "80",
+    "url": "http://grocery.evil.com:80",
+    "input": "grocery.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "http",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "grocery.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "5.841026485s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "1.0.0.1:53",
+      "1.1.1.1:53"
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T10:15:40.030050081+01:00",
+    "port": "80",
+    "url": "http://phishing-site.evil.com:80",
+    "input": "phishing-site.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "http",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "phishing-site.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "6.798524246s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "1.1.1.1:53",
+      "1.0.0.1:53"
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T10:15:41.821706808+01:00",
+    "port": "80",
+    "url": "http://testbank-login-1245056090.evil.com:80",
+    "input": "testbank-login-1245056090.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "http",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "testbank-login-1245056090.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "1.927084786s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "8.8.8.8:53",
+      "1.1.1.1:53"
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T10:15:41.844322027+01:00",
+    "port": "80",
+    "url": "http://testbank-login-1159946934.evil.com:80",
+    "input": "testbank-login-1159946934.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "http",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "testbank-login-1159946934.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "3.504280089s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "8.8.4.4:53",
+      "1.0.0.1:53"
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T10:15:48.726275845+01:00",
+    "port": "443",
+    "url": "https://testbank-login-1245056090.evil.com:443",
+    "input": "testbank-login-1245056090.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "https",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "testbank-login-1245056090.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "9.420250664s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "8.8.8.8:53",
+      "1.1.1.1:53"
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T10:15:48.735888044+01:00",
+    "port": "80",
+    "url": "http://testbank-login-1705456349.evil.com:80",
+    "input": "testbank-login-1705456349.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "http",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "testbank-login-1705456349.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "8.849441714s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "127.0.0.53:53",
+      "8.8.8.8:53"
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T10:15:49.828833901+01:00",
+    "port": "443",
+    "url": "https://testbank-login-1705456349.evil.com:443",
+    "input": "testbank-login-1705456349.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "https",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "testbank-login-1705456349.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "9.921456101s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "127.0.0.53:53",
+      "8.8.8.8:53"
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T10:15:56.266072535+01:00",
+    "port": "80",
+    "url": "http://testbank-login-1916046815.evil.com:80",
+    "input": "testbank-login-1916046815.evil.com",
+    "title": "Evil.Com - We get it...Daily.",
+    "scheme": "http",
+    "content_type": "text/html",
+    "method": "GET",
+    "host": "testbank-login-1916046815.evil.com",
+    "host_ip": "66.96.146.129",
+    "path": "/",
+    "time": "9.518284678s",
+    "a": [
+      "66.96.146.129"
+    ],
+    "tech": [
+      "FrontPage:6.0"
+    ],
+    "words": 382,
+    "lines": 117,
+    "status_code": 200,
+    "content_length": 4180,
+    "failed": false,
+    "knowledgebase": {
+      "PageType": "nonerror",
+      "pHash": 0
+    },
+    "resolvers": [
+      "1.0.0.1:53",
+      "8.8.4.4:53"
+    ]
+  }
+]

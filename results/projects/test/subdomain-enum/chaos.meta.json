@@ -1,0 +1,15 @@
+{
+  "step_name": "chaos",
+  "tool": "chaos",
+  "module_id": "subdomain-enum",
+  "module_name": "Subdomain Enumeration",
+  "timestamp": "2026-02-02T10:23:22.147190",
+  "duration_seconds": 22.31,
+  "line_count": 22,
+  "file_size": 440,
+  "command": "chaos -d evil.com -silent -key 3f5ef2fd-a5ee-43eb-9529-d57e9173895c",
+  "exit_code": 0,
+  "has_json": true,
+  "record_count": 22,
+  "parser_used": "chaos"
+}
