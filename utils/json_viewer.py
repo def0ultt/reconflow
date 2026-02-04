@@ -153,9 +153,54 @@ class JsonLogViewer:
                 
         return filtered_results
 
-    def print_entry(self, entry: Dict[str, Any]):
+    def _classify_value_type(self, value: str) -> str:
+        """
+        Classify value type for intelligent colorization.
+        
+        Returns: 'url', 'number', 'content_type', 'tech', or 'default'
+        """
+        value_str = str(value)
+        
+        # URL
+        if '://' in value_str or value_str.startswith(('http://', 'https://')):
+            return 'url'
+        
+        # Number
+        if re.fullmatch(r'\d+(\.\d+)?', value_str):
+            return 'number'
+        
+        # Content type
+        if any(x in value_str for x in ['text/', 'application/', 'image/', 'video/', 'audio/']):
+            return 'content_type'
+        
+        # Technology/Version (e.g., nginx:1.18, FrontPage:6.0)
+        if re.search(r'[a-zA-Z]+[:/]\d', value_str):
+            return 'tech'
+        
+        return 'default'
+    
+    def _colorize_value(self, value: str, value_type: str) -> str:
+        """Apply color markup based on value type."""
+        colors = {
+            'url': 'cyan',
+            'number': 'yellow',
+            'content_type': 'magenta',
+            'tech': 'green',
+            'default': 'white'
+        }
+        color = colors.get(value_type, 'white')
+        return f"[{color}]{value}[/{color}]"
+    
+    def print_entry(self, entry: Dict[str, Any], 
+                    include_fields: List[str] = None,
+                    exclude_fields: List[str] = None):
         """
         Print entry in a readable key-value format.
+        
+        Args:
+            entry: Dictionary to print
+            include_fields: If provided, only print these fields
+            exclude_fields: If provided, print all fields except these
         """
         if not isinstance(entry, dict):
             # Skip non-dict entries as requested
@@ -167,19 +212,54 @@ class JsonLogViewer:
             'status_code', 'title', 'content_length', 'time', 'tech'
         ]
         
-        # Print keys in priority order first
-        for key in priority:
-            if key in entry:
-                val = entry[key]
-                if isinstance(val, list):
-                    val = ", ".join(str(v) for v in val)
-                print(f"  {key}: {val}")
+        # Determine which fields to print
+        if include_fields:
+            # Only print specified fields, maintain priority order
+            fields_to_print = []
+            # Add priority fields that are in include list
+            for field in priority:
+                if field in include_fields and field in entry:
+                    fields_to_print.append(field)
+            # Add remaining include fields not in priority
+            for field in include_fields:
+                if field not in priority and field in entry:
+                    fields_to_print.append(field)
+        elif exclude_fields:
+            # Print all fields except excluded ones
+            fields_to_print = []
+            # Add priority fields not in exclude list
+            for field in priority:
+                if field not in exclude_fields and field in entry:
+                    fields_to_print.append(field)
+            # Add remaining fields not in priority or exclude
+            for field in entry.keys():
+                if field not in priority and field not in exclude_fields:
+                    fields_to_print.append(field)
+        else:
+            # Print all fields in priority order
+            fields_to_print = []
+            for field in priority:
+                if field in entry:
+                    fields_to_print.append(field)
+            for field in entry.keys():
+                if field not in priority:
+                    fields_to_print.append(field)
         
-        # Print remaining keys
-        for key, val in entry.items():
-            if key not in priority:
-                if isinstance(val, list):
-                    val = ", ".join(str(v) for v in val)
-                print(f"  {key}: {val}")
+        # Print the fields with colorization
+        from rich.console import Console
+        console = Console()
         
-        print() # Newline between entries
+        for key in fields_to_print:
+            val = entry[key]
+            if isinstance(val, list):
+                val = ", ".join(str(v) for v in val)
+            
+            # Classify and colorize the value
+            val_str = str(val)
+            val_type = self._classify_value_type(val_str)
+            colored_val = self._colorize_value(val_str, val_type)
+            
+            # Print with colored key (blue) and colored value
+            console.print(f"  [bold blue]{key}[/bold blue]: {colored_val}")
+        
+        console.print() # Newline between entries

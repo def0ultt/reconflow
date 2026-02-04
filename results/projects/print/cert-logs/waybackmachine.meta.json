@@ -1,0 +1,15 @@
+{
+  "step_name": "waybackmachine",
+  "tool": "bash",
+  "module_id": "cert-logs",
+  "module_name": "Certificate Transparency Logs recon",
+  "timestamp": "2026-02-04T13:50:51.261243",
+  "duration_seconds": 7.72,
+  "line_count": 10277,
+  "file_size": 114921,
+  "command": "bash -c \"curl -s 'http://web.archive.org/cdx/search/cdx?url=*.evil.com/*&output=text&fl=original&collapse=urlkey' | sort | sed -e 's_https*://__' -e 's/\\/.*//' -e 's/:.*//' -e 's/^www\\.//' \"",
+  "exit_code": 0,
+  "has_json": true,
+  "record_count": 10277,
+  "parser_used": "bash"
+}

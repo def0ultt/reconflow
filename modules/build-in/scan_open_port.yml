@@ -1,7 +1,7 @@
 type: module
 
 info:
-  id: port-scan-conditional
+  id: scan_open_port
   name: Port Scan with Conditional Targets
   tag: scanning
   description: Example module demonstrating conditional argument usage

@@ -1,152 +1,38 @@
 [
   {
-    "subdomain": "frame.evil.com"
+    "line": "localhost.127.0.0.1"
   },
   {
-    "subdomain": "abcdefghijklmnopqrstuvwxyz123456.evil.com"
+    "line": "mole.127.0.0.1"
   },
   {
-    "subdomain": "good.evil.com"
+    "line": "postgresql.127.0.0.1"
   },
   {
-    "subdomain": "252fclient.evil.com"
+    "line": "5.127.0.0.1"
   },
   {
-    "subdomain": "microsoft.com.foo.bar.evil.com"
+    "line": "code.127.0.0.1"
   },
   {
-    "subdomain": "mozilla.thunderbird.blahblahblahblahblah.evil.com"
+    "line": "pal.com.127.0.0.1"
   },
   {
-    "subdomain": "gist.github.com.evil.com"
+    "line": "dtc.127.0.0.1"
   },
   {
-    "subdomain": "data1.evil.com"
+    "line": "emailmarketer.127.0.0.1"
   },
   {
-    "subdomain": "dr.evil.com"
+    "line": "www.127.0.0.1"
   },
   {
-    "subdomain": "kjasdffdsfjewf.evil.com"
+    "line": "a.127.0.0.1"
   },
   {
-    "subdomain": "a.evil.com"
+    "line": "ap007.127.0.0.1"
   },
   {
-    "subdomain": "bad.evil.com"
-  },
-  {
-    "subdomain": "com.evil.com"
-  },
-  {
-    "subdomain": "auth.app.com.evil.com"
-  },
-  {
-    "subdomain": "my.bluehost.com.evil.com"
-  },
-  {
-    "subdomain": "facebook.com.facebook.com.evil.com"
-  },
-  {
-    "subdomain": "foo.com.evil.com"
-  },
-  {
-    "subdomain": "data2.evil.com"
-  },
-  {
-    "subdomain": "api.evil.com"
-  },
-  {
-    "subdomain": "foo.bar.evil.com"
-  },
-  {
-    "subdomain": "www.opentable.com.evil.com"
-  },
-  {
-    "subdomain": "xn--qq-pt3cr0eg2rkmlugut88d.com.evil.com"
-  },
-  {
-    "subdomain": "ivano-francovsk.evil.com"
-  },
-  {
-    "subdomain": "2fclient.evil.com"
-  },
-  {
-    "subdomain": "mail.google.com.backend-processing.am-i-off-the-screen-yet.evil.com"
-  },
-  {
-    "subdomain": "b.evil.com"
-  },
-  {
-    "subdomain": "not.to.be.evil.com"
-  },
-  {
-    "subdomain": "bobafett.evil.com"
-  },
-  {
-    "subdomain": "baidu.com.evil.com"
-  },
-  {
-    "subdomain": "domain.evil.com"
-  },
-  {
-    "subdomain": "external.evil.com"
-  },
-  {
-    "subdomain": "abcdefg.evil.com"
-  },
-  {
-    "subdomain": "attacker.evil.com"
-  },
-  {
-    "subdomain": "grocery.evil.com"
-  },
-  {
-    "subdomain": "127.localhost.evil.com"
-  },
-  {
-    "subdomain": "microsoft.com.foo.bar.baz.evil.com"
-  },
-  {
-    "subdomain": "bloopist.com.evil.com"
-  },
-  {
-    "subdomain": "good.com.evil.com"
-  },
-  {
-    "subdomain": "paypal.com.evil.com"
-  },
-  {
-    "subdomain": "yourbank.com.evil.com"
-  },
-  {
-    "subdomain": "yourtweetreader.com.evil.com"
-  },
-  {
-    "subdomain": "imap.evil.com"
-  },
-  {
-    "subdomain": "mallet.evil.com"
-  },
-  {
-    "subdomain": "anti-virus.evil.com"
-  },
-  {
-    "subdomain": "churches.are.evil.com"
-  },
-  {
-    "subdomain": "assets.evil.com"
-  },
-  {
-    "subdomain": "client.evil.com"
-  },
-  {
-    "subdomain": "example.com.evil.com"
-  },
-  {
-    "subdomain": "xxx.com.evil.com"
-  },
-  {
-    "subdomain": "motor-talk.de.evil.com"
+    "line": "blog.127.0.0.1"
   }
 ]
