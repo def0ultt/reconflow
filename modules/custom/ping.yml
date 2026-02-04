@@ -3,6 +3,7 @@ type: module
 info:
   id: ping
   name: test ping 
+  tag: network
   description: Complete recon pipeline with parallel execution
   author: charlie
 

@@ -3,6 +3,7 @@ type: module
 info:
   id: boolean-test
   name: Boolean Variable Test
+  tag: testing
   description: Test boolean variable support with flag injection
   author: test
 

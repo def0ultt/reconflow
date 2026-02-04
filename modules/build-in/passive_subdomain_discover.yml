@@ -1,0 +1,46 @@
+type: module
+
+info:
+  id: port-scan-conditional
+  name: Port Scan with Conditional Targets
+  tag: scanning
+  description: Example module demonstrating conditional argument usage
+  author: charlie
+
+vars:
+  target:
+    required: false
+    description: Single target IP or Domain
+  targets:
+    required: false
+    description: Path to file containing list of targets
+  ports:
+    default: "-" # All ports by default
+    description: Ports to scan
+
+
+steps:
+  - name: subfinder
+    tool: subfinder 
+    args: " -d {{target}} -all -silent "
+  
+  - name: assetfinder
+    tool: assetfinder
+    args: "-subs-only {{target}}"
+  - name: chaos
+    tool: chaos
+    args: "{{target}} -silent"
+
+  - name: findomain
+    tool: assetfinder
+    args: "-t {{target}} -q"
+
+  - name: amass
+    tool: amass
+    args: "enum -passive -d target.com"
+
+  - name: anew
+    tool: anew
+    args: ""
+    depends_on: [findomain,assetfinder,subfinder,chaos,amass]
+

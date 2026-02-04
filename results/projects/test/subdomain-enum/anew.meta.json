@@ -1,0 +1,15 @@
+{
+  "step_name": "anew",
+  "tool": "anew",
+  "module_id": "subdomain-enum",
+  "module_name": "Subdomain Enumeration",
+  "timestamp": "2026-02-02T10:26:37.201059",
+  "duration_seconds": 0.01,
+  "line_count": 84,
+  "file_size": 1834,
+  "command": "anew ",
+  "exit_code": 0,
+  "has_json": true,
+  "record_count": 83,
+  "parser_used": "anew"
+}

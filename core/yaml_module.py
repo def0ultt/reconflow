@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Set, Optional
+import sys
 import yaml
 import subprocess
 import os
@@ -43,8 +44,137 @@ class GenericYamlModule(BaseModule):
 
     def _render_template(self, template_str, context):
         if not template_str: return ""
+        
+        # Preprocess conditionals: {-l {{targets}} || -h {{target}} }
+        template_str = self._preprocess_conditionals(template_str, context)
+        
         env = Environment(undefined=StrictUndefined)
         return env.from_string(template_str).render(context)
+
+    def _preprocess_conditionals(self, template_str: str, context: Dict[str, Any]) -> str:
+        """
+        Pre-process conditional arguments in format: {-l {{targets}} || -h {{target}} }
+        """
+        import re
+        result = []
+        i = 0
+        length = len(template_str)
+        
+        while i < length:
+            # Check for start of conditional block: { followed by not {
+            if template_str[i] == '{' and (i + 1 >= length or template_str[i+1] != '{'):
+                start = i
+                # Simple brace balance finder
+                # Note: We need to properly skip Jinja {{ }} if they appear, but the simple counter
+                # works if we assume balanced braces inside.
+                
+                depth = 1
+                i += 1
+                inner_start = i
+                found_end = False
+                
+                while i < length:
+                    char = template_str[i]
+                    if char == '{':
+                        depth += 1
+                    elif char == '}':
+                        depth -= 1
+                        if depth == 0:
+                            found_end = True
+                            break
+                    i += 1
+                
+                if found_end:
+                    block_content = template_str[inner_start:i]
+                    if '||' in block_content:
+                         # Found conditional!
+                        options = [opt.strip() for opt in block_content.split('||')]
+                        selected_option = None
+                        valid_found = False
+                        
+                        for option in options:
+                            vars_needed = re.findall(r'\{\{\s*([a-zA-Z0-9_]+)\s*\}\}', option)
+                            is_valid = True
+                            if not vars_needed:
+                                is_valid = True
+                            else:
+                                for var in vars_needed:
+                                    val = context.get(var)
+                                    # Check for Truthy (exists and not empty)
+                                    if not val: 
+                                        is_valid = False
+                                        break
+                            
+                            if is_valid:
+                                selected_option = option
+                                valid_found = True
+                                break
+                        
+                        if not valid_found:
+                             # Strict Validation: Error if no option works
+                             raise ValueError(f"Conditional argument failed: No valid option found in block '{{ {block_content} }}'. Ensure at least one variable is defined.")
+                        
+                        result.append(selected_option)
+                    else:
+                        # Just a regular single brace block
+                        result.append(template_str[start:i+1])
+                else:
+                    # Incomplete brace
+                    result.append(template_str[start:i])
+            else:
+                result.append(template_str[i])
+            
+            i += 1
+            
+        return "".join(result)
+
+    def _evaluate_condition(self, condition: str, context: Dict[str, Any]) -> bool:
+        """
+        Evaluate condition with support for simplified syntax:
+        - {var}        -> True if var exists and is truthy
+        - {!var}       -> True if var is falsy or missing
+        - {var == val} -> Equality check
+        - {var != val} -> Inequality check
+        """
+        condition = condition.strip()
+        
+        # Check for simplified syntax { ... } but make sure it's not Jinja {{ ... }}
+        if condition.startswith('{') and condition.endswith('}') and not condition.startswith('{{'):
+            inner = condition[1:-1].strip()
+            
+            # Equality Check
+            if '==' in inner:
+                parts = inner.split('==')
+                if len(parts) == 2:
+                    var_name = parts[0].strip()
+                    target_val = parts[1].strip().strip("'").strip('"') # Remove quotes
+                    actual_val = str(context.get(var_name, ''))
+                    return actual_val == target_val
+            
+            # Inequality Check
+            elif '!=' in inner:
+                parts = inner.split('!=')
+                if len(parts) == 2:
+                    var_name = parts[0].strip()
+                    target_val = parts[1].strip().strip("'").strip('"')
+                    actual_val = str(context.get(var_name, ''))
+                    return actual_val != target_val
+            
+            # Negation (Strictly Falsy or Missing)
+            elif inner.startswith('!'):
+                var_name = inner[1:].strip()
+                val = context.get(var_name)
+                return not val # Returns True if None, False, Empty String, etc.
+
+            # Simple Truthiness
+            else:
+                var_name = inner
+                val = context.get(var_name)
+                return bool(val)
+
+        # Fallback to standard Jinja + Eval
+        cond_str = self._render_template(condition, context)
+        return bool(eval(cond_str))
 
     def load_from_yaml(self, path: str):
         if not os.path.exists(path):
@@ -63,7 +193,8 @@ class GenericYamlModule(BaseModule):
             'name': self.schema.info.name,
             'description': self.schema.info.description,
             'author': self.schema.info.author,
-            'id': self.schema.info.id
+            'id': self.schema.info.id,
+            'tag': self.schema.info.tag if self.schema.info.tag else ''
         })
 
         # 2. Parse Vars -> Options
@@ -79,7 +210,7 @@ class GenericYamlModule(BaseModule):
                 }
             )
 
-    def run(self, context) -> Dict[str, Any]:
+    def run(self, context, background=False) -> Dict[str, Any]:
         """
         Execute the steps defined in the YAML Schema using a DAG scheduler.
         Returns a dictionary of captured outputs.
@@ -88,10 +219,13 @@ class GenericYamlModule(BaseModule):
             print("[!] No schema loaded.")
             return {}
 
-        # Initialize progress tracker
+        # Initialize progress tracker (only if not in background)
         total_steps = len(self.schema.steps)
-        progress = ProgressTracker(total_steps)
-        progress.start()
+        progress = None
+        
+        if not background:
+            progress = ProgressTracker(total_steps)
+            progress.start()
 
         # 1. Prepare Context (Strict Scoping)
         render_ctx = {}
@@ -161,13 +295,15 @@ class GenericYamlModule(BaseModule):
                                 render_ctx[step_name] = step_ctx
                                 
                                 # Update progress
-                                progress.update(len(completed_steps))
+                                if progress:
+                                    progress.update(len(completed_steps))
                                 
                         except Exception as e:
                             # Format professional error message
                             failed_steps.add(step_name)
                             # Still count as progress (failed but completed)
-                            progress.update(len(completed_steps) + len(failed_steps))
+                            if progress:
+                                progress.update(len(completed_steps) + len(failed_steps))
 
                     # 2. Submit new steps
                     submission_list = []
@@ -191,7 +327,7 @@ class GenericYamlModule(BaseModule):
                             if can_run:
                                 pending_steps.remove(step_name)
                                 step_context = render_ctx.copy()
-                                future = executor.submit(self._execute_step, step, step_context, context)
+                                future = executor.submit(self._execute_step, step, step_context, context, background)
                                 running_futures[future] = step_name
                     
                     if not running_futures and pending_steps:
@@ -199,16 +335,18 @@ class GenericYamlModule(BaseModule):
                         break
 
             # Mark as complete
-            progress.complete()
+            if progress:
+                progress.complete()
             
         except Exception as e:
             # Ensure progress tracker stops on error
-            progress.stop()
+            if progress:
+                progress.stop()
             raise e
 
         return self._execution_results
 
-    def _execute_step(self, step, render_ctx, full_context):
+    def _execute_step(self, step, render_ctx, full_context, background=False):
         """
         Executes a single step (Tool or Module).
         """
@@ -217,9 +355,9 @@ class GenericYamlModule(BaseModule):
         # 1. Condition Check
         if step.condition:
             try:
-                cond_str = self._render_template(step.condition, render_ctx)
-                if not eval(cond_str):
-                    format_step_skipped(step_id, cond_str)
+                should_run = self._evaluate_condition(step.condition, render_ctx)
+                if not should_run:
+                    format_step_skipped(step_id, step.condition)
                     return {'skipped': True, 'stdout': '', 'output_file': None}
             except Exception as e:
                 console.print(f"[red]⚠️  Condition evaluation failed for '{step_id}': {e}[/red]")
@@ -234,17 +372,36 @@ class GenericYamlModule(BaseModule):
 
         # 3. Execute
         if step.tool:
-            return self._run_tool(step, cmd_args, render_ctx, full_context)
+            return self._run_tool(step, cmd_args, render_ctx, full_context, background=background)
         elif step.module:
-            return self._run_submodule(step, cmd_args, render_ctx, full_context)
+            return self._run_submodule(step, cmd_args, render_ctx, full_context, background=background)
         else:
             raise ValueError(f"Step '{step_id}' has neither tool nor module.")
 
-    def _run_tool(self, step, cmd_args, render_ctx, full_context):
+    def _run_tool(self, step, cmd_args, render_ctx, full_context, background=False):
         step_id = step.name
         
         # Custom Path Logic
         tool_cmd = step.tool
+        
+        # Built-in Tool Aliases
+        # Allow usage of "json_parser" -> "python3 {root}/tools/json_parser.py"
+        builtin_tools = {
+            'json_parser': 'tools/json_parser.py',
+            'xml_parser': 'tools/xml_parser.py'
+        }
+        
+        if tool_cmd in builtin_tools:
+            # Resolve absolute path relative to project root
+            # Assuming file is in reconflow/core/yaml_module.py -> root is ../..
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            tool_path = os.path.join(base_dir, builtin_tools[tool_cmd])
+            
+            if os.path.exists(tool_path):
+                tool_cmd = f"{sys.executable} {tool_path}"
+            else:
+                 console.print(f"[yellow]⚠️  Built-in tool alias '{tool_cmd}' found but file missing at {tool_path}[/yellow]")
+        
         if step.path:
             try:
                 custom_path = self._render_template(step.path, render_ctx)
@@ -257,8 +414,9 @@ class GenericYamlModule(BaseModule):
             
         full_cmd = f"{tool_cmd} {cmd_args}"
         
-        # Format professional tool execution message
-        format_tool_execution(step_id, tool_cmd, full_cmd)
+        if not background:
+            # Format professional tool execution message
+            format_tool_execution(step_id, tool_cmd, full_cmd)
 
         # Output Path Logic
         output_path = None
@@ -275,9 +433,16 @@ class GenericYamlModule(BaseModule):
         # Stdin Logic
         input_data = None
         if step.stdin and step.depends_on:
-             last_dep = step.depends_on[-1] 
-             if last_dep in render_ctx and 'stdout' in render_ctx[last_dep]:
-                 input_data = render_ctx[last_dep]['stdout']
+             # Aggregate stdout from ALL dependencies
+             combined_input = []
+             for dep_name in step.depends_on:
+                 if dep_name in render_ctx and 'stdout' in render_ctx[dep_name]:
+                     out = render_ctx[dep_name]['stdout']
+                     if out:
+                         combined_input.append(out)
+             
+             if combined_input:
+                 input_data = "\n".join(combined_input)
 
         # Timeout
         timeout_sec = self._parse_timeout(step.timeout)
@@ -306,8 +471,9 @@ class GenericYamlModule(BaseModule):
                     duration,
                     full_cmd
                 )
-                # Show save confirmation
-                format_output_saved(auto_output_path)
+                if not background:
+                    # Show save confirmation
+                    format_output_saved(auto_output_path)
             
             # Handle user-specified output (backward compatibility)
             if output_path:
@@ -325,10 +491,12 @@ class GenericYamlModule(BaseModule):
             format_command_error(step_id, e, full_cmd)
             raise e 
 
-    def _run_submodule(self, step, cmd_args, render_ctx, full_context):
+    def _run_submodule(self, step, cmd_args, render_ctx, full_context, background=False):
         step_id = step.name
         mod_ref = step.module
-        console.print(f"\n🔧 [bold cyan]Running Submodule:[/bold cyan] [yellow]{mod_ref}[/yellow]")
+        
+        if not background:
+            console.print(f"\n🔧 [bold cyan]Running Submodule:[/bold cyan] [yellow]{mod_ref}[/yellow]")
         
         # 1. Resolve Module
         target_mod = None
@@ -355,7 +523,7 @@ class GenericYamlModule(BaseModule):
                 target_mod.update_option(key, render_ctx[key])
         
         # 3. Execute recursively
-        results = target_mod.run(full_context)
+        results = target_mod.run(full_context, background=background)
         
         return {
             'module_results': results,

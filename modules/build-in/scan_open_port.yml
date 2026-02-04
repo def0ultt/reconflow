@@ -1,0 +1,37 @@
+type: module
+
+info:
+  id: port-scan-conditional
+  name: Port Scan with Conditional Targets
+  tag: scanning
+  description: Example module demonstrating conditional argument usage
+  author: charlie
+
+vars:
+  target:
+    required: false
+    description: Single target IP or Domain
+  targets:
+    required: false
+    description: Path to file containing list of targets
+  ports:
+    default: "-" # All ports by default
+    description: Ports to scan
+
+  use_sudo:
+    required: false
+    default: false
+    type: boolean
+    flag: "--sudo"
+    description: Run Nmap with sudo privileges
+
+steps:
+  - name: naabu_scan
+    tool: naabu 
+    args: "{-l {{targets}} || -host {{target}} } -p {{ports}} -verify -rate 1500 -silent  "
+  
+  - name: naabutonmap
+    tool: python3 tools/naabutonmap.py
+    args: "-i {{naabu_scan.output}} {{use_sudo}}"
+    depends_on: [naabu_scan]
+

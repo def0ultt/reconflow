@@ -40,5 +40,5 @@ class BaseModule:
                      missing.append(key)
         return missing
 
-    def run(self, context):
+    def run(self, context, background=False):
         raise NotImplementedError

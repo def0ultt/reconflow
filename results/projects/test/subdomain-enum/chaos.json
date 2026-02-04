@@ -1,0 +1,68 @@
+[
+  {
+    "line": "*.evil.com"
+  },
+  {
+    "line": "127.localhost.evil.com"
+  },
+  {
+    "line": "a.evil.com"
+  },
+  {
+    "line": "anti-virus.evil.com"
+  },
+  {
+    "line": "bloopist.com.evil.com"
+  },
+  {
+    "line": "bobafett.evil.com"
+  },
+  {
+    "line": "ckvm02.evil.com"
+  },
+  {
+    "line": "client.evil.com"
+  },
+  {
+    "line": "com.evil.com"
+  },
+  {
+    "line": "example.com.evil.com"
+  },
+  {
+    "line": "frame.evil.com"
+  },
+  {
+    "line": "gist.github.com.evil.com"
+  },
+  {
+    "line": "ivano-francovsk.evil.com"
+  },
+  {
+    "line": "mail.google.com.backend-processing.am-i-off-the-screen-yet.evil.com"
+  },
+  {
+    "line": "mx.evil.com"
+  },
+  {
+    "line": "my.evil.com"
+  },
+  {
+    "line": "some.evil.com"
+  },
+  {
+    "line": "tracker.evil.com"
+  },
+  {
+    "line": "www.evil.com"
+  },
+  {
+    "line": "www.opentable.com.evil.com"
+  },
+  {
+    "line": "yandex.ru.evil.com"
+  },
+  {
+    "line": "yourbank.com.evil.com"
+  }
+]

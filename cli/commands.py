@@ -139,7 +139,8 @@ def cmd_run(ctx: Context, arg: str):
         
         session = ctx.session_manager.create_session(ctx.active_module, ctx, target_val)
         if session:
-            print(f"[*] Module running in background as session {session.id}")
+            console.print(f"[green]✓ Module '{ctx.active_module.meta['name']}' started in background (Session {session.id})[/green]")
+            console.print(f"[dim]Type 'sessions' to view status.[/dim]")
     else:
         try:
             ctx.active_module.run(ctx)
@@ -314,6 +315,7 @@ def cmd_help(ctx: Context, arg: str):
         ("show", "Displays options, modules, projects, etc."),
         ("options", "Displays options for the active module"),
         ("search", "Search modules (regex)"),
+        ("info", "Display YAML configuration for a module"),
         ("project", "Switch project(add -c for create and -d for delete )"),
         ("sessions", "Manage background sessions"),
         ("ls", "List files for current project"),
@@ -578,132 +580,148 @@ def cmd_cat(ctx: Context, arg: str):
 
 
 def cmd_bcat(ctx: Context, arg: str):
-    """Display file as formatted table (if JSON) or text - Beautiful Cat"""
+    """
+    Display generic JSON output as text with optional search.
+    Usage: bcat <query> <file> OR bcat <file>
+    """
     if not ctx.current_project:
         console.print("[red]No active project. Use 'project <name>' first.[/red]")
         return
     
     if not arg:
-        print("Usage: bcat <module>/<file> or bcat <file>")
+        print("Usage: bcat <query string> <filename> or bcat <filename>")
+        print("Example: bcat 'status_code==200' httpx-output")
         return
 
+    # Parse arguments
+    # We support two formats:
+    # 1. bcat <query> <filename>
+    # 2. bcat <filename>
+    
+    import shlex
+    try:
+        parts = shlex.split(arg)
+    except:
+        parts = arg.split()
+        
+    query = None
+    filename = None
+    
+    if len(parts) >= 2:
+        # Heuristic: if first arg contains operators or is quoted, it's likely a query
+        # But shlex removes quotes, so checking for operators is safer
+        # Or simple assumption: first arg is query if 2 args provided
+        query = parts[0]
+        filename = parts[1]
+    else:
+        filename = parts[0]
+        query = None
+        
+    # Resolve file path
     project_path = ctx.current_project.path
     file_path = None
     
-    # Parse argument: module/file or just file
-    if '/' in arg:
-        # Format: module/file
-        parts = arg.split('/', 1)
-        module_name = parts[0]
-        filename = parts[1]
-        
-        if not filename.endswith('.txt'):
-            filename += '.txt'
-        
-        file_path = os.path.join(project_path, module_name, filename)
+    # Check if filename has extension (heuristic)
+    if filename.endswith('.json') or filename.endswith('.jsonl') or filename.endswith('.txt'):
+        search_name = filename
     else:
-        # Search all modules for the file
-        search_name = arg if arg.endswith('.txt') else f"{arg}.txt"
-        
-        for item in os.listdir(project_path):
-            item_path = os.path.join(project_path, item)
-            if os.path.isdir(item_path) and not item.startswith('.'):
-                potential_path = os.path.join(item_path, search_name)
-                if os.path.exists(potential_path):
-                    file_path = potential_path
-                    break
+        search_name = f"{filename}.json"
+    
+    # Try direct path first
+    if '/' in filename:
+        mod, name = filename.split('/', 1)
+        if not name.endswith('.json') and not name.endswith('.txt') and not name.endswith('.jsonl'):
+             name += '.json'
+        # Check if that exists
+        p = os.path.join(project_path, mod, name)
+        if os.path.exists(p):
+            file_path = p
+        else:
+             # Try txt extension
+             p_txt = p.replace('.json', '.txt')
+             if os.path.exists(p_txt):
+                 file_path = p_txt
+             else:
+                 # Try jsonl extension
+                 p_jsonl = p.replace('.json', '.jsonl')
+                 if os.path.exists(p_jsonl):
+                     file_path = p_jsonl
+    else:
+        # Search recursively
+        for root, dirs, files in os.walk(project_path):
+             # Skip hidden
+             if '/.' in root: continue
+             
+             if search_name in files:
+                 file_path = os.path.join(root, search_name)
+                 break
+             # Try .txt version if .json not found
+             elif search_name.replace('.json', '.txt') in files:
+                  file_path = os.path.join(root, search_name.replace('.json', '.txt'))
+                  break
+             # Try .jsonl version if .json not found
+             elif search_name.replace('.json', '.jsonl') in files:
+                  file_path = os.path.join(root, search_name.replace('.json', '.jsonl'))
+                  break
     
     if not file_path or not os.path.exists(file_path):
-        console.print(f"[red]File not found: {arg}[/red]")
-        console.print("[dim]Usage: bcat <module>/<file> or bcat <filename>[/dim]")
+        console.print(f"[red]File '{filename}' not found.[/red]")
         return
-    
-    # Use server-side file reader
-    data = file_reader.read_output_file(file_path)
-    
-    if not data['exists']:
-        console.print(f"[red]File not found: {arg}[/red]")
-        return
-    
-    # Display metadata header
-    from rich.panel import Panel
-    header_lines = []
-    rel_path = os.path.relpath(file_path, project_path)
-    header_lines.append(f"[bold cyan]File:[/bold cyan] {rel_path}")
-    
-    if data['metadata']:
-        metadata = data['metadata']
         
-        if 'timestamp' in metadata:
-            from datetime import datetime
-            try:
-                dt = datetime.fromisoformat(metadata['timestamp'])
-                time_str = dt.strftime("%Y-%m-%d %H:%M:%S")
-                header_lines.append(f"[bold cyan]Executed:[/bold cyan] {time_str}")
-            except:
-                pass
+    # Read file
+    try:
+        data = []
+        is_json = False
         
-        if 'duration_seconds' in metadata:
-            header_lines.append(f"[bold cyan]Duration:[/bold cyan] {metadata['duration_seconds']}s")
+        # First, try to parse as JSON array
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = json.load(f)
+                if isinstance(content, list):
+                    data = content
+                    is_json = True
+                elif isinstance(content, dict):
+                    data = [content]
+                    is_json = True
+        except (json.JSONDecodeError, ValueError):
+            # Not a JSON array, will try JSONL below
+            pass
         
-        if 'tool' in metadata:
-            header_lines.append(f"[bold cyan]Tool:[/bold cyan] {metadata['tool']}")
+        # If JSON array parsing didn't work, try JSONL
+        if not is_json:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line: continue
+                    try:
+                        js = json.loads(line)
+                        data.append(js)
+                        is_json = True
+                    except:
+                        pass
         
-        if 'has_json' in metadata and metadata['has_json']:
-            header_lines.append(f"[bold green]✓ JSON:[/bold green] {metadata.get('record_count', 0)} records")
-        else:
-            header_lines.append(f"[bold yellow]⚠ JSON:[/bold yellow] Not available (showing raw text)")
-    
-    if header_lines:
-        header_text = "\n".join(header_lines)
-        console.print(Panel(header_text, border_style="cyan", padding=(0, 1)))
-        console.print()
-    
-    # Check if JSON available
-    if data['has_json'] and data['json_data']:
-        # Use server-side formatter
-        table_data = formatter.format_as_table_data(data['json_data'])
-        
-        if table_data['total'] == 0:
-            console.print("[yellow]No data to display[/yellow]")
+        if not is_json:
+            console.print(f"[yellow]File '{os.path.basename(file_path)}' does not contain valid JSON lines.[/yellow]")
+            console.print("[dim]Use 'cat' command to view raw text files.[/dim]")
             return
+            
+        # Use Generic Viewer
+        from utils.json_viewer import JsonLogViewer
+        viewer = JsonLogViewer(data)
         
-        # Render table (CLI-specific rendering)
-        result_table = Table(show_header=True, header_style="bold cyan", box=box.ROUNDED)
-        
-        # Add columns
-        for col in table_data['columns']:
-            result_table.add_column(col.title(), style="white")
-        
-        # Add rows (limit to 100 for display)
-        display_limit = 100
-        for i, row in enumerate(table_data['rows']):
-            if i >= display_limit:
-                break
-            result_table.add_row(*row)
-        
-        console.print(result_table)
-        
-        # Show summary
-        if table_data['total'] > display_limit:
-            console.print(f"\n[dim]Showing {display_limit} of {table_data['total']} records[/dim]")
+        if query:
+            results = viewer.advanced_search(query)
+            console.print(f"\n[green][+] Results for query: {query} ({len(results)} records)[/green]\n")
+            for entry in results:
+                viewer.print_entry(entry)
         else:
-            console.print(f"\n[dim]Total: {table_data['total']} records[/dim]")
-    else:
-        # Fallback to raw text display
-        console.print("[yellow]No JSON data available. Displaying raw text:[/yellow]\n")
-        
-        lines = data['raw_text'].strip().splitlines()
-        result_table = Table(box=None, show_header=False, padding=(0, 1))
-        result_table.add_column("Content", style="white")
-        
-        for line in lines[:100]:  # Limit to first 100 lines
-            result_table.add_row(line)
-        
-        console.print(result_table)
-        
-        if len(lines) > 100:
-            console.print(f"\n[dim]... {len(lines) - 100} more lines (showing first 100)[/dim]")
+            console.print(f"\n[green][+] Showing all {len(data)} records[/green]\n")
+            for entry in data:
+                viewer.print_entry(entry)
+                
+    except Exception as e:
+        console.print(f"[red]Error processing file: {e}[/red]")
+
 
 
 def cmd_list_modules(ctx: Context, mode: str):
@@ -733,24 +751,28 @@ def cmd_list_modules(ctx: Context, mode: str):
     ctx.last_shown_map = items
     ctx.last_shown_type = 'module'
 
-    table = Table(title=title, show_header=True, header_style="bold cyan")
-    table.add_column("ID", style="cyan", justify="center")
-    table.add_column("Path/Name", style="green", justify="left")
-    table.add_column("Description", style="white", justify="left")
+    table = Table(title="[red]"+title+"[/red]", show_header=True)
+    table.add_column("[bold cyan]ID[/bold cyan]", style="bold cyan", justify="center")
+    table.add_column("[bold green]Name[/bold green]", style="bold green", justify="left")
+    table.add_column("[bold yellow]Tag[/bold yellow]", style="bold yellow", justify="left")
+    table.add_column("[bold white]Description[/bold white]", style="bold white", justify="left")
 
     for i, path in enumerate(items):
         try:
             mod_cls = ctx.tool_manager.modules[path]
             meta = getattr(mod_cls, 'meta', {})
             
+            module_id = meta.get('id', 'Unknown')
+            tag = meta.get('tag', '')
             desc = meta.get('description', '')
-            table.add_row(str(i+1), path, desc)
+            table.add_row(str(i+1), module_id, tag, desc)
         except Exception:
-             table.add_row(str(i+1), path, "Error loading metadata")
+             table.add_row(str(i+1), "Error", "", "Error loading metadata")
 
     console.print()
     console.print(table)
     console.print()
+
 
 def cmd_search(ctx: Context, arg: str):
     if not arg:
@@ -764,20 +786,137 @@ def cmd_search(ctx: Context, arg: str):
     
     table = Table(title=f"Search Results: {arg}", show_header=True, header_style="bold cyan")
     table.add_column("[red]ID[/red]", style="bold blue", justify="right")
-    table.add_column("[red]Path[/red]", style="bold blue")
     table.add_column("[red]Name[/red]", style="bold white")
+    table.add_column("[red]Tag[/red]", style="bold yellow")
     table.add_column("[red]Description[/red]", style="dim white")
     
     for idx, path, meta in results:
-        table.add_row(str(idx+1), path, meta.get('name', 'Unknown'), meta.get('description', ''))
+        table.add_row(
+            str(idx+1), 
+            meta.get('id', 'Unknown'), 
+            meta.get('tag', ''),
+            meta.get('description', '')
+        )
     
     console.print()
     console.print(table)
     console.print()
 
+
 def cmd_options(ctx: Context, arg: str):
     """Alias for 'show options'"""
     cmd_show(ctx, 'options')
+
+def cmd_info(ctx: Context, arg: str):
+    """Display YAML configuration for a module to understand what happens behind the scenes
+    Usage: info <module-name>
+    """
+    if not arg:
+        console.print("\n[bold red]❌ Usage:[/bold red] [cyan]info <module-name>[/cyan]")
+        console.print("[dim]💡 Example: info port-scan[/dim]\n")
+        return
+    
+    # Resolve module
+    target_path = arg
+    
+    # Check if arg is an ID
+    if arg.isdigit():
+        idx = int(arg) - 1
+        
+        if not ctx.last_shown_map:
+            console.print("[yellow]⚠️  Please run 'show module' or 'search' first (IDs change depending on context).[/yellow]")
+            return
+            
+        if 0 <= idx < len(ctx.last_shown_map):
+            target_path = ctx.last_shown_map[idx]
+        else:
+            console.print(f"[red]❌ Invalid ID: {arg}. Range is 1-{len(ctx.last_shown_map)}[/red]")
+            return
+    
+    # Get module
+    module = ctx.tool_manager.get_module(target_path)
+    if not module:
+        console.print(f"\n[red]❌ Module '{arg}' not found.[/red]")
+        console.print("[dim]💡 Use 'show module' or 'search <pattern>' to find modules.[/dim]\n")
+        return
+    
+    # Check if module has yaml_path
+    if not hasattr(module, 'yaml_path') or not module.yaml_path:
+        console.print(f"[yellow]⚠️  Module '{arg}' does not have a YAML configuration file.[/yellow]")
+        return
+    
+    yaml_path = module.yaml_path
+    
+    # Check if file exists
+    if not os.path.exists(yaml_path):
+        console.print(f"[red]❌ YAML file not found: {yaml_path}[/red]")
+        return
+    
+    # Read and display YAML content
+    try:
+        with open(yaml_path, 'r') as f:
+            yaml_content = f.read()
+        
+        # Get module metadata
+        from rich.panel import Panel
+        from rich.text import Text
+        module_name = module.meta.get('name', 'Unknown')
+        module_id = module.meta.get('id', 'Unknown')
+        module_desc = module.meta.get('description', 'No description')
+        module_author = module.meta.get('author', 'Unknown')
+        module_tag = module.meta.get('tag', 'general')
+        
+       
+        
+        # Create info table
+        info_table = Table(show_header=False, box=box.ROUNDED, border_style="cyan", padding=(0, 2))
+        info_table.add_column("Key", style="bold yellow", width=15)
+        info_table.add_column("Value", style="white")
+        
+        info_table.add_row("📦 Module", f"[bold green]{module_name}[/bold green]")
+        info_table.add_row("🆔 ID", f"[bold cyan]{module_id}[/bold cyan]")
+        info_table.add_row("🏷️  Tag", f"[bold magenta]{module_tag}[/bold magenta]")
+        info_table.add_row("👤 Author", f"[bold blue]{module_author}[/bold blue]")
+        info_table.add_row("📝 Description", f"[dim white]{module_desc}[/dim white]")
+        info_table.add_row("📂 Path", f"[dim cyan]{yaml_path}[/dim cyan]")
+        
+        # Center the table
+        from rich.align import Align
+        console.print(Align.center(info_table))
+        console.print()
+
+        
+        # Create YAML content panel with custom styling
+        console.print(Panel(
+            "",
+            title="[bold yellow]⚙️  YAML Configuration[/bold yellow]",
+            border_style="yellow",
+            padding=(0, 0)
+        ))
+        
+        # Display YAML with enhanced syntax highlighting
+        from rich.syntax import Syntax
+        syntax = Syntax(
+            yaml_content, 
+            "yaml", 
+            theme="dracula",  # Changed to dracula for better colors
+            line_numbers=True,
+            word_wrap=True,
+            background_color="default"
+        )
+        console.print(syntax)
+        
+        # Footer with helpful tips
+        console.print()
+        console.print(Panel(
+            "[dim]💡 Tip: Use [cyan]'use " + module_id + "'[/cyan] to load this module, then [cyan]'show options'[/cyan] to see available settings[/dim]",
+            border_style="dim white",
+            padding=(0, 1)
+        ))
+        console.print()
+        
+    except Exception as e:
+        console.print(f"\n[red]❌ Error reading YAML file: {e}[/red]\n")
 
 COMMANDS = {
     'use': cmd_use,
@@ -797,4 +936,5 @@ COMMANDS = {
     'settings': cmd_settings,
     'import': cmd_import,
     'list': cmd_list,
+    'info': cmd_info,
 }

@@ -377,6 +377,47 @@ steps:
 
 ---
 
+## New Features (v2.0)
+
+### 1. Conditional Argument Syntax
+Support for conditional flags based on variable presence.
+Syntax: `{-l {{targets}} || -h {{target}} }`
+
+- Checks if variables in the first option exist/truthy. If yes, uses it.
+- Else checks second option.
+- Strict validation: Fails if no option is valid.
+
+```yaml
+args: "{-l {{targets}} || -h {{target}} } -p 80"
+```
+
+### 2. Simplified Condition Syntax
+Cleaner syntax for step conditions (no more verbose Jinja2).
+
+- **Existence**: `condition: "{var}"` (Run if var exists)
+- **Absence**: `condition: "{!var}"` (Run if var missing/empty)
+- **Equality**: `condition: "{mode == 'fast'}"`
+- **Inequality**: `condition: "{env != 'prod'}"`
+
+### 3. Generic Parsers & Visualization
+Built-in tools to visualize JSON/XML files as rich tables.
+
+- `tool: json_parser` args: `-i file.json`
+- `tool: xml_parser` args: `-i file.xml`
+
+### 4. Multi-Dependency Piping
+Pipe output from multiple dependencies into one tool (concatenated).
+
+```yaml
+  - name: consolidate
+    tool: anew
+    stdin: true
+    depends_on: [tool1, tool2, tool3]
+    # Input will be: tool1_out + \n + tool2_out + \n + tool3_out
+```
+
+---
+
 ## Complete Examples
 
 ### Example 1: Simple Port Scanner
