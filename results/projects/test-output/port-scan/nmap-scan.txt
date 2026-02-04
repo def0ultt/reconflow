@@ -1,0 +1,49 @@
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-02-02 14:25 CET
+Nmap scan report for mongo.local (127.0.0.1)
+Host is up (0.00018s latency).
+Not shown: 997 closed tcp ports (conn-refused)
+PORT     STATE SERVICE    VERSION
+631/tcp  open  ipp        CUPS 2.4
+|_http-title: Bad Request - CUPS v2.4.7
+|_http-server-header: CUPS/2.4 IPP/2.1
+3306/tcp open  mysql      MySQL 8.0.44-0ubuntu0.24.04.2
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=MySQL_Server_8.0.44_Auto_Generated_Server_Certificate
+| Not valid before: 2026-01-02T15:48:47
+|_Not valid after:  2035-12-31T15:48:47
+| mysql-info: 
+|   Protocol: 10
+|   Version: 8.0.44-0ubuntu0.24.04.2
+|   Thread ID: 10
+|   Capabilities flags: 65535
+|   Some Capabilities: Speaks41ProtocolOld, Support41Auth, Speaks41ProtocolNew, IgnoreSigpipes, LongPassword, InteractiveClient, LongColumnFlag, ODBCClient, SupportsTransactions, IgnoreSpaceBeforeParenthesis, ConnectWithDatabase, SwitchToSSLAfterHandshake, SupportsLoadDataLocal, SupportsCompression, FoundRows, DontAllowDatabaseTableColumn, SupportsMultipleResults, SupportsAuthPlugins, SupportsMultipleStatments
+|   Status: Autocommit
+|   Salt: ?\x06`w)4=t\x07x|\x18&Za\x19pn~+
+|_  Auth Plugin Name: caching_sha2_password
+5432/tcp open  postgresql PostgreSQL DB 9.6.0 or later
+|_ssl-date: TLS randomness does not represent time
+| fingerprint-strings: 
+|   SMBProgNeg: 
+|     SFATAL
+|     VFATAL
+|     C0A000
+|     Munsupported frontend protocol 65363.19778: server supports 3.0 to 3.0
+|     Fpostmaster.c
+|     L2149
+|_    RProcessStartupPacket
+| ssl-cert: Subject: commonName=defaut-IdeaPad-L340-15IRH-Gaming
+| Subject Alternative Name: DNS:defaut-IdeaPad-L340-15IRH-Gaming
+| Not valid before: 2025-12-30T22:33:11
+|_Not valid after:  2035-12-28T22:33:11
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port5432-TCP:V=7.94SVN%I=7%D=2/2%Time=6980A5DE%P=x86_64-pc-linux-gnu%r(
+SF:SMBProgNeg,8C,"E\0\0\0\x8bSFATAL\0VFATAL\0C0A000\0Munsupported\x20front
+SF:end\x20protocol\x2065363\.19778:\x20server\x20supports\x203\.0\x20to\x2
+SF:03\.0\0Fpostmaster\.c\0L2149\0RProcessStartupPacket\0\0");
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 8.12 seconds
+
+
+--- STDERR ---
+WARNING: Duplicate port number(s) specified.  Are you alert enough to be using Nmap?  Have some coffee or Jolt(tm).

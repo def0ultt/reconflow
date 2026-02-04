@@ -46,7 +46,7 @@ steps:
     depends_on: [subfinder, assetfinder, chaos, findomain]
   - name: httpx
     tool: httpx
-    args: "-l {{anew.output}} -title -status-code -content-length -location  -p {{ports}} "
+    args: "-l {{anew.output}} -title -status-code -content-length -location  -p {{ports}}  -j "
     depends_on: [anew]
   - name: show_results
     tool: json_parser

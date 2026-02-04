@@ -16,12 +16,16 @@ vars:
     default: 3
   header:
     default: "User-Agent: Mozilla/5.0"
+  active:
+    default: true
+    type: boolean    
 steps:
   # Phase 1: Crawl URLs and save to file
   - name: katana_enum
     tool: katana
     args: "-u {{target}} -d {{depth}} -aff -xhr -fx -sb -H '{{header}}' -cos '.*\\/logout.*' -silent"
-  # Phase 2: Inject payloads into each URL
+    condition: '{{active}}'
+    # Phase 2: Inject payloads into each URL
   - name: inject_payloads
     tool: /bin/bash
     args: "-c 'cat {{payloads}} | while read payload; do cat {{katana_enum.output}} | zap \"$payload\"; done'"
@@ -30,6 +34,6 @@ steps:
   # Phase 3: Test with httpx
   - name: httpx_test
     tool: httpx
-    args: " -fr -mr 'google.com' -location -H '{{header}}' -random-agent -threads {{threads}}"
+    args: " -fr -mr 'google.com' -location -H '{{header}}' -random-agent -threads {{threads}} -j "
     stdin: true
     depends_on: [inject_payloads]

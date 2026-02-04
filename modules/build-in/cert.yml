@@ -1,0 +1,67 @@
+type: module
+
+info:
+  id: cert-logs
+  name: Certificate Transparency Logs recon
+  tag: recon
+  description: Certificate Transparency Logs recon
+  author: amir
+
+vars:
+  target:
+    required: true
+    description: Target domain
+  
+  ports:
+    required: false
+    default: "80,443,81,3000,3001,5000,8000,8001,8008,8080,8083,8443,8888,9000,9001,9090,9443"
+    description: Ports to scan
+  
+  virustotal_api_key:
+    required: false
+    description: VirusTotal API key (optional)
+
+steps:
+  - name: crt-sh 
+    tool: bash
+    args: "-c \"curl -s 'https://crt.sh/?q=%25.{{target}}&output=json' | jq -r '.[].name_value' | sed 's/\\*\\.//g'\""
+    output:
+      filename: crt-sh.txt
+      format: txt
+
+  - name: waybackmachine
+    tool: bash
+    args: "-c \"curl -s 'http://web.archive.org/cdx/search/cdx?url=*.{{target}}/*&output=text&fl=original&collapse=urlkey' | sort | sed -e 's_https*://__' -e 's/\\/.*//' -e 's/:.*//' -e 's/^www\\.//' \""
+    output:
+      filename: waybackmachine.txt
+      format: txt
+
+  - name: virustotal
+    tool: bash
+    args: "-c \"curl -s 'https://www.virustotal.com/vtapi/v2/domain/report?apikey={{virustotal_api_key}}&domain={{target}}' | jq -r '.domain_siblings[]'\""
+    condition: "{virustotal_api_key}"
+    output:
+      filename: virustotal.txt
+      format: txt
+
+  - name: urlscan
+    tool: bash
+    args: "-c \"curl -s 'https://urlscan.io/api/v1/search/?q=domain:{{target}}' | jq -r '.results[].page.domain' 2>/dev/null | sort -u\""
+    output:
+      filename: urlscan.txt
+      format: txt
+
+  - name: anew
+    tool: anew
+    args: ""
+    stdin: true
+    depends_on: [urlscan, virustotal, waybackmachine, crt-sh]
+
+
+  - name: httpx                                                                                  
+    tool: httpx                                                                                  
+    args: "-l {{anew.output}} -title -status-code -content-length -location  -p {{ports}}  -j "  
+    depends_on: [anew]                                                                           
+
+
+

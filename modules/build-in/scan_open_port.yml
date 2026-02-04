@@ -1,7 +1,7 @@
 type: module
 
 info:
-  id: port-scan-conditional
+  id: scan_open_port
   name: Port Scan with Conditional Targets
   tag: scanning
   description: Example module demonstrating conditional argument usage
@@ -28,10 +28,13 @@ vars:
 steps:
   - name: naabu_scan
     tool: naabu 
-    args: "{-l {{targets}} || -host {{target}} } -p {{ports}} -verify -rate 1500 -silent  "
+    args: "{-l {{targets}} || -host {{target}} } -p {{ports}} -verify -rate 1500 -silent -nmap-cli 'nmap -sV' -j "
   
-  - name: naabutonmap
-    tool: python3 tools/naabutonmap.py
-    args: "-i {{naabu_scan.output}} {{use_sudo}}"
-    depends_on: [naabu_scan]
-
+ # - name: naabutonmap
+  #  tool: python3 tools/naabutonmap.py
+   # args: "-i {{naabu_scan.output}} {{use_sudo}}"
+   # depends_on: [naabu_scan]
+ # - name: nmap-formatter
+  #  tool: nmap-formatter
+   # args: 'json {{naabutonmap.output}}'
+    #depends_on: [naabutonmap]

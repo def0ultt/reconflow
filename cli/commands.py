@@ -595,8 +595,8 @@ def cmd_bcat(ctx: Context, arg: str):
 
     # Parse arguments
     # We support two formats:
-    # 1. bcat <query> <filename>
-    # 2. bcat <filename>
+    # 1. bcat <query> <filename> [flags]
+    # 2. bcat <filename> [flags]
     
     import shlex
     try:
@@ -604,6 +604,23 @@ def cmd_bcat(ctx: Context, arg: str):
     except:
         parts = arg.split()
         
+    # Extract flags first
+    include_fields = None
+    exclude_fields = None
+    clean_parts = []
+    
+    for part in parts:
+        if part.startswith('--include='):
+            val = part.split('=', 1)[1]
+            include_fields = [f.strip() for f in val.split(',')]
+        elif part.startswith('--exclude='):
+            val = part.split('=', 1)[1]
+            exclude_fields = [f.strip() for f in val.split(',')]
+        else:
+            clean_parts.append(part)
+    
+    parts = clean_parts
+    
     query = None
     filename = None
     
@@ -613,9 +630,12 @@ def cmd_bcat(ctx: Context, arg: str):
         # Or simple assumption: first arg is query if 2 args provided
         query = parts[0]
         filename = parts[1]
-    else:
+    elif len(parts) == 1:
         filename = parts[0]
         query = None
+    else:
+        print("Usage: bcat <query string> <filename> [--include=field1,field2] [--exclude=field1]")
+        return
         
     # Resolve file path
     project_path = ctx.current_project.path
@@ -713,11 +733,11 @@ def cmd_bcat(ctx: Context, arg: str):
             results = viewer.advanced_search(query)
             console.print(f"\n[green][+] Results for query: {query} ({len(results)} records)[/green]\n")
             for entry in results:
-                viewer.print_entry(entry)
+                viewer.print_entry(entry, include_fields=include_fields, exclude_fields=exclude_fields)
         else:
             console.print(f"\n[green][+] Showing all {len(data)} records[/green]\n")
             for entry in data:
-                viewer.print_entry(entry)
+                viewer.print_entry(entry, include_fields=include_fields, exclude_fields=exclude_fields)
                 
     except Exception as e:
         console.print(f"[red]Error processing file: {e}[/red]")

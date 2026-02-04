@@ -1,0 +1,1061 @@
+[
+  {
+    "line": "Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-02-04 14:08 CET"
+  },
+  {
+    "line": "Nmap scan report for mongo.local (127.0.0.1)"
+  },
+  {
+    "line": "Host is up (0.00020s latency)."
+  },
+  {
+    "line": "PORT      STATE SERVICE     VERSION"
+  },
+  {
+    "line": "631/tcp   open  ipp         CUPS 2.4"
+  },
+  {
+    "line": "|_http-title: Bad Request - CUPS v2.4.7"
+  },
+  {
+    "line": "|_http-server-header: CUPS/2.4 IPP/2.1"
+  },
+  {
+    "line": "1716/tcp  open  tcpwrapped"
+  },
+  {
+    "line": "3306/tcp  open  mysql       MySQL 8.0.44-0ubuntu0.24.04.2"
+  },
+  {
+    "line": "|_ssl-date: TLS randomness does not represent time"
+  },
+  {
+    "line": "| ssl-cert: Subject: commonName=MySQL_Server_8.0.44_Auto_Generated_Server_Certificate"
+  },
+  {
+    "line": "| Not valid before: 2026-01-02T15:48:47"
+  },
+  {
+    "line": "|_Not valid after:  2035-12-31T15:48:47"
+  },
+  {
+    "line": "| mysql-info:"
+  },
+  {
+    "line": "|   Protocol: 10"
+  },
+  {
+    "line": "|   Version: 8.0.44-0ubuntu0.24.04.2"
+  },
+  {
+    "line": "|   Thread ID: 104"
+  },
+  {
+    "line": "|   Capabilities flags: 65535"
+  },
+  {
+    "line": "|   Some Capabilities: Speaks41ProtocolNew, ConnectWithDatabase, Speaks41ProtocolOld, IgnoreSigpipes, SupportsTransactions, FoundRows, LongColumnFlag, SwitchToSSLAfterHandshake, InteractiveClient, Support41Auth, LongPassword, ODBCClient, DontAllowDatabaseTableColumn, SupportsCompression, IgnoreSpaceBeforeParenthesis, SupportsLoadDataLocal, SupportsMultipleResults, SupportsMultipleStatments, SupportsAuthPlugins"
+  },
+  {
+    "line": "|   Status: Autocommit"
+  },
+  {
+    "line": "|   Salt: V\\x1ErI\\v{m\\x18"
+  },
+  {
+    "line": "| \"..\\x0C\\x11{#m-\\x1D"
+  },
+  {
+    "line": "|_  Auth Plugin Name: caching_sha2_password"
+  },
+  {
+    "line": "5432/tcp  open  postgresql  PostgreSQL DB 9.6.0 or later"
+  },
+  {
+    "line": "|_ssl-date: TLS randomness does not represent time"
+  },
+  {
+    "line": "| ssl-cert: Subject: commonName=defaut-IdeaPad-L340-15IRH-Gaming"
+  },
+  {
+    "line": "| Subject Alternative Name: DNS:defaut-IdeaPad-L340-15IRH-Gaming"
+  },
+  {
+    "line": "| Not valid before: 2025-12-30T22:33:11"
+  },
+  {
+    "line": "|_Not valid after:  2035-12-28T22:33:11"
+  },
+  {
+    "line": "| fingerprint-strings:"
+  },
+  {
+    "line": "|   SMBProgNeg:"
+  },
+  {
+    "line": "|     SFATAL"
+  },
+  {
+    "line": "|     VFATAL"
+  },
+  {
+    "line": "|     C0A000"
+  },
+  {
+    "line": "|     Munsupported frontend protocol 65363.19778: server supports 3.0 to 3.0"
+  },
+  {
+    "line": "|     Fpostmaster.c"
+  },
+  {
+    "line": "|     L2149"
+  },
+  {
+    "line": "|_    RProcessStartupPacket"
+  },
+  {
+    "line": "32853/tcp open  ssl/unknown"
+  },
+  {
+    "line": "|_ssl-date: TLS randomness does not represent time"
+  },
+  {
+    "line": "| ssl-cert: Subject: commonName=localhost/organizationName=ENABLES HTTP2"
+  },
+  {
+    "line": "| Subject Alternative Name: DNS:localhost, IP Address:127.0.0.1"
+  },
+  {
+    "line": "| Not valid before: 2025-09-04T20:55:04"
+  },
+  {
+    "line": "|_Not valid after:  2026-09-04T20:55:04"
+  },
+  {
+    "line": "| fingerprint-strings:"
+  },
+  {
+    "line": "|   FourOhFourRequest:"
+  },
+  {
+    "line": "|     HTTP/1.0 404 Not Found"
+  },
+  {
+    "line": "|     Content-Type: text/plain; charset=utf-8"
+  },
+  {
+    "line": "|     Vary: Origin"
+  },
+  {
+    "line": "|     X-Content-Type-Options: nosniff"
+  },
+  {
+    "line": "|     Date: Wed, 04 Feb 2026 13:09:14 GMT"
+  },
+  {
+    "line": "|     Content-Length: 19"
+  },
+  {
+    "line": "|     page not found"
+  },
+  {
+    "line": "|   GenericLines, Help, Kerberos, LPDString, RTSPRequest, SSLSessionReq, TLSSessionReq, TerminalServerCookie:"
+  },
+  {
+    "line": "|     HTTP/1.1 400 Bad Request"
+  },
+  {
+    "line": "|     Content-Type: text/plain; charset=utf-8"
+  },
+  {
+    "line": "|     Connection: close"
+  },
+  {
+    "line": "|     Request"
+  },
+  {
+    "line": "|   GetRequest, HTTPOptions:"
+  },
+  {
+    "line": "|     HTTP/1.0 404 Not Found"
+  },
+  {
+    "line": "|     Content-Type: text/plain; charset=utf-8"
+  },
+  {
+    "line": "|     Vary: Origin"
+  },
+  {
+    "line": "|     X-Content-Type-Options: nosniff"
+  },
+  {
+    "line": "|     Date: Wed, 04 Feb 2026 13:08:48 GMT"
+  },
+  {
+    "line": "|     Content-Length: 19"
+  },
+  {
+    "line": "|_    page not found"
+  },
+  {
+    "line": "33060/tcp open  mysqlx?"
+  },
+  {
+    "line": "| fingerprint-strings:"
+  },
+  {
+    "line": "|   DNSStatusRequestTCP, LDAPSearchReq, NotesRPC, SSLSessionReq, TLSSessionReq, X11Probe, afp:"
+  },
+  {
+    "line": "|     Invalid message\""
+  },
+  {
+    "line": "|     HY000"
+  },
+  {
+    "line": "|   LDAPBindReq:"
+  },
+  {
+    "line": "|     *Parse error unserializing protobuf message\""
+  },
+  {
+    "line": "|     HY000"
+  },
+  {
+    "line": "|   oracle-tns:"
+  },
+  {
+    "line": "|     Invalid message-frame.\""
+  },
+  {
+    "line": "|_    HY000"
+  },
+  {
+    "line": "35611/tcp open  unknown"
+  },
+  {
+    "line": "36033/tcp open  unknown"
+  },
+  {
+    "line": "| fingerprint-strings:"
+  },
+  {
+    "line": "|   DNSStatusRequestTCP, DNSVersionBindReqTCP, Help, Kerberos, LANDesk-RC, LDAPBindReq, LDAPSearchReq, LPDString, RPCCheck, SIPOptions, SMBProgNeg, SSLSessionReq, TLSSessionReq, TerminalServerCookie, X11Probe:"
+  },
+  {
+    "line": "|     HTTP/1.1 400 Bad Request"
+  },
+  {
+    "line": "|     Connection: close"
+  },
+  {
+    "line": "|   FourOhFourRequest, GetRequest, HTTPOptions, RTSPRequest:"
+  },
+  {
+    "line": "|     HTTP/1.1 403 Forbidden"
+  },
+  {
+    "line": "|     Content-Type: text/plain"
+  },
+  {
+    "line": "|     Date: Wed, 04 Feb 2026 13:08:42 GMT"
+  },
+  {
+    "line": "|     Connection: close"
+  },
+  {
+    "line": "|_    Invalid CSRF token"
+  },
+  {
+    "line": "36769/tcp open  unknown"
+  },
+  {
+    "line": "| fingerprint-strings:"
+  },
+  {
+    "line": "|   DNSStatusRequestTCP, DNSVersionBindReqTCP, GetRequest, HTTPOptions, Help, Kerberos, RPCCheck, RTSPRequest, SMBProgNeg, SSLSessionReq, TLSSessionReq, TerminalServerCookie, X11Probe:"
+  },
+  {
+    "line": "|     HTTP/1.0 400 Bad Request"
+  },
+  {
+    "line": "|     Content-Type: text/html; charset=UTF-8"
+  },
+  {
+    "line": "|_    WebSockets request was expected"
+  },
+  {
+    "line": "41311/tcp open  unknown"
+  },
+  {
+    "line": "| fingerprint-strings:"
+  },
+  {
+    "line": "|   GetRequest, HTTPOptions:"
+  },
+  {
+    "line": "|     HTTP/1.1 200 OK"
+  },
+  {
+    "line": "|     Content-Type: text/html"
+  },
+  {
+    "line": "|     Date: Wed, 04 Feb 2026 13:08:42 GMT"
+  },
+  {
+    "line": "|     Connection: close"
+  },
+  {
+    "line": "|     <!DOCTYPE html>"
+  },
+  {
+    "line": "|     <html>"
+  },
+  {
+    "line": "|     <head>"
+  },
+  {
+    "line": "|     <link rel=\"stylesheet\" href=\"browser.css\">"
+  },
+  {
+    "line": "|     <link rel=\"icon\" type=\"image/svg+xml\" href=\"antigravity.svg\">"
+  },
+  {
+    "line": "|     <title>Browser</title>"
+  },
+  {
+    "line": "|     </head>"
+  },
+  {
+    "line": "|     <body>"
+  },
+  {
+    "line": "|     <div class=\"animated-background\">"
+  },
+  {
+    "line": "|     <div class=\"gradient-orb orb-1\"></div>"
+  },
+  {
+    "line": "|     <div class=\"gradient-orb orb-2\"></div>"
+  },
+  {
+    "line": "|     <div class=\"gradient-orb orb-3\"></div>"
+  },
+  {
+    "line": "|     </div>"
+  },
+  {
+    "line": "|     <div class=\"landing-container\">"
+  },
+  {
+    "line": "|     <div class=\"onboarding-card\">"
+  },
+  {
+    "line": "|     <div class=\"icon-container\">"
+  },
+  {
+    "line": "|     <img src=\"antigravity.svg\" alt=\"Antigravity\" class=\"browser-icon\">"
+  },
+  {
+    "line": "|     </div>"
+  },
+  {
+    "line": "|     class=\"welcome-text\">Welcome to</h3>"
+  },
+  {
+    "line": "|     <div class=\"title-container\">"
+  },
+  {
+    "line": "|     class=\"main-title\">Antigravity Browser Control</h1>"
+  },
+  {
+    "line": "|     class=\"preview-pill\">Preview</p>"
+  },
+  {
+    "line": "|     </div>"
+  },
+  {
+    "line": "|     class=\"title-divider\">"
+  },
+  {
+    "line": "|     class=\"hero-title\">Getting Started</h2>"
+  },
+  {
+    "line": "|_    class"
+  },
+  {
+    "line": "44325/tcp open  unknown"
+  },
+  {
+    "line": "| fingerprint-strings:"
+  },
+  {
+    "line": "|   FourOhFourRequest:"
+  },
+  {
+    "line": "|     HTTP/1.0 404 Not Found"
+  },
+  {
+    "line": "|     Content-Type: text/plain; charset=utf-8"
+  },
+  {
+    "line": "|     Vary: Origin"
+  },
+  {
+    "line": "|     X-Content-Type-Options: nosniff"
+  },
+  {
+    "line": "|     Date: Wed, 04 Feb 2026 13:09:15 GMT"
+  },
+  {
+    "line": "|     Content-Length: 19"
+  },
+  {
+    "line": "|     page not found"
+  },
+  {
+    "line": "|   GetRequest, HTTPOptions:"
+  },
+  {
+    "line": "|     HTTP/1.0 404 Not Found"
+  },
+  {
+    "line": "|     Content-Type: text/plain; charset=utf-8"
+  },
+  {
+    "line": "|     Vary: Origin"
+  },
+  {
+    "line": "|     X-Content-Type-Options: nosniff"
+  },
+  {
+    "line": "|     Date: Wed, 04 Feb 2026 13:08:42 GMT"
+  },
+  {
+    "line": "|     Content-Length: 19"
+  },
+  {
+    "line": "|     page not found"
+  },
+  {
+    "line": "|   Kerberos, LDAPSearchReq, RTSPRequest, SIPOptions, SSLSessionReq, TLSSessionReq, TerminalServerCookie:"
+  },
+  {
+    "line": "|     HTTP/1.1 400 Bad Request"
+  },
+  {
+    "line": "|     Content-Type: text/plain; charset=utf-8"
+  },
+  {
+    "line": "|     Connection: close"
+  },
+  {
+    "line": "|_    Request"
+  },
+  {
+    "line": "7 services unrecognized despite returning data. If you know the service/version, please submit the following fingerprints at https://nmap.org/cgi-bin/submit.cgi?new-service :"
+  },
+  {
+    "line": "==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)=============="
+  },
+  {
+    "line": "SF-Port5432-TCP:V=7.94SVN%I=7%D=2/4%Time=698344D5%P=x86_64-pc-linux-gnu%r("
+  },
+  {
+    "line": "SF:SMBProgNeg,8C,\"E\\0\\0\\0\\x8bSFATAL\\0VFATAL\\0C0A000\\0Munsupported\\x20front"
+  },
+  {
+    "line": "SF:end\\x20protocol\\x2065363\\.19778:\\x20server\\x20supports\\x203\\.0\\x20to\\x2"
+  },
+  {
+    "line": "SF:03\\.0\\0Fpostmaster\\.c\\0L2149\\0RProcessStartupPacket\\0\\0\");"
+  },
+  {
+    "line": "==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)=============="
+  },
+  {
+    "line": "SF-Port32853-TCP:V=7.94SVN%T=SSL%I=7%D=2/4%Time=698344E0%P=x86_64-pc-linux"
+  },
+  {
+    "line": "SF:-gnu%r(GenericLines,67,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nContent-T"
+  },
+  {
+    "line": "SF:ype:\\x20text/plain;\\x20charset=utf-8\\r\\nConnection:\\x20close\\r\\n\\r\\n400"
+  },
+  {
+    "line": "SF:\\x20Bad\\x20Request\")%r(GetRequest,BE,\"HTTP/1\\.0\\x20404\\x20Not\\x20Found\\"
+  },
+  {
+    "line": "SF:r\\nContent-Type:\\x20text/plain;\\x20charset=utf-8\\r\\nVary:\\x20Origin\\r\\n"
+  },
+  {
+    "line": "SF:X-Content-Type-Options:\\x20nosniff\\r\\nDate:\\x20Wed,\\x2004\\x20Feb\\x20202"
+  },
+  {
+    "line": "SF:6\\x2013:08:48\\x20GMT\\r\\nContent-Length:\\x2019\\r\\n\\r\\n404\\x20page\\x20not"
+  },
+  {
+    "line": "SF:\\x20found\\n\")%r(HTTPOptions,BE,\"HTTP/1\\.0\\x20404\\x20Not\\x20Found\\r\\nCon"
+  },
+  {
+    "line": "SF:tent-Type:\\x20text/plain;\\x20charset=utf-8\\r\\nVary:\\x20Origin\\r\\nX-Cont"
+  },
+  {
+    "line": "SF:ent-Type-Options:\\x20nosniff\\r\\nDate:\\x20Wed,\\x2004\\x20Feb\\x202026\\x201"
+  },
+  {
+    "line": "SF:3:08:48\\x20GMT\\r\\nContent-Length:\\x2019\\r\\n\\r\\n404\\x20page\\x20not\\x20fo"
+  },
+  {
+    "line": "SF:und\\n\")%r(RTSPRequest,67,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nContent"
+  },
+  {
+    "line": "SF:-Type:\\x20text/plain;\\x20charset=utf-8\\r\\nConnection:\\x20close\\r\\n\\r\\n4"
+  },
+  {
+    "line": "SF:00\\x20Bad\\x20Request\")%r(Help,67,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\"
+  },
+  {
+    "line": "SF:nContent-Type:\\x20text/plain;\\x20charset=utf-8\\r\\nConnection:\\x20close\\"
+  },
+  {
+    "line": "SF:r\\n\\r\\n400\\x20Bad\\x20Request\")%r(SSLSessionReq,67,\"HTTP/1\\.1\\x20400\\x20"
+  },
+  {
+    "line": "SF:Bad\\x20Request\\r\\nContent-Type:\\x20text/plain;\\x20charset=utf-8\\r\\nConn"
+  },
+  {
+    "line": "SF:ection:\\x20close\\r\\n\\r\\n400\\x20Bad\\x20Request\")%r(TerminalServerCookie,"
+  },
+  {
+    "line": "SF:67,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nContent-Type:\\x20text/plain;\\"
+  },
+  {
+    "line": "SF:x20charset=utf-8\\r\\nConnection:\\x20close\\r\\n\\r\\n400\\x20Bad\\x20Request\")"
+  },
+  {
+    "line": "SF:%r(TLSSessionReq,67,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nContent-Type"
+  },
+  {
+    "line": "SF::\\x20text/plain;\\x20charset=utf-8\\r\\nConnection:\\x20close\\r\\n\\r\\n400\\x2"
+  },
+  {
+    "line": "SF:0Bad\\x20Request\")%r(Kerberos,67,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\n"
+  },
+  {
+    "line": "SF:Content-Type:\\x20text/plain;\\x20charset=utf-8\\r\\nConnection:\\x20close\\r"
+  },
+  {
+    "line": "SF:\\n\\r\\n400\\x20Bad\\x20Request\")%r(FourOhFourRequest,BE,\"HTTP/1\\.0\\x20404\\"
+  },
+  {
+    "line": "SF:x20Not\\x20Found\\r\\nContent-Type:\\x20text/plain;\\x20charset=utf-8\\r\\nVar"
+  },
+  {
+    "line": "SF:y:\\x20Origin\\r\\nX-Content-Type-Options:\\x20nosniff\\r\\nDate:\\x20Wed,\\x20"
+  },
+  {
+    "line": "SF:04\\x20Feb\\x202026\\x2013:09:14\\x20GMT\\r\\nContent-Length:\\x2019\\r\\n\\r\\n40"
+  },
+  {
+    "line": "SF:4\\x20page\\x20not\\x20found\\n\")%r(LPDString,67,\"HTTP/1\\.1\\x20400\\x20Bad\\x"
+  },
+  {
+    "line": "SF:20Request\\r\\nContent-Type:\\x20text/plain;\\x20charset=utf-8\\r\\nConnectio"
+  },
+  {
+    "line": "SF:n:\\x20close\\r\\n\\r\\n400\\x20Bad\\x20Request\");"
+  },
+  {
+    "line": "==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)=============="
+  },
+  {
+    "line": "SF-Port33060-TCP:V=7.94SVN%I=7%D=2/4%Time=698344D5%P=x86_64-pc-linux-gnu%r"
+  },
+  {
+    "line": "SF:(NULL,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(GenericLines,9,\"\\x05\\0\\0\\0\\x0"
+  },
+  {
+    "line": "SF:b\\x08\\x05\\x1a\\0\")%r(GetRequest,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(HTTP"
+  },
+  {
+    "line": "SF:Options,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(RTSPRequest,9,\"\\x05\\0\\0\\0\\x"
+  },
+  {
+    "line": "SF:0b\\x08\\x05\\x1a\\0\")%r(RPCCheck,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(DNSVe"
+  },
+  {
+    "line": "SF:rsionBindReqTCP,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(DNSStatusRequestTCP"
+  },
+  {
+    "line": "SF:,2B,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\\x1e\\0\\0\\0\\x01\\x08\\x01\\x10\\x88'\\x1a\\x0"
+  },
+  {
+    "line": "SF:fInvalid\\x20message\\\"\\x05HY000\")%r(Help,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0"
+  },
+  {
+    "line": "SF:\")%r(SSLSessionReq,2B,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\\x1e\\0\\0\\0\\x01\\x08\\x"
+  },
+  {
+    "line": "SF:01\\x10\\x88'\\x1a\\x0fInvalid\\x20message\\\"\\x05HY000\")%r(TerminalServerCook"
+  },
+  {
+    "line": "SF:ie,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(TLSSessionReq,2B,\"\\x05\\0\\0\\0\\x0b"
+  },
+  {
+    "line": "SF:\\x08\\x05\\x1a\\0\\x1e\\0\\0\\0\\x01\\x08\\x01\\x10\\x88'\\x1a\\x0fInvalid\\x20message"
+  },
+  {
+    "line": "SF:\\\"\\x05HY000\")%r(Kerberos,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(SMBProgNeg"
+  },
+  {
+    "line": "SF:,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(X11Probe,2B,\"\\x05\\0\\0\\0\\x0b\\x08\\x0"
+  },
+  {
+    "line": "SF:5\\x1a\\0\\x1e\\0\\0\\0\\x01\\x08\\x01\\x10\\x88'\\x1a\\x0fInvalid\\x20message\\\"\\x05H"
+  },
+  {
+    "line": "SF:Y000\")%r(FourOhFourRequest,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(LPDStrin"
+  },
+  {
+    "line": "SF:g,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(LDAPSearchReq,2B,\"\\x05\\0\\0\\0\\x0b\\"
+  },
+  {
+    "line": "SF:x08\\x05\\x1a\\0\\x1e\\0\\0\\0\\x01\\x08\\x01\\x10\\x88'\\x1a\\x0fInvalid\\x20message\\"
+  },
+  {
+    "line": "SF:\"\\x05HY000\")%r(LDAPBindReq,46,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\x009\\0\\0\\0\\x0"
+  },
+  {
+    "line": "SF:1\\x08\\x01\\x10\\x88'\\x1a\\*Parse\\x20error\\x20unserializing\\x20protobuf\\x20"
+  },
+  {
+    "line": "SF:message\\\"\\x05HY000\")%r(SIPOptions,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(L"
+  },
+  {
+    "line": "SF:ANDesk-RC,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(TerminalServer,9,\"\\x05\\0\\"
+  },
+  {
+    "line": "SF:0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(NCP,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(Notes"
+  },
+  {
+    "line": "SF:RPC,2B,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\\x1e\\0\\0\\0\\x01\\x08\\x01\\x10\\x88'\\x1a"
+  },
+  {
+    "line": "SF:\\x0fInvalid\\x20message\\\"\\x05HY000\")%r(JavaRMI,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05"
+  },
+  {
+    "line": "SF:\\x1a\\0\")%r(WMSRequest,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\")%r(oracle-tns,32"
+  },
+  {
+    "line": "SF:,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0%\\0\\0\\0\\x01\\x08\\x01\\x10\\x88'\\x1a\\x16Inval"
+  },
+  {
+    "line": "SF:id\\x20message-frame\\.\\\"\\x05HY000\")%r(ms-sql-s,9,\"\\x05\\0\\0\\0\\x0b\\x08\\x05"
+  },
+  {
+    "line": "SF:\\x1a\\0\")%r(afp,2B,\"\\x05\\0\\0\\0\\x0b\\x08\\x05\\x1a\\0\\x1e\\0\\0\\0\\x01\\x08\\x01\\x"
+  },
+  {
+    "line": "SF:10\\x88'\\x1a\\x0fInvalid\\x20message\\\"\\x05HY000\");"
+  },
+  {
+    "line": "==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)=============="
+  },
+  {
+    "line": "SF-Port36033-TCP:V=7.94SVN%I=7%D=2/4%Time=698344DA%P=x86_64-pc-linux-gnu%r"
+  },
+  {
+    "line": "SF:(GetRequest,7E,\"HTTP/1\\.1\\x20403\\x20Forbidden\\r\\nContent-Type:\\x20text/"
+  },
+  {
+    "line": "SF:plain\\r\\nDate:\\x20Wed,\\x2004\\x20Feb\\x202026\\x2013:08:42\\x20GMT\\r\\nConne"
+  },
+  {
+    "line": "SF:ction:\\x20close\\r\\n\\r\\nInvalid\\x20CSRF\\x20token\")%r(HTTPOptions,7E,\"HTT"
+  },
+  {
+    "line": "SF:P/1\\.1\\x20403\\x20Forbidden\\r\\nContent-Type:\\x20text/plain\\r\\nDate:\\x20W"
+  },
+  {
+    "line": "SF:ed,\\x2004\\x20Feb\\x202026\\x2013:08:42\\x20GMT\\r\\nConnection:\\x20close\\r\\n"
+  },
+  {
+    "line": "SF:\\r\\nInvalid\\x20CSRF\\x20token\")%r(RTSPRequest,7E,\"HTTP/1\\.1\\x20403\\x20Fo"
+  },
+  {
+    "line": "SF:rbidden\\r\\nContent-Type:\\x20text/plain\\r\\nDate:\\x20Wed,\\x2004\\x20Feb\\x2"
+  },
+  {
+    "line": "SF:02026\\x2013:08:42\\x20GMT\\r\\nConnection:\\x20close\\r\\n\\r\\nInvalid\\x20CSRF"
+  },
+  {
+    "line": "SF:\\x20token\")%r(RPCCheck,2F,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnec"
+  },
+  {
+    "line": "SF:tion:\\x20close\\r\\n\\r\\n\")%r(DNSVersionBindReqTCP,2F,\"HTTP/1\\.1\\x20400\\x2"
+  },
+  {
+    "line": "SF:0Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n\")%r(DNSStatusRequestTCP"
+  },
+  {
+    "line": "SF:,2F,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n"
+  },
+  {
+    "line": "SF:\")%r(Help,2F,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20clos"
+  },
+  {
+    "line": "SF:e\\r\\n\\r\\n\")%r(SSLSessionReq,2F,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nC"
+  },
+  {
+    "line": "SF:onnection:\\x20close\\r\\n\\r\\n\")%r(TerminalServerCookie,2F,\"HTTP/1\\.1\\x204"
+  },
+  {
+    "line": "SF:00\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n\")%r(TLSSessionReq,"
+  },
+  {
+    "line": "SF:2F,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n\""
+  },
+  {
+    "line": "SF:)%r(Kerberos,2F,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20c"
+  },
+  {
+    "line": "SF:lose\\r\\n\\r\\n\")%r(SMBProgNeg,2F,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nC"
+  },
+  {
+    "line": "SF:onnection:\\x20close\\r\\n\\r\\n\")%r(X11Probe,2F,\"HTTP/1\\.1\\x20400\\x20Bad\\x2"
+  },
+  {
+    "line": "SF:0Request\\r\\nConnection:\\x20close\\r\\n\\r\\n\")%r(FourOhFourRequest,7E,\"HTTP"
+  },
+  {
+    "line": "SF:/1\\.1\\x20403\\x20Forbidden\\r\\nContent-Type:\\x20text/plain\\r\\nDate:\\x20We"
+  },
+  {
+    "line": "SF:d,\\x2004\\x20Feb\\x202026\\x2013:08:42\\x20GMT\\r\\nConnection:\\x20close\\r\\n\\"
+  },
+  {
+    "line": "SF:r\\nInvalid\\x20CSRF\\x20token\")%r(LPDString,2F,\"HTTP/1\\.1\\x20400\\x20Bad\\x"
+  },
+  {
+    "line": "SF:20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n\")%r(LDAPSearchReq,2F,\"HTTP/1\\"
+  },
+  {
+    "line": "SF:.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n\\r\\n\")%r(LDAPBin"
+  },
+  {
+    "line": "SF:dReq,2F,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnection:\\x20close\\r\\n"
+  },
+  {
+    "line": "SF:\\r\\n\")%r(SIPOptions,2F,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nConnectio"
+  },
+  {
+    "line": "SF:n:\\x20close\\r\\n\\r\\n\")%r(LANDesk-RC,2F,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Reque"
+  },
+  {
+    "line": "SF:st\\r\\nConnection:\\x20close\\r\\n\\r\\n\");"
+  },
+  {
+    "line": "==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)=============="
+  },
+  {
+    "line": "SF-Port36769-TCP:V=7.94SVN%I=7%D=2/4%Time=698344DA%P=x86_64-pc-linux-gnu%r"
+  },
+  {
+    "line": "SF:(GetRequest,65,\"HTTP/1\\.0\\x20400\\x20Bad\\x20Request\\r\\nContent-Type:\\x20"
+  },
+  {
+    "line": "SF:text/html;\\x20charset=UTF-8\\r\\n\\r\\nWebSockets\\x20request\\x20was\\x20expe"
+  },
+  {
+    "line": "SF:cted\\r\\n\")%r(HTTPOptions,65,\"HTTP/1\\.0\\x20400\\x20Bad\\x20Request\\r\\nCont"
+  },
+  {
+    "line": "SF:ent-Type:\\x20text/html;\\x20charset=UTF-8\\r\\n\\r\\nWebSockets\\x20request\\x"
+  },
+  {
+    "line": "SF:20was\\x20expected\\r\\n\")%r(RTSPRequest,65,\"HTTP/1\\.0\\x20400\\x20Bad\\x20Re"
+  },
+  {
+    "line": "SF:quest\\r\\nContent-Type:\\x20text/html;\\x20charset=UTF-8\\r\\n\\r\\nWebSockets"
+  },
+  {
+    "line": "SF:\\x20request\\x20was\\x20expected\\r\\n\")%r(RPCCheck,65,\"HTTP/1\\.0\\x20400\\x2"
+  },
+  {
+    "line": "SF:0Bad\\x20Request\\r\\nContent-Type:\\x20text/html;\\x20charset=UTF-8\\r\\n\\r\\n"
+  },
+  {
+    "line": "SF:WebSockets\\x20request\\x20was\\x20expected\\r\\n\")%r(DNSVersionBindReqTCP,6"
+  },
+  {
+    "line": "SF:5,\"HTTP/1\\.0\\x20400\\x20Bad\\x20Request\\r\\nContent-Type:\\x20text/html;\\x2"
+  },
+  {
+    "line": "SF:0charset=UTF-8\\r\\n\\r\\nWebSockets\\x20request\\x20was\\x20expected\\r\\n\")%r("
+  },
+  {
+    "line": "SF:DNSStatusRequestTCP,65,\"HTTP/1\\.0\\x20400\\x20Bad\\x20Request\\r\\nContent-T"
+  },
+  {
+    "line": "SF:ype:\\x20text/html;\\x20charset=UTF-8\\r\\n\\r\\nWebSockets\\x20request\\x20was"
+  },
+  {
+    "line": "SF:\\x20expected\\r\\n\")%r(Help,65,\"HTTP/1\\.0\\x20400\\x20Bad\\x20Request\\r\\nCon"
+  },
+  {
+    "line": "SF:tent-Type:\\x20text/html;\\x20charset=UTF-8\\r\\n\\r\\nWebSockets\\x20request\\"
+  },
+  {
+    "line": "SF:x20was\\x20expected\\r\\n\")%r(SSLSessionReq,65,\"HTTP/1\\.0\\x20400\\x20Bad\\x2"
+  },
+  {
+    "line": "SF:0Request\\r\\nContent-Type:\\x20text/html;\\x20charset=UTF-8\\r\\n\\r\\nWebSock"
+  },
+  {
+    "line": "SF:ets\\x20request\\x20was\\x20expected\\r\\n\")%r(TerminalServerCookie,65,\"HTTP"
+  },
+  {
+    "line": "SF:/1\\.0\\x20400\\x20Bad\\x20Request\\r\\nContent-Type:\\x20text/html;\\x20charse"
+  },
+  {
+    "line": "SF:t=UTF-8\\r\\n\\r\\nWebSockets\\x20request\\x20was\\x20expected\\r\\n\")%r(TLSSess"
+  },
+  {
+    "line": "SF:ionReq,65,\"HTTP/1\\.0\\x20400\\x20Bad\\x20Request\\r\\nContent-Type:\\x20text/"
+  },
+  {
+    "line": "SF:html;\\x20charset=UTF-8\\r\\n\\r\\nWebSockets\\x20request\\x20was\\x20expected\\"
+  },
+  {
+    "line": "SF:r\\n\")%r(Kerberos,65,\"HTTP/1\\.0\\x20400\\x20Bad\\x20Request\\r\\nContent-Type"
+  },
+  {
+    "line": "SF::\\x20text/html;\\x20charset=UTF-8\\r\\n\\r\\nWebSockets\\x20request\\x20was\\x2"
+  },
+  {
+    "line": "SF:0expected\\r\\n\")%r(SMBProgNeg,65,\"HTTP/1\\.0\\x20400\\x20Bad\\x20Request\\r\\n"
+  },
+  {
+    "line": "SF:Content-Type:\\x20text/html;\\x20charset=UTF-8\\r\\n\\r\\nWebSockets\\x20reque"
+  },
+  {
+    "line": "SF:st\\x20was\\x20expected\\r\\n\")%r(X11Probe,65,\"HTTP/1\\.0\\x20400\\x20Bad\\x20R"
+  },
+  {
+    "line": "SF:equest\\r\\nContent-Type:\\x20text/html;\\x20charset=UTF-8\\r\\n\\r\\nWebSocket"
+  },
+  {
+    "line": "SF:s\\x20request\\x20was\\x20expected\\r\\n\");"
+  },
+  {
+    "line": "==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)=============="
+  },
+  {
+    "line": "SF-Port41311-TCP:V=7.94SVN%I=7%D=2/4%Time=698344DA%P=x86_64-pc-linux-gnu%r"
+  },
+  {
+    "line": "SF:(GetRequest,D84,\"HTTP/1\\.1\\x20200\\x20OK\\r\\nContent-Type:\\x20text/html\\r"
+  },
+  {
+    "line": "SF:\\nDate:\\x20Wed,\\x2004\\x20Feb\\x202026\\x2013:08:42\\x20GMT\\r\\nConnection:\\"
+  },
+  {
+    "line": "SF:x20close\\r\\n\\r\\n<!DOCTYPE\\x20html>\\n<html>\\n\\n<head>\\n\\t<link\\x20rel=\\\""
+  },
+  {
+    "line": "SF:stylesheet\\\"\\x20href=\\\"browser\\.css\\\">\\n\\t<link\\x20rel=\\\"icon\\\"\\x20type"
+  },
+  {
+    "line": "SF:=\\\"image/svg\\+xml\\\"\\x20href=\\\"antigravity\\.svg\\\">\\n\\t<title>Browser</ti"
+  },
+  {
+    "line": "SF:tle>\\n</head>\\n\\n<body>\\n\\t<div\\x20class=\\\"animated-background\\\">\\n\\t\\t"
+  },
+  {
+    "line": "SF:<div\\x20class=\\\"gradient-orb\\x20orb-1\\\"></div>\\n\\t\\t<div\\x20class=\\\"gra"
+  },
+  {
+    "line": "SF:dient-orb\\x20orb-2\\\"></div>\\n\\t\\t<div\\x20class=\\\"gradient-orb\\x20orb-3\\"
+  },
+  {
+    "line": "SF:\"></div>\\n\\t</div>\\n\\n\\t<div\\x20class=\\\"landing-container\\\">\\n\\t\\t<div\\"
+  },
+  {
+    "line": "SF:x20class=\\\"onboarding-card\\\">\\n\\t\\t\\t<div\\x20class=\\\"icon-container\\\">\\"
+  },
+  {
+    "line": "SF:n\\t\\t\\t\\t<img\\x20src=\\\"antigravity\\.svg\\\"\\x20alt=\\\"Antigravity\\\"\\x20cla"
+  },
+  {
+    "line": "SF:ss=\\\"browser-icon\\\">\\n\\t\\t\\t</div>\\n\\t\\t\\t<h3\\x20class=\\\"welcome-text\\\""
+  },
+  {
+    "line": "SF:>Welcome\\x20to</h3>\\n\\t\\t\\t<div\\x20class=\\\"title-container\\\">\\n\\t\\t\\t\\t"
+  },
+  {
+    "line": "SF:<h1\\x20class=\\\"main-title\\\">Antigravity\\x20Browser\\x20Control</h1>\\n\\t\\"
+  },
+  {
+    "line": "SF:t\\t\\t<p\\x20class=\\\"preview-pill\\\">Preview</p>\\n\\t\\t\\t</div>\\n\\t\\t\\t<hr\\"
+  },
+  {
+    "line": "SF:x20class=\\\"title-divider\\\">\\n\\n\\t\\t\\t<h2\\x20class=\\\"hero-title\\\">Gettin"
+  },
+  {
+    "line": "SF:g\\x20Started</h2>\\n\\n\\t\\t\\t<p\\x20class\")%r(HTTPOptions,D84,\"HTTP/1\\.1\\x"
+  },
+  {
+    "line": "SF:20200\\x20OK\\r\\nContent-Type:\\x20text/html\\r\\nDate:\\x20Wed,\\x2004\\x20Feb"
+  },
+  {
+    "line": "SF:\\x202026\\x2013:08:42\\x20GMT\\r\\nConnection:\\x20close\\r\\n\\r\\n<!DOCTYPE\\x2"
+  },
+  {
+    "line": "SF:0html>\\n<html>\\n\\n<head>\\n\\t<link\\x20rel=\\\"stylesheet\\\"\\x20href=\\\"brows"
+  },
+  {
+    "line": "SF:er\\.css\\\">\\n\\t<link\\x20rel=\\\"icon\\\"\\x20type=\\\"image/svg\\+xml\\\"\\x20href="
+  },
+  {
+    "line": "SF:\\\"antigravity\\.svg\\\">\\n\\t<title>Browser</title>\\n</head>\\n\\n<body>\\n\\t<"
+  },
+  {
+    "line": "SF:div\\x20class=\\\"animated-background\\\">\\n\\t\\t<div\\x20class=\\\"gradient-orb"
+  },
+  {
+    "line": "SF:\\x20orb-1\\\"></div>\\n\\t\\t<div\\x20class=\\\"gradient-orb\\x20orb-2\\\"></div>\\"
+  },
+  {
+    "line": "SF:n\\t\\t<div\\x20class=\\\"gradient-orb\\x20orb-3\\\"></div>\\n\\t</div>\\n\\n\\t<div"
+  },
+  {
+    "line": "SF:\\x20class=\\\"landing-container\\\">\\n\\t\\t<div\\x20class=\\\"onboarding-card\\\""
+  },
+  {
+    "line": "SF:>\\n\\t\\t\\t<div\\x20class=\\\"icon-container\\\">\\n\\t\\t\\t\\t<img\\x20src=\\\"antig"
+  },
+  {
+    "line": "SF:ravity\\.svg\\\"\\x20alt=\\\"Antigravity\\\"\\x20class=\\\"browser-icon\\\">\\n\\t\\t\\t"
+  },
+  {
+    "line": "SF:</div>\\n\\t\\t\\t<h3\\x20class=\\\"welcome-text\\\">Welcome\\x20to</h3>\\n\\t\\t\\t<"
+  },
+  {
+    "line": "SF:div\\x20class=\\\"title-container\\\">\\n\\t\\t\\t\\t<h1\\x20class=\\\"main-title\\\">"
+  },
+  {
+    "line": "SF:Antigravity\\x20Browser\\x20Control</h1>\\n\\t\\t\\t\\t<p\\x20class=\\\"preview-p"
+  },
+  {
+    "line": "SF:ill\\\">Preview</p>\\n\\t\\t\\t</div>\\n\\t\\t\\t<hr\\x20class=\\\"title-divider\\\">\\"
+  },
+  {
+    "line": "SF:n\\n\\t\\t\\t<h2\\x20class=\\\"hero-title\\\">Getting\\x20Started</h2>\\n\\n\\t\\t\\t<"
+  },
+  {
+    "line": "SF:p\\x20class\");"
+  },
+  {
+    "line": "==============NEXT SERVICE FINGERPRINT (SUBMIT INDIVIDUALLY)=============="
+  },
+  {
+    "line": "SF-Port44325-TCP:V=7.94SVN%I=7%D=2/4%Time=698344DA%P=x86_64-pc-linux-gnu%r"
+  },
+  {
+    "line": "SF:(GetRequest,BE,\"HTTP/1\\.0\\x20404\\x20Not\\x20Found\\r\\nContent-Type:\\x20te"
+  },
+  {
+    "line": "SF:xt/plain;\\x20charset=utf-8\\r\\nVary:\\x20Origin\\r\\nX-Content-Type-Options"
+  },
+  {
+    "line": "SF::\\x20nosniff\\r\\nDate:\\x20Wed,\\x2004\\x20Feb\\x202026\\x2013:08:42\\x20GMT\\r"
+  },
+  {
+    "line": "SF:\\nContent-Length:\\x2019\\r\\n\\r\\n404\\x20page\\x20not\\x20found\\n\")%r(HTTPOp"
+  },
+  {
+    "line": "SF:tions,BE,\"HTTP/1\\.0\\x20404\\x20Not\\x20Found\\r\\nContent-Type:\\x20text/pla"
+  },
+  {
+    "line": "SF:in;\\x20charset=utf-8\\r\\nVary:\\x20Origin\\r\\nX-Content-Type-Options:\\x20n"
+  },
+  {
+    "line": "SF:osniff\\r\\nDate:\\x20Wed,\\x2004\\x20Feb\\x202026\\x2013:08:42\\x20GMT\\r\\nCont"
+  },
+  {
+    "line": "SF:ent-Length:\\x2019\\r\\n\\r\\n404\\x20page\\x20not\\x20found\\n\")%r(RTSPRequest,"
+  },
+  {
+    "line": "SF:67,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nContent-Type:\\x20text/plain;\\"
+  },
+  {
+    "line": "SF:x20charset=utf-8\\r\\nConnection:\\x20close\\r\\n\\r\\n400\\x20Bad\\x20Request\")"
+  },
+  {
+    "line": "SF:%r(SSLSessionReq,67,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nContent-Type"
+  },
+  {
+    "line": "SF::\\x20text/plain;\\x20charset=utf-8\\r\\nConnection:\\x20close\\r\\n\\r\\n400\\x2"
+  },
+  {
+    "line": "SF:0Bad\\x20Request\")%r(TerminalServerCookie,67,\"HTTP/1\\.1\\x20400\\x20Bad\\x2"
+  },
+  {
+    "line": "SF:0Request\\r\\nContent-Type:\\x20text/plain;\\x20charset=utf-8\\r\\nConnection"
+  },
+  {
+    "line": "SF::\\x20close\\r\\n\\r\\n400\\x20Bad\\x20Request\")%r(TLSSessionReq,67,\"HTTP/1\\.1"
+  },
+  {
+    "line": "SF:\\x20400\\x20Bad\\x20Request\\r\\nContent-Type:\\x20text/plain;\\x20charset=ut"
+  },
+  {
+    "line": "SF:f-8\\r\\nConnection:\\x20close\\r\\n\\r\\n400\\x20Bad\\x20Request\")%r(Kerberos,6"
+  },
+  {
+    "line": "SF:7,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nContent-Type:\\x20text/plain;\\x"
+  },
+  {
+    "line": "SF:20charset=utf-8\\r\\nConnection:\\x20close\\r\\n\\r\\n400\\x20Bad\\x20Request\")%"
+  },
+  {
+    "line": "SF:r(FourOhFourRequest,BE,\"HTTP/1\\.0\\x20404\\x20Not\\x20Found\\r\\nContent-Typ"
+  },
+  {
+    "line": "SF:e:\\x20text/plain;\\x20charset=utf-8\\r\\nVary:\\x20Origin\\r\\nX-Content-Type"
+  },
+  {
+    "line": "SF:-Options:\\x20nosniff\\r\\nDate:\\x20Wed,\\x2004\\x20Feb\\x202026\\x2013:09:15\\"
+  },
+  {
+    "line": "SF:x20GMT\\r\\nContent-Length:\\x2019\\r\\n\\r\\n404\\x20page\\x20not\\x20found\\n\")%"
+  },
+  {
+    "line": "SF:r(LDAPSearchReq,67,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\nContent-Type:"
+  },
+  {
+    "line": "SF:\\x20text/plain;\\x20charset=utf-8\\r\\nConnection:\\x20close\\r\\n\\r\\n400\\x20"
+  },
+  {
+    "line": "SF:Bad\\x20Request\")%r(SIPOptions,67,\"HTTP/1\\.1\\x20400\\x20Bad\\x20Request\\r\\"
+  },
+  {
+    "line": "SF:nContent-Type:\\x20text/plain;\\x20charset=utf-8\\r\\nConnection:\\x20close\\"
+  },
+  {
+    "line": "SF:r\\n\\r\\n400\\x20Bad\\x20Request\");"
+  },
+  {
+    "line": "Service detection performed. Please report any incorrect results at https://nmap.org/submit/ ."
+  },
+  {
+    "line": "Nmap done: 1 IP address (1 host up) scanned in 112.17 seconds"
+  },
+  {
+    "line": "[+] Found 1 hosts to scan."
+  },
+  {
+    "line": "[*] Executing: nmap -sV -sC -Pn -p 631,1716,3306,5432,32853,33060,35611,36033,36769,41311,44325 127.0.0.1"
+  }
+]

@@ -1,0 +1,1 @@
+[{"url": "https://example.com", "status_code": 200, "title": "Example", "timestamp": "2026-01-01", "hash": "abc123"}, {"url": "https://test.com", "status_code": 404, "title": "Not Found", "timestamp": "2026-01-02", "hash": "def456"}]
