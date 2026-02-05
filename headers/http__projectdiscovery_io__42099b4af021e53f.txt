@@ -1,0 +1,6 @@
+308 Permanent Redirect
+Server: Vercel
+Retry-Count: 0
+Content-Type: text/plain
+Location: https://projectdiscovery.io/
+Refresh: 0;url=https://projectdiscovery.io/

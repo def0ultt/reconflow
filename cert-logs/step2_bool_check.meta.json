@@ -1,0 +1,15 @@
+{
+  "step_name": "step2_bool_check",
+  "tool": "bash",
+  "module_id": "cert-logs",
+  "module_name": "Certificate Transparency Logs recon",
+  "timestamp": "2026-02-05T11:18:22.660994",
+  "duration_seconds": 0.01,
+  "line_count": 1,
+  "file_size": 19,
+  "command": "bash -c 'echo Running Extra Step'",
+  "exit_code": 0,
+  "has_json": true,
+  "record_count": 1,
+  "parser_used": "bash"
+}

@@ -1,0 +1,135 @@
+[agent:tcp_port_scanner] Received new host: projectdiscovery.io
+[agent:tcp_port_scanner] Received new host: Evil.Com
+[agent:url_requester] Received new URL https://evil.com:443
+[agent:tcp_port_scanner] Received new host: 66.96.146.129
+[agent:url_requester] Received new URL http://evil.com:80
+[agent:tcp_port_scanner] Received new host: evil.com
+[agent:tcp_port_scanner] Received new host: 1.0.0.1:53
+[agent:tcp_port_scanner] Received new host: 1.1.1.1:53
+[agent:url_publisher] Received new open port on projectdiscovery.io: 80
+[agent:url_requester] Received new URL http://projectdiscovery.io/
+[agent:url_publisher] Received new open port on projectdiscovery.io: 443
+[agent:url_requester] Received new URL https://projectdiscovery.io/
+[agent:tcp_port_scanner] Port 8443 is closed on Evil.Com
+[agent:tcp_port_scanner] Port 80 is closed on 1.0.0.1:53
+[agent:url_publisher] Received new open port on 66.96.146.129: 80
+[agent:url_publisher] Received new open port on Evil.Com: 80
+[agent:url_requester] Received new URL http://66.96.146.129/
+[agent:url_requester] Received new URL http://Evil.Com/
+[agent:tcp_port_scanner] Port 80 is closed on 1.1.1.1:53
+[agent:url_publisher] Received new open port on Evil.Com: 443
+[agent:url_requester] Received new URL https://Evil.Com/
+[agent:tcp_port_scanner] Port 8080 is closed on Evil.Com
+[agent:url_publisher] Received new open port on 66.96.146.129: 443
+[agent:url_requester] Received new URL https://66.96.146.129/
+[agent:tcp_port_scanner] Port 443 is closed on 1.0.0.1:53
+[agent:url_page_title_extractor] Received new responsive URL http://projectdiscovery.io/
+[agent:url_technology_fingerprinter] Received new responsive URL http://projectdiscovery.io/
+[agent:url_screenshotter] Received new responsive URL http://projectdiscovery.io/
+[agent:url_hostname_resolver] Received new responsive URL http://projectdiscovery.io/
+[agent:tcp_port_scanner] Port 443 is closed on 1.1.1.1:53
+[agent:url_takeover_detector] Received new responsive URL: http://projectdiscovery.io/
+[agent:url_tls_checker] Received new responsive URL: http://projectdiscovery.io/
+[agent:url_publisher] Received new open port on evil.com: 80
+[agent:url_requester] Received new URL http://evil.com/
+[agent:url_publisher] Received new open port on evil.com: 443
+[agent:url_requester] Received new URL https://evil.com/
+[agent:url_screenshotter] Received new responsive URL https://evil.com:443
+[agent:url_hostname_resolver] Received new responsive URL https://evil.com:443
+[agent:url_page_title_extractor] Received new responsive URL https://evil.com:443
+[agent:url_takeover_detector] Received new responsive URL: https://evil.com:443
+[agent:url_technology_fingerprinter] Received new responsive URL https://evil.com:443
+[agent:url_tls_checker] Received new responsive URL: https://evil.com:443
+[agent:tcp_port_scanner] Port 8080 is closed on 66.96.146.129
+[agent:url_hostname_resolver] Received new responsive URL http://evil.com:80
+[agent:url_takeover_detector] Received new responsive URL: http://evil.com:80
+[agent:url_screenshotter] Received new responsive URL http://evil.com:80
+[agent:url_tls_checker] Received new responsive URL: http://evil.com:80
+[agent:url_technology_fingerprinter] Received new responsive URL http://evil.com:80
+[agent:url_page_title_extractor] Received new responsive URL http://evil.com:80
+[agent:tcp_port_scanner] Port 8080 is closed on 1.0.0.1:53
+[agent:url_hostname_resolver] Received new responsive URL http://66.96.146.129/
+[agent:tcp_port_scanner] Port 8080 is closed on 1.1.1.1:53
+[agent:url_screenshotter] Received new responsive URL http://66.96.146.129/
+[agent:url_takeover_detector] Received new responsive URL: http://66.96.146.129/
+[agent:url_takeover_detector] Skipping takeover detection on IP URL http://66.96.146.129/
+[agent:url_technology_fingerprinter] Received new responsive URL http://66.96.146.129/
+[agent:url_tls_checker] Received new responsive URL: http://66.96.146.129/
+[agent:url_page_title_extractor] Received new responsive URL http://66.96.146.129/
+[agent:url_hostname_resolver] Skipping hostname resolving on IP host: http://66.96.146.129/
+[agent:tcp_port_scanner] Port 8080 is closed on evil.com
+[agent:url_screenshotter] Received new responsive URL http://Evil.Com/
+[agent:url_takeover_detector] Received new responsive URL: http://Evil.Com/
+[agent:url_technology_fingerprinter] Received new responsive URL http://Evil.Com/
+[agent:url_hostname_resolver] Received new responsive URL http://Evil.Com/
+[agent:url_page_title_extractor] Received new responsive URL http://Evil.Com/
+[agent:url_tls_checker] Received new responsive URL: http://Evil.Com/
+[agent:url_takeover_detector] IP addresses for projectdiscovery.io: [76.76.21.21]
+[agent:url_takeover_detector] CNAME for projectdiscovery.io: projectdiscovery.io.
+[agent:url_screenshotter] Received new responsive URL https://66.96.146.129/
+[agent:url_hostname_resolver] Received new responsive URL https://66.96.146.129/
+[agent:url_hostname_resolver] Skipping hostname resolving on IP host: https://66.96.146.129/
+[agent:url_takeover_detector] Received new responsive URL: https://66.96.146.129/
+[agent:url_takeover_detector] Skipping takeover detection on IP URL https://66.96.146.129/
+[agent:url_page_title_extractor] Received new responsive URL https://66.96.146.129/
+[agent:url_technology_fingerprinter] Received new responsive URL https://66.96.146.129/
+[agent:url_tls_checker] Received new responsive URL: https://66.96.146.129/
+[agent:url_screenshotter] Received new responsive URL https://Evil.Com/
+[agent:url_takeover_detector] Received new responsive URL: https://Evil.Com/
+[agent:url_page_title_extractor] Received new responsive URL https://Evil.Com/
+[agent:url_hostname_resolver] Received new responsive URL https://Evil.Com/
+[agent:url_tls_checker] Received new responsive URL: https://Evil.Com/
+[agent:url_technology_fingerprinter] Received new responsive URL https://Evil.Com/
+[agent:tcp_port_scanner] Port 8443 is closed on 66.96.146.129
+[agent:url_screenshotter] Received new responsive URL http://evil.com/
+[agent:url_hostname_resolver] Received new responsive URL http://evil.com/
+[agent:url_page_title_extractor] Received new responsive URL http://evil.com/
+[agent:url_takeover_detector] Received new responsive URL: http://evil.com/
+[agent:url_technology_fingerprinter] Received new responsive URL http://evil.com/
+[agent:url_tls_checker] Received new responsive URL: http://evil.com/
+[agent:url_takeover_detector] IP addresses for evil.com: [66.96.146.129]
+[agent:url_takeover_detector] CNAME for evil.com: evil.com.
+[agent:url_page_title_extractor] Received new responsive URL https://evil.com/
+[agent:url_tls_checker] Received new responsive URL: https://evil.com/
+[agent:url_takeover_detector] Received new responsive URL: https://evil.com/
+[agent:url_screenshotter] Received new responsive URL https://evil.com/
+[agent:url_hostname_resolver] Received new responsive URL https://evil.com/
+[agent:url_technology_fingerprinter] Received new responsive URL https://evil.com/
+[agent:tcp_port_scanner] Port 8443 is closed on evil.com
+[agent:url_screenshotter] Received new responsive URL https://projectdiscovery.io/
+[agent:url_hostname_resolver] Received new responsive URL https://projectdiscovery.io/
+[agent:url_takeover_detector] Received new responsive URL: https://projectdiscovery.io/
+[agent:url_technology_fingerprinter] Received new responsive URL https://projectdiscovery.io/
+[agent:url_tls_checker] Received new responsive URL: https://projectdiscovery.io/
+[agent:url_page_title_extractor] Received new responsive URL https://projectdiscovery.io/
+[agent:url_screenshotter] Screenshotted successfully for http://projectdiscovery.io/
+[agent:tcp_port_scanner] Port 8443 is closed on 1.0.0.1:53
+[agent:tcp_port_scanner] Port 8443 is closed on 1.1.1.1:53
+[agent:url_takeover_detector] IP addresses for evil.com: [66.96.146.129]
+[agent:url_takeover_detector] CNAME for evil.com: evil.com.
+[agent:tcp_port_scanner] Port 8080 is closed on projectdiscovery.io
+[agent:tcp_port_scanner] Port 8443 is closed on projectdiscovery.io
+[agent:url_tls_checker] https://evil.com:443 uses 
+[agent:url_takeover_detector] IP addresses for Evil.Com: [66.96.146.129]
+[agent:url_takeover_detector] CNAME for Evil.Com: Evil.Com.
+[agent:url_screenshotter] Screenshotted successfully for https://evil.com:443
+[agent:url_tls_checker] Unable to identify TLS information for https://66.96.146.129/: Get "https://66.96.146.129/": tls: failed to verify certificate: x509: cannot validate certificate for 66.96.146.129 because it doesn't contain any IP SANs
+[agent:url_takeover_detector] IP addresses for Evil.Com: [66.96.146.129]
+[agent:url_takeover_detector] CNAME for Evil.Com: Evil.Com.
+[agent:url_tls_checker] Unable to identify TLS information for https://Evil.Com/: Get "https://Evil.Com/": tls: failed to verify certificate: x509: certificate is valid for *.bizland.com, bizland.com, not Evil.Com
+[agent:url_screenshotter] Screenshotted successfully for http://evil.com:80
+[agent:url_screenshotter] Screenshotted successfully for http://Evil.Com/
+[agent:url_screenshotter] Screenshotted successfully for http://66.96.146.129/
+[agent:url_tls_checker] https://evil.com/ uses 
+[agent:url_screenshotter] Screenshotted successfully for https://Evil.Com/
+[agent:url_screenshotter] Screenshotted successfully for https://66.96.146.129/
+[agent:url_screenshotter] Screenshotted successfully for http://evil.com/
+[agent:url_screenshotter] Screenshotted successfully for https://evil.com/
+[agent:url_screenshotter] Screenshotted successfully for https://projectdiscovery.io/
+[agent:url_takeover_detector] IP addresses for evil.com: [66.96.146.129]
+[agent:url_takeover_detector] CNAME for evil.com: evil.com.
+[agent:url_takeover_detector] IP addresses for evil.com: [66.96.146.129]
+[agent:url_takeover_detector] CNAME for evil.com: evil.com.
+[agent:url_takeover_detector] IP addresses for projectdiscovery.io: [76.76.21.21]
+[agent:url_takeover_detector] CNAME for projectdiscovery.io: projectdiscovery.io.
+[agent:url_tls_checker] https://projectdiscovery.io/ uses 

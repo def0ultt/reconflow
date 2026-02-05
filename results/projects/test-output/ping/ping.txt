@@ -1,8 +1,0 @@
-PING google.com (142.251.209.78) 56(84) bytes of data.
-64 bytes from ncmrsa-ai-in-f14.1e100.net (142.251.209.78): icmp_seq=1 ttl=114 time=58.5 ms
-64 bytes from ncmrsa-ai-in-f14.1e100.net (142.251.209.78): icmp_seq=2 ttl=114 time=118 ms
-64 bytes from ncmrsa-ai-in-f14.1e100.net (142.251.209.78): icmp_seq=3 ttl=114 time=141 ms
-
---- google.com ping statistics ---
-3 packets transmitted, 3 received, 0% packet loss, time 2003ms
-rtt min/avg/max/mdev = 58.535/105.876/140.674/34.686 ms

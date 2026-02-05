@@ -1,0 +1,49 @@
+type: module
+
+info:
+  id: test_bool_logic
+  name: Test Boolean Logic
+  author: tester
+  description: Verify boolean variable behavior
+
+vars:
+  # Case 1: Boolean with flag (Old behavior)
+  use_flag:
+    type: boolean
+    default: true
+    flag: "--verbose"
+  
+  # Case 2: Boolean WITHOUT flag (New behavior)
+  run_extra:
+    type: boolean
+    default: true
+
+  # Case 3: Boolean WITHOUT flag set to false
+  skip_me:
+    type: boolean
+    default: false
+
+steps:
+  - name: step1_flag_check
+    tool: bash
+    args: "-c 'echo Flag is: {{use_flag}}'"
+    # Should run because use_flag is True (and thus "--verbose")
+    condition: "{use_flag}"
+
+  - name: step2_bool_check
+    tool: bash
+    args: "-c 'echo Running Extra Step'"
+    # Should run because run_extra is True
+    condition: "{run_extra == true}"
+
+  - name: step3_bool_false_check
+    tool: bash
+    args: "-c 'echo This should NOT run'"
+    # Should NOT run because skip_me is False
+    condition: "{skip_me == true}"
+
+  - name: step4_bool_implicit_check
+    tool: bash
+    args: "-c 'echo Running Implicit Check'"
+    # Should run because run_extra is truthy
+    condition: "{run_extra}"

@@ -149,6 +149,11 @@ class GenericYamlModule(BaseModule):
                     var_name = parts[0].strip()
                     target_val = parts[1].strip().strip("'").strip('"') # Remove quotes
                     actual_val = str(context.get(var_name, ''))
+                    
+                    # Handle boolean string comparison (e.g. 'True' == 'true')
+                    if target_val.lower() in ('true', 'false') and actual_val.lower() in ('true', 'false'):
+                         return target_val.lower() == actual_val.lower()
+                         
                     return actual_val == target_val
             
             # Inequality Check
@@ -158,6 +163,11 @@ class GenericYamlModule(BaseModule):
                     var_name = parts[0].strip()
                     target_val = parts[1].strip().strip("'").strip('"')
                     actual_val = str(context.get(var_name, ''))
+                    
+                    # Handle boolean string comparison
+                    if target_val.lower() in ('true', 'false') and actual_val.lower() in ('true', 'false'):
+                         return target_val.lower() != actual_val.lower()
+
                     return actual_val != target_val
             
             # Negation (Strictly Falsy or Missing)
@@ -240,12 +250,16 @@ class GenericYamlModule(BaseModule):
                 var_type = opt.metadata.get('type', 'string')
                 
                 if var_type == "boolean":
-                    # Inject flag if True, empty string if False
-                    if opt.value is True:
-                        flag = opt.metadata.get('flag', '')
-                        render_ctx[name] = flag
+                    flag = opt.metadata.get('flag')
+                    if flag:
+                        # OLD BEHAVIOR: If flag defined, inject flag string
+                        if opt.value is True:
+                            render_ctx[name] = flag
+                        else:
+                            render_ctx[name] = ""
                     else:
-                        render_ctx[name] = ""
+                        # NEW BEHAVIOR: No flag defined, inject raw boolean
+                        render_ctx[name] = opt.value
                 else:
                     # Regular string variable
                     render_ctx[name] = opt.value

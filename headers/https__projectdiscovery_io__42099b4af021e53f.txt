@@ -1,0 +1,20 @@
+200 OK
+Content-Disposition: inline
+Age: 220914
+Cache-Control: public, max-age=0, must-revalidate
+Critical-Ch: Sec-CH-Prefers-Color-Scheme
+Retry-Count: 0
+Accept-Ch: Sec-CH-Prefers-Color-Scheme
+Access-Control-Allow-Origin: *
+Etag: W/"ee1fd5012960132a4de7be44ff40879a"
+Server: Vercel
+Strict-Transport-Security: max-age=63072000
+Vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch
+X-Matched-Path: /
+Content-Type: text/html; charset=utf-8
+Date: Thu, 05 Feb 2026 10:24:29 GMT
+X-Nextjs-Prerender: 1
+X-Nextjs-Stale-Time: 300
+X-Powered-By: Next.js, Payload
+X-Vercel-Cache: HIT
+X-Vercel-Id: cdg1::rd9r4-1770287069334-092d430cff71
