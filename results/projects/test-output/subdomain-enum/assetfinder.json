@@ -1,8 +1,158 @@
 [
   {
-    "line": "127.0.0.1"
+    "line": "www.justwatch.com"
   },
   {
-    "line": "https://127.0.0.1"
+    "line": "justwatch.com"
+  },
+  {
+    "line": "accounts.justwatch.com"
+  },
+  {
+    "line": "alertmanager.justwatch.com"
+  },
+  {
+    "line": "amazon.justwatch.com"
+  },
+  {
+    "line": "apb.justwatch.com"
+  },
+  {
+    "line": "api.justwatch.com"
+  },
+  {
+    "line": "apis.justwatch.com"
+  },
+  {
+    "line": "apis-vodster.justwatch.com"
+  },
+  {
+    "line": "apis-vodster-v2.justwatch.com"
+  },
+  {
+    "line": "argocd.justwatch.com"
+  },
+  {
+    "line": "automation.justwatch.com"
+  },
+  {
+    "line": "bapi.justwatch.com"
+  },
+  {
+    "line": "bi.justwatch.com"
+  },
+  {
+    "line": "bi-appsflyer-webhook.justwatch.com"
+  },
+  {
+    "line": "bi-appsflyer-webhook-dumper.justwatch.com"
+  },
+  {
+    "line": "bi-clockify-webhook-dumper.justwatch.com"
+  },
+  {
+    "line": "bi-zendesk-webhook-dumper.justwatch.com"
+  },
+  {
+    "line": "c.justwatch.com"
+  },
+  {
+    "line": "campaigns-api.justwatch.com"
+  },
+  {
+    "line": "checkip.justwatch.com"
+  },
+  {
+    "line": "click.justwatch.com"
+  },
+  {
+    "line": "clicks.justwatch.com"
+  },
+  {
+    "line": "d.justwatch.com"
+  },
+  {
+    "line": "bi-mcp-server.dev.justwatch.com"
+  },
+  {
+    "line": "e.justwatch.com"
+  },
+  {
+    "line": "email.justwatch.com"
+  },
+  {
+    "line": "events.justwatch.com"
+  },
+  {
+    "line": "feedback.justwatch.com"
+  },
+  {
+    "line": "geo.justwatch.com"
+  },
+  {
+    "line": "guides.justwatch.com"
+  },
+  {
+    "line": "havas.justwatch.com"
+  },
+  {
+    "line": "hudxcljw.hello.justwatch.com"
+  },
+  {
+    "line": "hooks.justwatch.com"
+  },
+  {
+    "line": "i18n.justwatch.com"
+  },
+  {
+    "line": "images.justwatch.com"
+  },
+  {
+    "line": "info.justwatch.com"
+  },
+  {
+    "line": "intranet.justwatch.com"
+  },
+  {
+    "line": "jeeves.intranet.justwatch.com"
+  },
+  {
+    "line": "litellm.intranet.justwatch.com"
+  },
+  {
+    "line": "ipg.justwatch.com"
+  },
+  {
+    "line": "media.justwatch.com"
+  },
+  {
+    "line": "www.media.justwatch.com"
+  },
+  {
+    "line": "omg.justwatch.com"
+  },
+  {
+    "line": "partners.justwatch.com"
+  },
+  {
+    "line": "partners-auth.justwatch.com"
+  },
+  {
+    "line": "pixel.justwatch.com"
+  },
+  {
+    "line": "reports.justwatch.com"
+  },
+  {
+    "line": "sapi.justwatch.com"
+  },
+  {
+    "line": "sentry.justwatch.com"
+  },
+  {
+    "line": "sg-api.justwatch.com"
+  },
+  {
+    "line": "sp.justwatch.com"
   }
 ]

@@ -16,15 +16,11 @@ vars:
     default: 3
   header:
     default: "User-Agent: Mozilla/5.0"
-  active:
-    default: true
-    type: boolean    
 steps:
   # Phase 1: Crawl URLs and save to file
   - name: katana_enum
     tool: katana
     args: "-u {{target}} -d {{depth}} -aff -xhr -fx -sb -H '{{header}}' -cos '.*\\/logout.*' -silent"
-    condition: '{{active}}'
     # Phase 2: Inject payloads into each URL
   - name: inject_payloads
     tool: /bin/bash

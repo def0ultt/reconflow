@@ -1,0 +1,15 @@
+{
+  "step_name": "inject_payloads",
+  "tool": "/bin/bash",
+  "module_id": "recon-openredirect",
+  "module_name": "Open Redirect Detection",
+  "timestamp": "2026-02-04T15:21:25.789714",
+  "duration_seconds": 1.13,
+  "line_count": 0,
+  "file_size": 8934,
+  "command": "/bin/bash -c 'cat /home/defaut/toolkit/web/loxs/payloads/or.txt | while read payload; do cat None | zap \"$payload\"; done'",
+  "exit_code": 0,
+  "has_json": false,
+  "record_count": 0,
+  "parser_used": null
+}
