@@ -1,0 +1,30 @@
+type: module
+info:
+  id: live_web_server
+  name: discover live web server 
+  tag: recon
+  description: Multi-tool subdomain enumeration pipeline
+  author: default
+vars:
+  target:
+    required: false
+    description: target name  
+  targets:
+    required: false
+    description: path to targets list 
+  ports:
+    required: false
+    default: "80,443,81,3000,3001,5000,8000,8001,8008,8080,8083,8443,8888,9000,9001,9090,9443"
+    description: Ports to scan
+  screenshot:
+    type: boolean
+    default: false
+steps:
+  - name: httpx
+    tool: httpx
+    args: "{-l {{targets}}||-u {{target}} }-title -status-code -content-length -location  -p {{ports}}  -j "
+  - name: screenshot
+    tool: bash
+    args: "-c 'cat {{httpx.output}}|aquatone'"
+    condition: "{screenshot == true}"
+    depends_on: [httpx]

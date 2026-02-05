@@ -1,191 +1,350 @@
 [
   {
-    "line": "frame.evil.com"
+    "line": "sapi.justwatch.com"
   },
   {
-    "line": "abcdefghijklmnopqrstuvwxyz123456.evil.com"
+    "line": "userapi.justwatch.com"
   },
   {
-    "line": "good.evil.com"
+    "line": "sites.justwatch.com"
   },
   {
-    "line": "252fclient.evil.com"
+    "line": "mail.justwatch.com"
   },
   {
-    "line": "microsoft.com.foo.bar.evil.com"
+    "line": "translate.justwatch.com"
   },
   {
-    "line": "mozilla.thunderbird.blahblahblahblahblah.evil.com"
+    "line": "campaigns-api.justwatch.com"
   },
   {
-    "line": "gist.github.com.evil.com"
+    "line": "g.justwatch.com"
   },
   {
-    "line": "data1.evil.com"
+    "line": "groups.justwatch.com"
   },
   {
-    "line": "dr.evil.com"
+    "line": "bi-zendesk-webhook-dumper.justwatch.com"
   },
   {
-    "line": "kjasdffdsfjewf.evil.com"
+    "line": "start.justwatch.com"
   },
   {
-    "line": "a.evil.com"
+    "line": "omd.justwatch.com"
   },
   {
-    "line": "bad.evil.com"
+    "line": "lipoid.justwatch.com"
   },
   {
-    "line": "com.evil.com"
+    "line": "api.justwatch.com"
   },
   {
-    "line": "auth.app.com.evil.com"
+    "line": "sst.justwatch.com"
   },
   {
-    "line": "my.bluehost.com.evil.com"
+    "line": "calendar.justwatch.com"
   },
   {
-    "line": "facebook.com.facebook.com.evil.com"
+    "line": "letsencrypt-test.justwatch.com"
   },
   {
-    "line": "foo.com.evil.com"
+    "line": "static-sports-widgets.tmp.justwatch.com"
   },
   {
-    "line": "data2.evil.com"
+    "line": "intranet.tmp.justwatch.com"
   },
   {
-    "line": "api.evil.com"
+    "line": "sr-assets2.justwatch.com"
   },
   {
-    "line": "foo.bar.evil.com"
+    "line": "tvwebapp.tv.justwatch.com"
   },
   {
-    "line": "www.opentable.com.evil.com"
+    "line": "hudxcljw.hello.justwatch.com"
   },
   {
-    "line": "xn--qq-pt3cr0eg2rkmlugut88d.com.evil.com"
+    "line": "accounts.justwatch.com"
   },
   {
-    "line": "ivano-francovsk.evil.com"
+    "line": "click.justwatch.com"
   },
   {
-    "line": "2fclient.evil.com"
+    "line": "editorial.justwatch.com"
   },
   {
-    "line": "mail.google.com.backend-processing.am-i-off-the-screen-yet.evil.com"
+    "line": "support.justwatch.com"
   },
   {
-    "line": "b.evil.com"
+    "line": "tv.justwatch.com"
   },
   {
-    "line": "not.to.be.evil.com"
+    "line": "sports-widget.tmp.justwatch.com"
   },
   {
-    "line": "bobafett.evil.com"
+    "line": "bi-appsflyer-webhook-dumper.justwatch.com"
   },
   {
-    "line": "baidu.com.evil.com"
+    "line": "c.justwatch.com"
   },
   {
-    "line": "domain.evil.com"
+    "line": "reports.justwatch.com"
   },
   {
-    "line": "external.evil.com"
+    "line": "video.justwatch.com"
   },
   {
-    "line": "abcdefg.evil.com"
+    "line": "video-feed.justwatch.com"
   },
   {
-    "line": "attacker.evil.com"
+    "line": "prod.vault-test.justwatch.com"
   },
   {
-    "line": "grocery.evil.com"
+    "line": "staging.vault-test.justwatch.com"
   },
   {
-    "line": "127.localhost.evil.com"
+    "line": "images.tmp.justwatch.com"
   },
   {
-    "line": "microsoft.com.foo.bar.baz.evil.com"
+    "line": "apis.justwatch.com"
   },
   {
-    "line": "bloopist.com.evil.com"
+    "line": "clicks.justwatch.com"
   },
   {
-    "line": "good.com.evil.com"
+    "line": "litellm.intranet.justwatch.com"
   },
   {
-    "line": "paypal.com.evil.com"
+    "line": "omg.justwatch.com"
   },
   {
-    "line": "yourbank.com.evil.com"
+    "line": "sports-widget.justwatch.com"
   },
   {
-    "line": "yourtweetreader.com.evil.com"
+    "line": "static-widgets.justwatch.com"
   },
   {
-    "line": "imap.evil.com"
+    "line": "www.apis.justwatch.com"
   },
   {
-    "line": "mallet.evil.com"
+    "line": "partners.justwatch.com"
   },
   {
-    "line": "anti-virus.evil.com"
+    "line": "partners-auth.justwatch.com"
   },
   {
-    "line": "churches.are.evil.com"
+    "line": "registry.justwatch.com"
   },
   {
-    "line": "assets.evil.com"
+    "line": "static.justwatch.com"
   },
   {
-    "line": "client.evil.com"
+    "line": "jtb28meh.updates.justwatch.com"
   },
   {
-    "line": "example.com.evil.com"
+    "line": "scaler.justwatch.com"
   },
   {
-    "line": "xxx.com.evil.com"
+    "line": "guides.justwatch.com"
   },
   {
-    "line": "motor-talk.de.evil.com"
+    "line": "debug.sst.tmp.justwatch.com"
   },
   {
-    "line": "evil.com"
+    "line": "account.justwatch.com"
   },
   {
-    "line": "phishing-site.evil.com"
+    "line": "hooks.justwatch.com"
   },
   {
-    "line": "testbank-login-1159946934.evil.com"
+    "line": "redash.justwatch.com"
   },
   {
-    "line": "testbank-login-1705456349.evil.com"
+    "line": "alertmanager.justwatch.com"
   },
   {
-    "line": "testbank-login-2008498729.evil.com"
+    "line": "apis-vodster.justwatch.com"
   },
   {
-    "line": "testbank-login-397646267.evil.com"
+    "line": "argocd.justwatch.com"
   },
   {
-    "line": "testbank-login-99279983.evil.com"
+    "line": "intranet.justwatch.com"
   },
   {
-    "line": "testbank-login-1800125655.evil.com"
+    "line": "pixel.justwatch.com"
   },
   {
-    "line": "testbank-login-1916046815.evil.com"
+    "line": "uct2.justwatch.com"
   },
   {
-    "line": "testbank-login-1245056090.evil.com"
+    "line": "www.justwatch.com"
   },
   {
-    "line": "super-suspicious-tunnel-domain-12345678abcdef.evil.com"
+    "line": "automation.justwatch.com"
   },
   {
-    "line": "real.evil.com"
+    "line": "bi-appsflyer-webhook.justwatch.com"
   },
   {
-    "line": "www.evil.com"
+    "line": "bi-mcp-server.dev.justwatch.com"
+  },
+  {
+    "line": "bi.justwatch.com"
+  },
+  {
+    "line": "sr-assets.justwatch.com"
+  },
+  {
+    "line": "wavemaker.justwatch.com"
+  },
+  {
+    "line": "talent.justwatch.com"
+  },
+  {
+    "line": "www.g.justwatch.com"
+  },
+  {
+    "line": "apis-vodster-v2.justwatch.com"
+  },
+  {
+    "line": "havas.justwatch.com"
+  },
+  {
+    "line": "hi.justwatch.com"
+  },
+  {
+    "line": "debug.sst.justwatch.com"
+  },
+  {
+    "line": "e.justwatch.com"
+  },
+  {
+    "line": "gitlab.justwatch.com"
+  },
+  {
+    "line": "drive.justwatch.com"
+  },
+  {
+    "line": "drone.justwatch.com"
+  },
+  {
+    "line": "ipg.justwatch.com"
+  },
+  {
+    "line": "static-sports-widgets.justwatch.com"
+  },
+  {
+    "line": "amazon.justwatch.com"
+  },
+  {
+    "line": "i18n.justwatch.com"
+  },
+  {
+    "line": "sg-api.justwatch.com"
+  },
+  {
+    "line": "vault-2.justwatch.com"
+  },
+  {
+    "line": "tmp.justwatch.com"
+  },
+  {
+    "line": "bi-clockify-webhook-dumper.justwatch.com"
+  },
+  {
+    "line": "prd-eu-2.internal.justwatch.com"
+  },
+  {
+    "line": "jeeves.intranet.justwatch.com"
+  },
+  {
+    "line": "www.media.justwatch.com"
+  },
+  {
+    "line": "sr-assets3.justwatch.com"
+  },
+  {
+    "line": "ww.justwatch.com"
+  },
+  {
+    "line": "sst.tmp.justwatch.com"
+  },
+  {
+    "line": "translations.justwatch.com"
+  },
+  {
+    "line": "bapi.justwatch.com"
+  },
+  {
+    "line": "email.justwatch.com"
+  },
+  {
+    "line": "sports.justwatch.com"
+  },
+  {
+    "line": "vault.justwatch.com"
+  },
+  {
+    "line": "checkip.justwatch.com"
+  },
+  {
+    "line": "wpp.justwatch.com"
+  },
+  {
+    "line": "d.justwatch.com"
+  },
+  {
+    "line": "events.justwatch.com"
+  },
+  {
+    "line": "images.justwatch.com"
+  },
+  {
+    "line": "sp.justwatch.com"
+  },
+  {
+    "line": "jeeves.intranet.tmp.justwatch.com"
+  },
+  {
+    "line": "testca.justwatch.com"
+  },
+  {
+    "line": "feedback.justwatch.com"
+  },
+  {
+    "line": "widget.justwatch.com"
+  },
+  {
+    "line": "apb.justwatch.com"
+  },
+  {
+    "line": "media.justwatch.com"
+  },
+  {
+    "line": "caddylab.justwatch.com"
+  },
+  {
+    "line": "partners.tmp.justwatch.com"
+  },
+  {
+    "line": "url430.justwatch.com"
+  },
+  {
+    "line": "geo.justwatch.com"
+  },
+  {
+    "line": "sentry.justwatch.com"
+  },
+  {
+    "line": "typeform-webhook.justwatch.com"
+  },
+  {
+    "line": "info.justwatch.com"
+  },
+  {
+    "line": "t.justwatch.com"
+  },
+  {
+    "line": "justwatch.com"
   }
 ]

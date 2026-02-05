@@ -1,41 +1,218 @@
 [
   {
-    "line": "testbank-login-1800125655.evil.com"
+    "line": "bi-clockify-webhook-dumper.justwatch.com"
   },
   {
-    "line": "real.evil.com"
+    "line": "argocd.justwatch.com"
   },
   {
-    "line": "evil.com"
+    "line": "wavemaker.justwatch.com"
   },
   {
-    "line": "phishing-site.evil.com"
+    "line": "feedback.justwatch.com"
   },
   {
-    "line": "testbank-login-397646267.evil.com"
+    "line": "d.justwatch.com"
   },
   {
-    "line": "super-suspicious-tunnel-domain-12345678abcdef.evil.com"
+    "line": "c.justwatch.com"
   },
   {
-    "line": "testbank-login-1159946934.evil.com"
+    "line": "sr-assets2.justwatch.com"
   },
   {
-    "line": "testbank-login-99279983.evil.com"
+    "line": "sr-assets.justwatch.com"
   },
   {
-    "line": "testbank-login-1705456349.evil.com"
+    "line": "pixel.justwatch.com"
   },
   {
-    "line": "www.evil.com"
+    "line": "t.justwatch.com"
   },
   {
-    "line": "testbank-login-1245056090.evil.com"
+    "line": "sports.justwatch.com"
   },
   {
-    "line": "testbank-login-1916046815.evil.com"
+    "line": "click.justwatch.com"
   },
   {
-    "line": "testbank-login-2008498729.evil.com"
+    "line": "tv.justwatch.com"
+  },
+  {
+    "line": "www.justwatch.com"
+  },
+  {
+    "line": "wpp.justwatch.com"
+  },
+  {
+    "line": "bapi.justwatch.com"
+  },
+  {
+    "line": "clicks.justwatch.com"
+  },
+  {
+    "line": "bi-appsflyer-webhook-dumper.justwatch.com"
+  },
+  {
+    "line": "checkip.justwatch.com"
+  },
+  {
+    "line": "partners.justwatch.com"
+  },
+  {
+    "line": "apb.justwatch.com"
+  },
+  {
+    "line": "images.justwatch.com"
+  },
+  {
+    "line": "bi-zendesk-webhook-dumper.justwatch.com"
+  },
+  {
+    "line": "uct2.justwatch.com"
+  },
+  {
+    "line": "litellm.intranet.justwatch.com"
+  },
+  {
+    "line": "amazon.justwatch.com"
+  },
+  {
+    "line": "static.justwatch.com"
+  },
+  {
+    "line": "geo.justwatch.com"
+  },
+  {
+    "line": "omg.justwatch.com"
+  },
+  {
+    "line": "api.justwatch.com"
+  },
+  {
+    "line": "havas.justwatch.com"
+  },
+  {
+    "line": "apis-vodster-v2.justwatch.com"
+  },
+  {
+    "line": "reports.justwatch.com"
+  },
+  {
+    "line": "sg-api.justwatch.com"
+  },
+  {
+    "line": "events.justwatch.com"
+  },
+  {
+    "line": "ipg.justwatch.com"
+  },
+  {
+    "line": "partners-auth.justwatch.com"
+  },
+  {
+    "line": "typeform-webhook.justwatch.com"
+  },
+  {
+    "line": "sp.justwatch.com"
+  },
+  {
+    "line": "intranet.justwatch.com"
+  },
+  {
+    "line": "bi.justwatch.com"
+  },
+  {
+    "line": "apis.justwatch.com"
+  },
+  {
+    "line": "e.justwatch.com"
+  },
+  {
+    "line": "debug.sst.justwatch.com"
+  },
+  {
+    "line": "justwatch.com"
+  },
+  {
+    "line": "accounts.justwatch.com"
+  },
+  {
+    "line": "prd-eu-2.internal.justwatch.com"
+  },
+  {
+    "line": "video.justwatch.com"
+  },
+  {
+    "line": "email.justwatch.com"
+  },
+  {
+    "line": "automation.justwatch.com"
+  },
+  {
+    "line": "jeeves.intranet.justwatch.com"
+  },
+  {
+    "line": "info.justwatch.com"
+  },
+  {
+    "line": "bi-mcp-server.dev.justwatch.com"
+  },
+  {
+    "line": "sports-widget.justwatch.com"
+  },
+  {
+    "line": "bi-appsflyer-webhook.justwatch.com"
+  },
+  {
+    "line": "sentry.justwatch.com"
+  },
+  {
+    "line": "media.justwatch.com"
+  },
+  {
+    "line": "www.media.justwatch.com"
+  },
+  {
+    "line": "apis-vodster.justwatch.com"
+  },
+  {
+    "line": "static-sports-widgets.justwatch.com"
+  },
+  {
+    "line": "hooks.justwatch.com"
+  },
+  {
+    "line": "i18n.justwatch.com"
+  },
+  {
+    "line": "sapi.justwatch.com"
+  },
+  {
+    "line": "widget.justwatch.com"
+  },
+  {
+    "line": "static-widgets.justwatch.com"
+  },
+  {
+    "line": "video-feed.justwatch.com"
+  },
+  {
+    "line": "support.justwatch.com"
+  },
+  {
+    "line": "talent.justwatch.com"
+  },
+  {
+    "line": "guides.justwatch.com"
+  },
+  {
+    "line": "campaigns-api.justwatch.com"
+  },
+  {
+    "line": "sr-assets3.justwatch.com"
+  },
+  {
+    "line": "sst.justwatch.com"
   }
 ]
