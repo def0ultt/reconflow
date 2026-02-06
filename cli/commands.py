@@ -771,7 +771,7 @@ def cmd_list_modules(ctx: Context, mode: str):
     ctx.last_shown_map = items
     ctx.last_shown_type = 'module'
 
-    table = Table(title="[red]"+title+"[/red]", show_header=True)
+    table = Table(title="[red]"+title+"[/red]", show_header=True,show_lines=True)
     table.add_column("[bold cyan]ID[/bold cyan]", style="bold cyan", justify="center")
     table.add_column("[bold green]Name[/bold green]", style="bold green", justify="left")
     table.add_column("[bold yellow]Tag[/bold yellow]", style="bold yellow", justify="left")
@@ -804,7 +804,7 @@ def cmd_search(ctx: Context, arg: str):
         print("No matching modules found.")
         return
     
-    table = Table(title=f"Search Results: {arg}", show_header=True, header_style="bold cyan")
+    table = Table(title=f"Search Results: {arg}", show_header=True, header_style="bold cyan",show_lines=True)
     table.add_column("[red]ID[/red]", style="bold blue", justify="right")
     table.add_column("[red]Name[/red]", style="bold white")
     table.add_column("[red]Tag[/red]", style="bold yellow")

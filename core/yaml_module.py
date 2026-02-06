@@ -461,6 +461,15 @@ class GenericYamlModule(BaseModule):
         # Timeout
         timeout_sec = self._parse_timeout(step.timeout)
 
+        # Determine working directory for tool execution
+        # Tools should run from the project path, not reconflow installation path
+        working_dir = None
+        if full_context and hasattr(full_context, 'current_project') and full_context.current_project:
+            working_dir = full_context.current_project.path
+            # Ensure the project directory exists
+            if not os.path.exists(working_dir):
+                os.makedirs(working_dir, exist_ok=True)
+
         start_time = time.time()
         try:
             proc = subprocess.run(
@@ -470,7 +479,8 @@ class GenericYamlModule(BaseModule):
                 capture_output=True,
                 text=True,
                 input=input_data,
-                timeout=timeout_sec
+                timeout=timeout_sec,
+                cwd=working_dir  # Execute from project directory
             )
             duration = time.time() - start_time
             

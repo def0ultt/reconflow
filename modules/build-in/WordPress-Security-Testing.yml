@@ -1,0 +1,29 @@
+type: module
+info:
+  id: WordPress-Security-Testing
+  name: WordPress Security Testing
+  tag: web,wordpress
+  description: Security assessment pipeline for WordPress installations covering enumeration, misconfigurations, and known vulnerabilities
+  author: default
+vars:
+  target:
+    required: false
+    description: Target domain
+  cookie:
+    required: false
+    description: "set cookie for authentication with target format cookie1=value1; cookie2=value2"
+ 
+  api_token:
+    required: true
+    description: wpscan api token
+
+steps:
+  - name: wordpress scanner
+    tool: wpscan
+    args: "--url https://{{target}} --disable-tls-checks --api-token {{api_token}} -e at -e ap -e u --enumerate ap --plugins-detection aggressive --force --cookie-string '{{cookie}}' --stealthy --format json"
+    condition: "{api_token}"
+  - name: nuclei scanner 
+    tool: 
+    args: "nuclei -t github/topscoder/nuclei-wordfence-cve  -u https://{{target}} -j -H 'Cookie: {{cookie}}'"
+
+ 

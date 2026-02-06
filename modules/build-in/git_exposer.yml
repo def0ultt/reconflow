@@ -1,0 +1,17 @@
+type: module
+info:
+  id: git-config-exposer
+  name: Git Config Exposure Detector
+  tags: recon,git
+  description: |
+    Detects exposed /.git/config files on target subdomains.
+  author: default
+vars:
+  target:
+    required: true
+    description: path to target subdomain 
+steps:
+  - name: git-exposer
+    tool: bash
+    args: "-c 'cat {{target}}|httpx-toolkit -silent -path /.git/config -mc 200 -ms \"[core]\" -j '"
+  

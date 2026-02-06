@@ -246,12 +246,16 @@ def _create_new_project(ctx: Context):
         exit(1)
 
 def _create_temp_project(ctx: Context):
-    temp_id = f"temp_{uuid.uuid4().hex[:8]}"
+    from datetime import datetime
+    # Create timestamp-based temp project name
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    temp_id = f"temp{timestamp}"
     console.print(f"[yellow]Creating temporary project: {temp_id}[/yellow]")
     
     try:
-        temp_path = Path("/tmp/reconflow_temps") / temp_id
-        proj = ctx.project_repo.create({"name": temp_id, "path": str(temp_path), "description": "Temporary Project"})
+        # Use /results directory as specified by user
+        temp_path = Path("results") / temp_id
+        proj = ctx.project_repo.create({"name": temp_id, "path": str(temp_path.absolute()), "description": "Temporary Project"})
         temp_path.mkdir(parents=True, exist_ok=True)
         ctx.current_project = proj
         
