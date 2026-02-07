@@ -4,7 +4,11 @@ from prompt_toolkit.formatted_text import HTML
 from core.context import Context
 from .completer import Completer
 from .commands import COMMANDS
+from rich.console import Console
 
+
+
+console = Console()
 class Shell:
     """
     Encapsulates the prompt_toolkit session and main loop.
@@ -52,7 +56,7 @@ class Shell:
                 arg = parts[1] if len(parts) > 1 else ""
 
                 if cmd == 'exit':
-                    print("Goodbye!")
+                    console.print("[bold green]Goodbye![/bold green]")
                     break
                 
                 if cmd in COMMANDS:
@@ -60,5 +64,9 @@ class Shell:
                 else:
                     print(f" Unknown command: {cmd}")
 
-            except (KeyboardInterrupt, EOFError):
+            except KeyboardInterrupt:
+                # Graceful exit: prompt user to type "exit" instead of immediate exit
+                console.print("\n[bold red][!] To exit, please type 'exit'[/bold red]")
+                continue
+            except EOFError:
                 break
