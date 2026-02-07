@@ -198,7 +198,7 @@ def cmd_show(ctx: Context, arg: str):
             print("No projects found.")
             return
 
-        table = Table(title="Projects", show_header=True, header_style="bold cyan")
+        table = Table(title="Projects", show_header=True, header_style="bold cyan",show_lines=True)
         table.add_column("ID", style="cyan", justify="center")
         table.add_column("Name", style="green", justify="center")
         table.add_column("Created At", style="magenta", justify="center")
@@ -504,6 +504,7 @@ def cmd_ls(ctx: Context, arg: str):
     table = Table(
         title=f"Project: {ctx.current_project.name}",
         show_header=True,
+        show_lines=True,
         header_style="bold cyan"
     )
     
