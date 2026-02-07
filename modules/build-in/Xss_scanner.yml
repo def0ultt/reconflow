@@ -2,7 +2,7 @@ type: module
 info:
   id: xss-scanner
   name: XSS Scanner
-  tag: scan,xss
+  tag: Scan
   description: Detects reflected cross-site scripting (XSS) by checking whether dangerous characters like < > ' " are reflected in the page response
   author: default
 

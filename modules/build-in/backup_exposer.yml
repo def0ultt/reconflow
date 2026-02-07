@@ -2,7 +2,7 @@ type: module
 info:
   id: backup-file-exposure
   name: Backup_File_Exposure_Scanne
-  tag: exposure,backup
+  tag: Exposure
   description: |
     Detects exposed backup and sensitive files on web servers by fuzzing
     common backup filenames (such as .zip, .bak, .sql, .tar.gz) and checking

@@ -2,7 +2,7 @@ type: module
 info:
   id: WordPress-Security-Testing
   name: WordPress Security Testing
-  tag: web,wordpress
+  tag: Scan
   description: Security assessment pipeline for WordPress installations covering enumeration, misconfigurations, and known vulnerabilities
   author: default
 vars:
