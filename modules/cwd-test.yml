@@ -1,0 +1,21 @@
+---
+info:
+  name: "CWD Test Module"
+  description: "Test module to verify tools run from project directory"
+  author: "System"
+  id: "cwd-test"
+
+vars: {}
+
+steps:
+  - name: test_current_directory
+    tool: "bash"
+    args: "-c 'pwd > current_dir.txt && echo \"Tool executed from: $(pwd)\" && ls -la'"
+    parallel: false
+    
+  - name: test_file_creation
+    tool: "bash"
+    args: "-c 'echo \"Testing file creation in CWD\" > test_output.txt && cat test_output.txt'"
+    parallel: false
+    depends_on:
+      - test_current_directory

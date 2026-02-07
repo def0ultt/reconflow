@@ -1,0 +1,59 @@
+type: module
+
+info:
+  id: quick_discover_live_web_server.yml
+  name: Subdomain Enumeration
+  tag: recon
+  description: Multi-tool subdomain enumeration pipeline
+  author: charlie
+
+vars:
+  target:
+    required: true
+    description: Target domain
+  chaos_api_key:
+    required: false
+    description: Chaos API key
+  ports:
+    required: false
+    default: "80,443,81,3000,3001,5000,8000,8001,8008,8080,8083,8443,8888,9000,9001,9090,9443"
+    description: Ports to scan
+steps:
+  - name: subfinder
+    tool: subfinder 
+    tool: subfinder
+    args: "-d {{target}} -all -silent"
+
+  - name: assetfinder
+    tool: assetfinder
+    args: "-subs-only {{target}}"
+
+  # Chaos often requires API key, run only if provided
+  - name: chaos
+    tool: chaos
+    args: "-d {{target}} -silent -key {{chaos_api_key}}"
+    # Check if variable is defined AND not empty (Simple Syntax)
+    condition: "{chaos_api_key}"
+
+  - name: findomain
+    tool: findomain
+    args: "-t {{target}} -q"
+
+  - name: anew # Consolidate unique subdomains
+    tool: anew
+    args: ""
+    stdin: true # ENABLE STDIN PIPING from all dependencies
+    depends_on: [subfinder, assetfinder, chaos, findomain]
+  - name: httpx
+    tool: httpx
+    args: "-l {{anew.output}} -title -status-code -content-length -location  -p {{ports}}  -j "
+    depends_on: [anew]
+  - name: show_results
+    tool: json_parser
+    args: "-i {{httpx.output}}"
+    depends_on: [httpx]
+  - name: rm_file
+    tool: rm
+    args: "{{subfinder.output}} {{assetfinder.output}} {{findomain.output}} {{Chaos.output}}"
+    # Only remove files if they ran (best effort)
+    depends_on: [anew]

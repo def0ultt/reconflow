@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Access Denied</title>
+<style>
+html, body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+h1 {
+    color: #c00;
+    font-size: 2.5em;
+    margin: 50px 0 10px 0;
+    text-align: center;
+}
+h2 {
+    color: #555;
+    font-size: 1.7em;
+    margin: 5px 0 40px 0;
+    text-align: center;
+}
+
+/* Browser window */
+.screen {
+    width: 90%;
+    max-width: 1200px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    border: 1px solid #ccc;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Tab bar */
+.screen .tab-bar {
+    height: 35px;
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    border-bottom: 1px solid #ccc;
+}
+.screen .tab {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+.screen .tab.red { background: #f25f58; }
+.screen .tab.yellow { background: #f8c956; }
+.screen .tab.green { background: #3fc14f; }
+
+/* URL bar */
+.screen .url-bar {
+    height: 28px;
+    background: #ffffff;
+    margin: 5px 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 0.9em;
+    color: #555;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Page content */
+.screen .content {
+    padding: 100px 40px; 
+    position: relative;
+}
+
+/* Red circle X */
+.block-icon {
+    width: 160px;  
+    height: 160px; 
+    margin: 0 auto;
+    border-radius: 50%;
+    background-color: #c00;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 12px rgba(0,0,0,0.25);
+}
+.block-icon svg {
+    width: 80px;
+    height: 80px;
+    stroke: #fff;
+    stroke-width: 10;
+}
+
+/* Bottom questions */
+.container {
+    width: 95%;
+    max-width: 1400px;
+    margin: 40px auto 10px auto; 
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+.box {
+    flex: 1;
+    min-width: 0;
+    background: #fff;
+    padding: 30px;
+    border-radius: 6px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    text-align: left;
+    font-size: 1em;
+}
+
+/* Request ID in rectangle */
+.request-id-footer {
+    margin-top: 10px; 
+    background: #f8f8f8;
+    border: 1px solid #ccc;
+    padding: 15px 30px;
+    font-weight: bold;
+    font-family: monospace;
+    color: #c00;
+    font-size: 1.3em;
+    border-radius: 6px;
+    text-align: center;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+</style>
+</head>
+<body>
+
+<h1>Sorry, you have been blocked</h1>
+<h2>You are unable to access <strong>66.96.146.129</strong></h2>
+
+<div class="screen">
+    <!-- Tab bar -->
+    <div class="tab-bar">
+        <div class="tab red"></div>
+        <div class="tab yellow"></div>
+        <div class="tab green"></div>
+    </div>
+    <!-- URL bar -->
+    <div class="url-bar">
+        https://66.96.146.129
+    </div>
+    <!-- Page content -->
+    <div class="content">
+        <div class="block-icon">
+            <svg viewBox="0 0 60 60">
+                <line x1="0" y1="0" x2="60" y2="60"/>
+                <line x1="60" y1="0" x2="0" y2="60"/>
+            </svg>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="box">
+        <strong>Why have I been blocked?</strong>
+        <p>It seems that something in your recent request triggered our website’s security system. These protections are in place to keep the site safe from online threats and misuse. Various actions can cause this block, such as submitting specific words or phrases, executing a SQL command, or sending improperly formatted data.</p>
+    </div>
+    <div class="box">
+        <strong>What can I do to resolve this?</strong>
+        <p>If you think you were blocked by mistake, please reach out to the site owner. Be sure to include the Request ID shown below so they can quickly look into your request and restore access if appropriate.</p>
+    </div>
+</div>
+
+<div class="request-id-footer">
+    REQUEST ID : c333418b-d280-477e-87fd-9b07a9cf1e48
+</div>
+
+</body>
+</html>
+

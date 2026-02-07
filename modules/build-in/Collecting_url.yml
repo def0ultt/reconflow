@@ -1,0 +1,39 @@
+type: module
+info:
+  id: Collecting_url
+  name: URL Collection
+  tag: recon
+  description: Gathers URLs using passive sources such as historical archives and active techniques like crawling
+  author: default
+vars:
+  target:
+    required: true
+    description: Path to a file containing the target list
+  header:
+    required: false
+    description: add header
+    default: 'test'
+  active:
+    type: boolean
+    default: true
+     
+steps:
+  - name: katana
+    tool: katana 
+    args: '-u {{target}} -jc -aff -xhr -fx -sb  -H {{header}} -cos ".*\/logout.*" -d 20 '
+    condition: "{active == true}"
+  - name: gau
+    tool: bash
+    args: "-c 'cat {{target}} | gau | sort -u '"
+  - name: urlfinder
+    tool: bash
+    args: " -c 'cat {{target}}|urlfinder -silent' "
+  - name: Collecting_url
+    tool: anew
+    args: ""
+    stdin: true
+    depends_on: [katana, gau, urlfinder]
+  - name: remove_file
+    tool: bash 
+    args: "-c 'rm -rf {{urlfinder.output or ''}} {{gau.output or ''}} {{katana.output or ''}} '"
+    depends_on: [Collecting_url]

@@ -22,7 +22,7 @@ vars:
 steps:
   - name: httpx
     tool: httpx
-    args: "{-l {{targets}}||-u {{target}} }-title -status-code -content-length -location  -p {{ports}}  -j "
+    args: "{-l {{targets}}||-u {{target}} } -title -status-code -content-length -location  -p {{ports}}  -j "
   - name: screenshot
     tool: bash
     args: "-c 'cat {{httpx.output}}|aquatone'"

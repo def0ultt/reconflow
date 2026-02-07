@@ -1,0 +1,35 @@
+type: module
+info:
+  id: backup-file-exposure
+  name: Backup_File_Exposure_Scanne
+  tag: exposure,backup
+  description: |
+    Detects exposed backup and sensitive files on web servers by fuzzing
+    common backup filenames (such as .zip, .bak, .sql, .tar.gz) and checking
+    for accessible files that return HTTP 200 responses.
+  author: default
+vars:
+  target:
+    required: true
+    description: Path to a file containing the target list
+  proxy:                                                                          
+    type: boolean                                                                      
+    default: false 
+  wordlist:
+    required: false 
+    description: wordlist containing backup file 
+    default: ~/reconflow/reconflow/wordlist/backup_files_only.txt
+steps:
+  - name: xss scanner
+    tool: bash
+    args: "ffuf -w {{target}}:SUB -w {{wordlist}}:FILE -u https://SUB/FILE -mc 200 -rate 50 -fs 0 -c  {-x {{proxy}} || }"
+                                                                         
+                                                          
+                                                                    
+                                                              
+                                                                                       
+                                                                                       
+                                                                                       
+                                                                                       
+                                                                                       
+                                                                                       

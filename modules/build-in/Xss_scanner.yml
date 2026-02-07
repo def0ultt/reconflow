@@ -1,0 +1,21 @@
+type: module
+info:
+  id: xss-scanner
+  name: XSS Scanner
+  tag: scan,xss
+  description: Detects reflected cross-site scripting (XSS) by checking whether dangerous characters like < > ' " are reflected in the page response
+  author: default
+
+vars:
+  target:
+    required: true
+    description: Path to a file containing the target list
+  header:
+    required: false
+    description: add header 
+    default: test
+steps:
+  - name: xss scanner
+    tool: bash
+    args: "-c ' cat {{target}} |zap -a  |ifxss -H {{header}} -j '"
+  

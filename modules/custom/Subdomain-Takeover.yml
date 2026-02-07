@@ -1,0 +1,24 @@
+type: module
+info:
+  id: Subdomain-Takeover 
+  name: Subdomain Takeover 
+  tag: recon
+  description: Reconnaissance workflow that detects potential subdomain takeover candidates by analyzing HTTP responses, CNAME records, and unclaimed third-party services
+  author: default
+vars:
+  target:
+    required: true
+    description: path to file subdomain
+  nuclei_templaite:
+    required: false
+    default: "~/nuclei-templates/http/takeovers/"
+
+
+steps:
+  - name: subzy
+    tool: subzy
+    args: "run --targets {{target}} "
+  - name: nuclei
+    tool: nuclei
+    args: "-l {{target}} -t {{nuclei_templaite}}  -j " 
+ 
