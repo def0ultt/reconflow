@@ -2,7 +2,7 @@ type: module
 info:
   id: recon-openredirect
   name: Open Redirect Detection
-  tag: web
+  tag: Scan
   description: Crawl and test for open redirects
   author: charlie
 vars:

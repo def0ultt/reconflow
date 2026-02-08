@@ -745,53 +745,131 @@ def cmd_bcat(ctx: Context, arg: str):
 
 
 
+
 def cmd_list_modules(ctx: Context, mode: str):
     """
     mode: 'modules' | 'all'
     """
-    if mode == 'all':
-         # Just print summary, do NOT set context
-         mods = ctx.tool_manager.list_modules()
-         
-         console.print(f"\n[bold cyan]Modules:[/bold cyan]")
-         for i, m in enumerate(mods):
-             console.print(f"{i+1}. {m}")
-         console.print()
-         return
-
-    # Specific Mode -> Sets context
-    items = ctx.tool_manager.list_modules()
-    title = "Modules"
-        
-    if not items:
-        print(f"No {title.lower()} found.")
+    # Fetch all modules
+    # list_modules returns relative paths
+    mod_paths = ctx.tool_manager.list_modules()
+    
+    if not mod_paths:
+        console.print("[yellow]No modules found.[/yellow]")
         ctx.last_shown_map = []
         return
 
-    # Set Context
-    ctx.last_shown_map = items
+    # Set context mapping
+    ctx.last_shown_map = mod_paths
     ctx.last_shown_type = 'module'
-
-    table = Table(title="[red]"+title+"[/red]", show_header=True,show_lines=True)
-    table.add_column("[bold cyan]ID[/bold cyan]", style="bold cyan", justify="center")
-    table.add_column("[bold green]Name[/bold green]", style="bold green", justify="left")
-    table.add_column("[bold yellow]Tag[/bold yellow]", style="bold yellow", justify="left")
-    table.add_column("[bold white]Description[/bold white]", style="bold white", justify="left")
-
-    for i, path in enumerate(items):
-        try:
-            mod_cls = ctx.tool_manager.modules[path]
+    
+    # Strict Categorization based on Allowed Tags
+    # allowed_tags = {tag_keyword: (Display Title, Color)}
+    ALLOWED_TAGS = {
+        "recon": ("Recon", "blue"),
+        "exposure": ("Exposure", "magenta"),
+        "scan": ("Scan", "red")
+    }
+    
+    buckets = {meta[0]: [] for meta in ALLOWED_TAGS.values()}
+    buckets["Uncategorized"] = []
+    
+    # Sort modules into buckets
+    for i, path in enumerate(mod_paths):
+        mod_id = str(i + 1)
+        mod_cls = ctx.tool_manager.modules.get(path)
+        
+        # Get metadata
+        name = "Unknown"
+        tag_str = ""
+        
+        if mod_cls:
             meta = getattr(mod_cls, 'meta', {})
+            name = meta.get('name', os.path.basename(path))
+            if '/' in name: name = os.path.basename(name).replace('.yml', '')
             
-            module_id = meta.get('id', 'Unknown')
-            tag = meta.get('tag', '')
-            desc = meta.get('description', '')
-            table.add_row(str(i+1), module_id, tag, desc)
-        except Exception:
-             table.add_row(str(i+1), "Error", "", "Error loading metadata")
+            tag_str = meta.get('tag', '').strip().lower()
+        
+        # Determine Category from Tag
+        assigned = False
+        if tag_str:
+            tags = [t.strip() for t in tag_str.split(',')]
+            
+            # Priority check: look for allowed tags in order
+            # The order in ALLOWED_TAGS dict isn't guaranteed in older python, but 3.7+ it is insertion order.
+            # We want to match 'recon' even if 'scan' is also present? Or just first match?
+            # Let's iterate through the allowed keys to define precedence if needed, 
+            # OR just check the module tags.
+            
+            # Simple check: if any alias of tag is in allowed logic.
+            # But here we have specific keywords.
+            
+            found_title = None
+            found_color = None
+            
+            for t in tags:
+                if t in ALLOWED_TAGS:
+                    found_title, found_color = ALLOWED_TAGS[t]
+                    break
+            
+            if found_title:
+                buckets[found_title].append((mod_id, name))
+                assigned = True
+        
+        if not assigned:
+            buckets["Uncategorized"].append((mod_id, name))
 
+    # Identify active categories and their colors
+    # We want a specific order: Recon, Exposure, Scan, Uncategorized
+    ordered_titles = ["Recon", "Exposure", "Scan", "Uncategorized"]
+    
+    # Create Columns Data
+    from rich.columns import Columns
+    pass # imports already at top usually but okay here for local scope if needed, 
+         # but actually lines 803-805 imported them. Be careful with indentation.
+    from rich.panel import Panel
+    from rich.align import Align
+    
+    panels = []
+    
+    for title in ordered_titles:
+        items = buckets.get(title, [])
+        if not items: continue
+        
+        # Create text list
+        text_lines = []
+        for mid, mname in items:
+            text_lines.append(f"[bold cyan]{mid}.[/bold cyan] {mname}")
+        
+        content = "\n".join(text_lines)
+        
+        # Determine panel color
+        color = "yellow" # Default for Uncategorized
+        
+        # Find color from ALLOWED_TAGS
+        for key, val in ALLOWED_TAGS.items():
+            if val[0] == title:
+                color = val[1]
+                break
+        
+        # Create Panel
+        p = Panel(
+            content,
+            title=f"[bold {color}]{title}[/bold {color}]",
+            border_style=f"dim {color}",
+            box=box.ROUNDED,
+            expand=True 
+        )
+        panels.append(p)
+    
+    # Use Columns to render panels side-by-side
+    from rich.columns import Columns
     console.print()
-    console.print(table)
+    console.print(Columns(panels, equal=True, expand=True))
+    console.print()
+    
+    # Footer
+    console.print(Align.center("[dim]Use 'use <id>' to select a module[/dim]"))
     console.print()
 
 

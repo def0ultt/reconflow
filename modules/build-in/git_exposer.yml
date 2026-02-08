@@ -2,7 +2,7 @@ type: module
 info:
   id: git-config-exposer
   name: Git Config Exposure Detector
-  tags: recon,git
+  tag: Exposure
   description: |
     Detects exposed /.git/config files on target subdomains.
   author: default

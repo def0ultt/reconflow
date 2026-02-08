@@ -48,10 +48,6 @@ steps:
     tool: httpx
     args: "-l {{anew.output}} -title -status-code -content-length -location  -p {{ports}}  -j "
     depends_on: [anew]
-  - name: show_results
-    tool: json_parser
-    args: "-i {{httpx.output}}"
-    depends_on: [httpx]
   - name: rm_file
     tool: rm
     args: "{{subfinder.output}} {{assetfinder.output}} {{findomain.output}} {{Chaos.output}}"

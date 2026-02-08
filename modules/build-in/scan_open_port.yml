@@ -3,7 +3,7 @@ type: module
 info:
   id: scan_open_port
   name: Port Scan with Conditional Targets
-  tag: scanning
+  tag: recon
   description: Example module demonstrating conditional argument usage
   author: charlie
 

@@ -1,0 +1,3 @@
+[
+{"target":"http://example.com","http_status":200,"request_config":{"headers":{"User-Agent":"WhatWeb/0.5.5"}},"plugins":{"Allow":{"module":["GET, HEAD"]},"Country":{"string":["UNITED STATES"],"module":["US"]},"HTML5":{},"HTTPServer":{"string":["cloudflare"]},"IP":{"string":["104.18.27.120"]},"Title":{"string":["Example Domain"]},"UncommonHeaders":{"string":["cf-cache-status,cf-ray"]}}}
+]

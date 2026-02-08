@@ -1,0 +1,21 @@
+type: module
+info:
+  id: csp-deep-analyzer
+  name: csp-deep-analyzer
+  tag: recon
+  description: >
+    Analyzes Content Security Policy (CSP) headers to identify trusted domains,
+    third-party services, and potential hidden assets for reconnaissance.
+  author: default
+vars:
+  target:
+    required: true
+    description: target name  
+  cookie:
+    required: false
+    description: cookie for authentication
+    default: "session=abc123"
+steps:
+  - name: csp-analyer
+    tool: csp-analyzer
+    args: "{{target}} {{cookie}} "

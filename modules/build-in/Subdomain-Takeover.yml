@@ -2,7 +2,7 @@ type: module
 info:
   id: Subdomain-Takeover 
   name: Subdomain Takeover 
-  tag: recon
+  tag: Scan
   description: Reconnaissance workflow that detects potential subdomain takeover candidates by analyzing HTTP responses, CNAME records, and unclaimed third-party services
   author: default
 vars:

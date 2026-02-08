@@ -1,5 +1,5 @@
 from core.context import Context
-from cli.shell import Shell
+from cli.shell import ReconFlowShell
 
 def main():
     # Initialize Core Context (Config, DB, Managers)
@@ -10,8 +10,8 @@ def main():
     run_startup_flow(context)
     
     # Initialize and start CLI Shell
-    shell = Shell(context)
-    shell.start()
+    shell = ReconFlowShell(context)
+    shell.cmdloop()
 
 if __name__ == '__main__':
     main()
