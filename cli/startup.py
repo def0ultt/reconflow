@@ -7,77 +7,222 @@ from pathlib import Path
 from core.context import Context
 from rich.console import Console
 from rich.table import Table
+from cli.menu.components import (
+    print_header, create_info_panel, create_menu_header,
+    show_success, show_info, show_warning, show_error,
+    show_loading, exit_animation, create_beautiful_table
+)
+from cli.menu.styles import CYBERPUNK_STYLE
 
 console = Console()
 
 def run_startup_flow(ctx: Context):
     """
-    Interactive startup flow:
+    Interactive startup flow with beautiful visuals:
     - Load Existing Project
     - Create New Project
     - Temporary Project
     """
-    console.print("[bold cyan]Welcome to ReconFlow[/bold cyan]")
+    # Display beautiful header
+    print_header()
     
-    choice = questionary.select(
-        "What would you like to do?",
-        choices=[
-            "Load Existing Project",
-            "Create New Project",
-            "Create Temporary Project",
-            "Settings",
-            "Exit"
-        ]
-    ).ask()
-
-    if choice == "Load Existing Project":
-        projects = ctx.project_repo.get_all()
-        if not projects:
-            console.print("[yellow]No projects found. Creating a new one.[/yellow]")
-            return _create_new_project(ctx)
-        
-        project_names = [p.name for p in projects]
-        p_name = questionary.select(
-            "Select a project:",
-            choices=project_names
+    # Show welcome panel
+    info_panel = create_info_panel(
+        "[dim]Navigate using arrow keys • Press Enter to select[/]\n"
+        "[dim]Your all-in-one reconnaissance automation suite[/]",
+        title="🔷 Welcome to ReconFlow"
+    )
+    console.print(info_panel)
+    console.print()
+    
+    while True:
+        choice = questionary.select(
+            "What would you like to do?",
+            choices=[
+                "📁 Projects",
+                "🔧 Modules",
+                "⚙️  Settings",
+                "🚪 Exit"
+            ],
+            style=CYBERPUNK_STYLE,
+            instruction="(Use arrow keys)"
         ).ask()
         
-        if p_name:
-            proj = ctx.project_repo.get_by_name(p_name)
-            ctx.current_project = proj
-            console.print(f"[green]Loaded project: {proj.name}[/green]")
-        else:
-            exit(0)
+        if choice == "📁 Projects":
+            # If project is loaded/created, return to continue to CLI
+            if run_projects_menu(ctx):
+                return  # Exit to CLI shell
+            print_header()
+            console.print(info_panel)
+            console.print()
+            
+        elif choice == "🔧 Modules":
+            run_modules_menu(ctx)
+            print_header()
+            console.print(info_panel)
+            console.print()
+            
+        elif choice == "⚙️  Settings":
+            run_settings_flow(ctx)
+            print_header()
+            console.print(info_panel)
+            console.print()
+            
+        elif choice == "🚪 Exit":
+            exit_animation()
 
-    elif choice == "Create New Project":
-        return _create_new_project(ctx)
-
-    elif choice == "Create Temporary Project":
-        return _create_temp_project(ctx)
+def run_projects_menu(ctx: Context):
+    """Enhanced projects menu - returns True if project is ready to use"""
+    console.clear()
     
-    elif choice == "Settings":
-        run_settings_flow(ctx)
-        run_startup_flow(ctx) # Loop back to main menu
+    # Projects menu header
+    header = create_menu_header(
+        "📁 PROJECT MANAGEMENT",
+        "Create, load, and manage your reconnaissance projects"
+    )
+    console.print(header)
+    console.print()
+    
+    while True:
+        action = questionary.select(
+            "Project Actions:",
+            choices=[
+                "📂 Load Project",
+                "🆕 Create Project",
+                "⚡ Create Temp Project",
+                "📁 Change Project Path",
+                "🗑️  Delete Project",
+                "⬅️  Back to Main Menu"
+            ],
+            style=CYBERPUNK_STYLE,
+            instruction="(Select an action)"
+        ).ask()
+        
+        if action == "📂 Load Project":
+            projects = ctx.project_repo.get_all()
+            if not projects:
+                show_warning("No projects found. Please create a new one.")
+                continue
+            
+            project_names = [p.name for p in projects]
+            p_name = questionary.select(
+                "Select a project:",
+                choices=project_names + ["⬅️ Cancel"],
+                style=CYBERPUNK_STYLE
+            ).ask()
+            
+            if p_name and p_name != "⬅️ Cancel":
+                show_loading("Loading project")
+                proj = ctx.project_repo.get_by_name(p_name)
+                ctx.current_project = proj
+                show_success(f"Loaded project: {proj.name}")
+                return True  # Project loaded, return to CLI
+            
+        elif action == "🆕 Create Project":
+            if _create_new_project(ctx):
+                return True  # Project created, return to CLI
+            
+        elif action == "⚡ Create Temp Project":
+            _create_temp_project(ctx)
+            return True  # Temp project created, return to CLI
+            
+        elif action == "📁 Change Project Path":
+            show_info("Change project path feature - Coming soon!")
+            
+        elif action == "🗑️  Delete Project":
+            projects = ctx.project_repo.get_all()
+            if not projects:
+                show_warning("No projects available to delete.")
+                continue
+            
+            project_names = [p.name for p in projects]
+            p_name = questionary.select(
+                "Select project to delete:",
+                choices=project_names + ["⬅️  Cancel"],
+                style=CYBERPUNK_STYLE
+            ).ask()
+            
+            if p_name and p_name != "⬅️  Cancel":
+                confirm = questionary.confirm(
+                    f"Are you sure you want to delete '{p_name}'?",
+                    default=False
+                ).ask()
+                
+                if confirm:
+                    show_loading("Deleting project")
+                    try:
+                        proj = ctx.project_repo.get_by_name(p_name)
+                        ctx.project_repo.delete(proj.id)
+                        show_success(f"Deleted project: {p_name}")
+                    except Exception as e:
+                        show_error(f"Failed to delete project: {str(e)}")
+            
+        elif action == "⬅️  Back to Main Menu":
+            return False  # No project selected, back to menu
 
-    elif choice == "Exit":
-        exit(0)
+def run_modules_menu(ctx: Context):
+    """Enhanced modules menu"""
+    console.clear()
+    
+    # Modules menu header
+    header = create_menu_header(
+        "🔧 MODULE MANAGEMENT",
+        "Import and manage reconnaissance modules"
+    )
+    console.print(header)
+    console.print()
+    
+    while True:
+        action = questionary.select(
+            "Module Actions:",
+            choices=[
+                "📥 Import Module",
+                "⬅️  Back to Main Menu"
+            ],
+            style=CYBERPUNK_STYLE,
+            instruction="(Select an action)"
+        ).ask()
+        
+        if action == "📥 Import Module":
+            show_info("Module import feature - Coming soon!")
+            
+        elif action == "⬅️  Back to Main Menu":
+            break
 
 def run_settings_flow(ctx: Context):
+    """Enhanced settings menu with beautiful visuals"""
+    console.clear()
+    
+    # Settings header
+    header = create_menu_header(
+        "⚙️  CONFIGURATION",
+        "Manage API keys and global variables"
+    )
+    console.print(header)
+    console.print()
+    
     while True:
         action = questionary.select(
             "Settings:",
-            choices=["API Keys", "Global Variables", "Back"]
+            choices=[
+                "🔑 API Keys",
+                "🌐 Global Variables",
+                "⬅️  Back to Main Menu"
+            ],
+            style=CYBERPUNK_STYLE,
+            instruction="(Navigate and select)"
         ).ask()
         
-        if action == "Back":
+        if action == "⬅️  Back to Main Menu":
             break
-        elif action == "API Keys":
+        elif action == "🔑 API Keys":
             _run_api_keys_flow(ctx)
-        elif action == "Global Variables":
+        elif action == "🌐 Global Variables":
             _run_global_vars_flow(ctx)
 
 def _run_api_keys_flow(ctx: Context):
-    # List of services from user request
+    """Enhanced API keys configuration with beautiful interface"""
+    # List of services
     services = [
         "360PassiveDNS", "ARIN", "AbuseIPDB", "Ahrefs", "AlienVault", "Alterations", "AnubisDB",
         "ArchiveIt", "Arquivo", "Ask", "AskDNS", "BGPTools", "BGPView", "Baidu", "BinaryEdge",
@@ -93,29 +238,44 @@ def _run_api_keys_flow(ctx: Context):
         "VirusTotal", "Wayback", "WhoisXMLAPI", "Yahoo", "ZETAlytics", "ZoomEye"
     ]
     
-    # Get all configured keys to mark them
+    # Get all configured keys
     configured_keys = {k.tool_name for k in ctx.settings_manager.list_api_keys()}
     
     choices = []
     for s in services:
         if s in configured_keys:
-            choices.append(questionary.Choice(title=f"[+] {s}", value=s))
+            choices.append(questionary.Choice(title=f"✓ {s}", value=s))
         else:
-            choices.append(questionary.Choice(title=f"    {s}", value=s))
+            choices.append(questionary.Choice(title=f"  {s}", value=s))
     
-    choices.append(questionary.Choice(title="    Back", value="Back"))
+    choices.append(questionary.Choice(title="⬅️  Back", value="Back"))
 
-    selected = questionary.select("Select Service to Configure:", choices=choices).ask()
+    selected = questionary.select(
+        "Select Service to Configure:",
+        choices=choices,
+        style=CYBERPUNK_STYLE,
+        instruction="(✓ = configured)"
+    ).ask()
+    
     if selected == "Back" or not selected:
         return
         
     current_key = ctx.settings_manager.get_api_key(selected)
-    print(f"Current Key: {current_key or 'Not Set'}")
     
-    new_key = questionary.text(f"Enter API Key for {selected} (Leave empty to keep current):").ask()
+    if current_key:
+        show_info(f"Current Key: {'*' * (len(current_key) - 4)}{current_key[-4:]}")
+    else:
+        show_info(f"No API key set for {selected}")
+    
+    new_key = questionary.password(
+        f"Enter API Key for {selected} (Leave empty to keep current):",
+        style=CYBERPUNK_STYLE
+    ).ask()
+    
     if new_key:
+        show_loading("Saving API key")
         ctx.settings_manager.set_api_key(selected, new_key)
-        console.print(f"[green]API Key for {selected} saved.[/green]")
+        show_success(f"API Key for {selected} saved securely!")
 
 def _run_global_vars_flow(ctx: Context):
     # Get ALL variables
@@ -232,35 +392,51 @@ def _run_global_vars_flow(ctx: Context):
                     console.print(f"[red]Error deleting variable {key}.[/red]")
 
 def _create_new_project(ctx: Context):
-    name = questionary.text("Enter project name:").ask()
+    """Enhanced project creation with beautiful interface - returns True on success"""
+    name = questionary.text(
+        "Enter project name:",
+        style=CYBERPUNK_STYLE
+    ).ask()
+    
     if not name:
-        console.print("[red]Project name required.[/red]")
-        exit(1)
+        show_error("Project name is required!")
+        return False
         
     try:
+        show_loading("Creating project")
         proj = ctx.project_manager.create_project(name)
         ctx.current_project = proj
-        console.print(f"[green]Created project: {proj.name}[/green]")
+        show_success(f"Project '{proj.name}' created successfully!")
+        return True
     except Exception as e:
-        console.print(f"[red]Error creating project: {e}[/red]")
-        exit(1)
+        show_error(f"Failed to create project: {str(e)}")
+        return False
 
 def _create_temp_project(ctx: Context):
+    """Enhanced temporary project creation with cleanup"""
     from datetime import datetime
+    
     # Create timestamp-based temp project name
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     temp_id = f"temp{timestamp}"
-    console.print(f"[yellow]Creating temporary project: {temp_id}[/yellow]")
+    
+    show_info(f"Creating temporary project: {temp_id}")
     
     try:
-        # Use /results directory as specified by user
+        # Use /results directory
         temp_path = Path("results") / temp_id
-        proj = ctx.project_repo.create({"name": temp_id, "path": str(temp_path.absolute()), "description": "Temporary Project"})
+        
+        show_loading("Setting up temporary workspace")
+        proj = ctx.project_repo.create({
+            "name": temp_id,
+            "path": str(temp_path.absolute()),
+            "description": "Temporary Project"
+        })
         temp_path.mkdir(parents=True, exist_ok=True)
         ctx.current_project = proj
         
         def cleanup():
-            console.print(f"\n[yellow]Cleaning up temporary project {temp_id}...[/yellow]")
+            console.print(f"\n[yellow]🧹 Cleaning up temporary project {temp_id}...[/yellow]")
             try:
                 if temp_path.exists():
                     shutil.rmtree(temp_path)
@@ -268,13 +444,15 @@ def _create_temp_project(ctx: Context):
                 session = get_session()
                 session.query(type(proj)).filter_by(id=proj.id).delete()
                 session.commit()
-                console.print("[green]Cleanup complete.[/green]")
+                console.print("[green]✓ Cleanup complete![/green]")
             except Exception as e:
-                console.print(f"[red]Cleanup failed: {e}[/red]")
+                console.print(f"[red]✗ Cleanup failed: {e}[/red]")
 
         atexit.register(cleanup)
-        ctx.is_temporary_project = True 
+        ctx.is_temporary_project = True
+        
+        show_success(f"Temporary project created! Will auto-clean on exit.")
         
     except Exception as e:
-        console.print(f"[red]Error creating temp project: {e}[/red]")
+        show_error(f"Failed to create temp project: {str(e)}")
         exit(1)
