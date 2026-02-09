@@ -1,7 +1,7 @@
 type: module
 info:
   id: backup-file-exposure
-  name: Backup_File_Exposure_Scanne
+  name: Backup_File_Exposure_Scanner
   tag: Exposure
   description: |
     Detects exposed backup and sensitive files on web servers by fuzzing
@@ -12,24 +12,21 @@ vars:
   target:
     required: true
     description: Path to a file containing the target list
-  proxy:                                                                          
-    type: boolean                                                                      
-    default: false 
+  proxy:
+    type: boolean
+    default: false
+    description: Enable proxy
   wordlist:
-    required: false 
-    description: wordlist containing backup file 
-    default: ~/reconflow/reconflow/wordlist/backup_files_only.txt
+    required: false
+    description: wordlist containing backup file
+    default: /home/defaut/tool/reconflow/wordlist/backup_files_only.txt
+  ext:
+    required: true
+    description: path to EXTENSIONS wordlist
 steps:
-  - name: xss scanner
-    tool: bash
-    args: "ffuf -w {{target}}:SUB -w {{wordlist}}:FILE -u https://SUB/FILE -mc 200 -rate 50 -fs 0 -c  {-x {{proxy}} || }"
-                                                                         
-                                                          
-                                                                    
-                                                              
-                                                                                       
-                                                                                       
-                                                                                       
-                                                                                       
-                                                                                       
-                                                                                       
+  - name: backup_enum_lostsec
+    tool: ffuf
+    args: " -w {{target}}:SUB -w {{wordlist}}:FILE -u https://SUB/FILE -mc 200 -rate 50 -fs 0 -c  {-x {{proxy}} || } -s "
+  - name: subdomain_backup-expose
+    tool: Backup_enum
+    args: "-f {{target}} -x {{ext}} -m {1 || {{mode}}} --json test.jsonl"

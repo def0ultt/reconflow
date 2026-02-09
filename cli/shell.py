@@ -6,7 +6,7 @@ from typing import List, Optional
 from rich.console import Console
 from core.context import Context
 from cli.commands import (
-    cmd_use, cmd_back, cmd_set, cmd_run, cmd_show,
+    cmd_use, cmd_back, cmd_set, cmd_setg, cmd_run, cmd_show,
     cmd_import, cmd_search, cmd_cat, cmd_bcat, cmd_ls,
     cmd_settings, cmd_create_project, cmd_info, cmd_list_modules
 )
@@ -108,6 +108,10 @@ class ReconFlowShell(cmd2.Cmd):
     def do_set(self, arg):
         """Set a context-specific variable to a value."""
         cmd_set(self.context, arg)
+
+    def do_setg(self, arg):
+        """Set a global variable for the current project context."""
+        cmd_setg(self.context, arg)
 
     def complete_set(self, text, line, begidx, endidx):
         """Autocomplete for 'set' command."""

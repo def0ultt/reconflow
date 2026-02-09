@@ -213,7 +213,7 @@ class GenericYamlModule(BaseModule):
                 name=name,
                 value=config.default,
                 required=config.required,
-                description=f"Variable: {name}",
+                description=config.description if config.description else "No description provided",
                 metadata={
                     'type': config.type,
                     'flag': config.flag
@@ -443,6 +443,20 @@ class GenericYamlModule(BaseModule):
             elif step.output.filename:
                  if full_context.current_project:
                     output_path = os.path.join(full_context.current_project.path, step.output.filename)
+        
+        # New "filename" field on step (takes precedence or works standalone)
+        if step.filename:
+            try:
+                resolved_name = self._render_template(step.filename, render_ctx)
+                
+                # Strip quotes if present (common in conditional defaults)
+                if resolved_name:
+                    resolved_name = resolved_name.strip("'\"")
+
+                if resolved_name and full_context.current_project:
+                    output_path = os.path.join(full_context.current_project.path, resolved_name)
+            except Exception as e:
+                console.print(f"[red]⚠️  Failed to resolve filename for step '{step_id}': {e}[/red]")
 
         # Stdin Logic
         input_data = None

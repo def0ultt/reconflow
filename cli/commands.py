@@ -46,6 +46,23 @@ def cmd_use(ctx: Context, arg: str):
         # For now, keep it simple.
     else:
         print(f" Module '{arg}' not found.")
+        return
+
+    # Auto-inject global/project variables
+    if ctx.current_project:
+        project_vars = ctx.settings_manager.get_global_vars_dict(project_id=ctx.current_project.id)
+        # project_vars keys are without '$' prefix
+        
+        injected_count = 0
+        for opt_name in ctx.active_module.options:
+            if opt_name in project_vars:
+                val = project_vars[opt_name]
+                if val is not None:
+                     ctx.active_module.update_option(opt_name, val)
+                     injected_count += 1
+        
+        if injected_count > 0:
+             console.print(f"[dim]ℹ️  Auto-filled {injected_count} option(s) from project variables.[/dim]")
 
 def cmd_back(ctx: Context, arg: str):
     ctx.active_module = None
@@ -108,6 +125,38 @@ def cmd_set(ctx: Context, arg: str):
     else:
         print(f"❌ Option '{opt}' not found.")
         
+
+def cmd_setg(ctx: Context, arg: str):
+    """
+    Set a global variable for the current project context.
+    Usage: setg <variable> <value>
+    """
+    if not ctx.current_project:
+        print("❌ No active project. Use 'project <name>' first.")
+        return
+
+    parts = arg.split(maxsplit=1)
+    if len(parts) != 2:
+        print("Usage: setg <variable> <value>")
+        return
+    
+    key, val = parts[0], parts[1]
+    
+    # Ensure key starts with $ for storage
+    storage_key = key if key.startswith('$') else f"${key}"
+    
+    try:
+        ctx.settings_manager.set_variable(storage_key, val, project_id=ctx.current_project.id)
+        
+        # Also update active module if applicable
+        if ctx.active_module and key in ctx.active_module.options:
+            ctx.active_module.update_option(key, val)
+            print(f"✅ {key} set globally and updated in active module.")
+        else:
+            print(f"✅ Global variable '{key}' set to '{val}' for project '{ctx.current_project.name}'")
+            
+    except Exception as e:
+        console.print(f"[red]Error setting global variable: {e}[/red]")
 
 from cli.session_cmd import cmd_sessions
 from cli.startup import run_settings_flow

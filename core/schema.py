@@ -23,6 +23,7 @@ class VarConfig(BaseModel):
     default: Optional[Any] = None
     required: bool = False
     flag: Optional[str] = None  # CLI flag for boolean variables
+    description: Optional[str] = None # Description of the variable
     
     @model_validator(mode='after')
     def validate_boolean_config(self):
@@ -59,6 +60,7 @@ class ModuleStep(BaseModel):
     depends_on: List[str] = Field(default_factory=list)
     parallel: bool = True
     path: Optional[str] = None  # Custom path for tool execution
+    filename: Optional[str] = None # Output filename (supports conditionals)
 
     @model_validator(mode='after')
     def check_tool_or_module(self):
