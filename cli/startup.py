@@ -402,9 +402,18 @@ def _create_new_project(ctx: Context):
         show_error("Project name is required!")
         return False
         
+    path = questionary.path(
+        "Project Path (Leave empty for default):",
+        default="",
+        style=CYBERPUNK_STYLE
+    ).ask()
+    
+    if not path:
+        path = None
+        
     try:
         show_loading("Creating project")
-        proj = ctx.project_manager.create_project(name)
+        proj = ctx.project_manager.create_project(name, path=path)
         ctx.current_project = proj
         show_success(f"Project '{proj.name}' created successfully!")
         return True

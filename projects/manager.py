@@ -10,13 +10,19 @@ class ProjectManager:
         self.session = get_session()
         self.current_project = None
 
-    def create_project(self, name: str) -> Project:
+    def create_project(self, name: str, path: str = None) -> Project:
         existing = self.session.query(Project).filter_by(name=name).first()
         if existing:
             print(f"Project {name} already exists.")
             return existing
         
-        results_path = get_results_dir() / "projects" / name
+        if path:
+             # Use custom path from user
+             import pathlib
+             results_path = pathlib.Path(path).expanduser().resolve()
+        else:
+             results_path = get_results_dir() / "projects" / name
+             
         results_path.mkdir(parents=True, exist_ok=True)
         
         new_proj = Project(name=name, path=str(results_path))

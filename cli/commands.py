@@ -405,7 +405,18 @@ def cmd_create_project(ctx: Context, arg: str):
             print("Usage: project -c <name>")
             return
         name = args[1]
-        proj = ctx.project_manager.create_project(name)
+        
+        # Ask for path
+        try:
+             import questionary
+             path = questionary.path("Project Path (Leave empty for default):").ask()
+        except:
+             path = input("Project Path (Leave empty for default): ").strip()
+             
+        if not path:
+             path = None
+             
+        proj = ctx.project_manager.create_project(name, path=path)
         if proj:
             ctx.current_project = proj
             print(f"✅ Project '{proj.name}' created and active.")
@@ -498,6 +509,49 @@ def cmd_ls(ctx: Context, arg: str):
     
     for item in os.listdir(project_path):
         item_path = os.path.join(project_path, item)
+        
+        # Handle Root Files
+        if os.path.isfile(item_path) and item.endswith('.txt'):
+             module_name = "[bold]Root[/bold]"
+             file = item
+             file_path = item_path
+             step_name = file.replace('.txt', '')
+             
+             # Get file stats
+             try:
+                 stat = os.stat(file_path)
+                 file_size = stat.st_size
+                 mtime = stat.st_mtime
+                 
+                 # Calculate line count
+                 try:
+                     with open(file_path, 'r') as f:
+                         line_count = sum(1 for _ in f)
+                 except:
+                     line_count = 0
+                 
+                 # Format time
+                 from datetime import datetime
+                 scan_time = datetime.fromtimestamp(mtime).strftime("%H:%M")
+                 
+                 # Format size
+                 if file_size < 1024:
+                     size_str = f"{file_size} B"
+                 elif file_size < 1024 * 1024:
+                     size_str = f"{file_size // 1024} KB"
+                 else:
+                     size_str = f"{file_size // (1024 * 1024)} MB"
+                     
+                 files_data.append({
+                     'module': module_name,
+                     'step': step_name,
+                     'size': size_str,
+                     'lines': line_count,
+                     'time': scan_time
+                 })
+             except:
+                 pass
+             continue
         
         # Skip hidden directories and non-directories
         if item.startswith('.') or not os.path.isdir(item_path):
