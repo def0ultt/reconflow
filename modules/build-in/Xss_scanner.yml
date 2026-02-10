@@ -17,5 +17,5 @@ vars:
 steps:
   - name: xss scanner
     tool: bash
-    args: "-c ' cat {{target}} |zap -a  |ifxss -H {{header}} -j '"
+    args: "-c ' cat {{target}} |zap -a  |ifxss -H {{header}} -j  '"
   

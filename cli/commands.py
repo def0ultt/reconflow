@@ -77,6 +77,60 @@ def parse_boolean(value: str):
         return False
     return None
 
+def _handle_json_target(file_path: str) -> str:
+    """
+    Parses a JSON/JSONL file to extract URLs/targets.
+    Returns the path to the extracted text file, or the original path if parsing failed/not applicable.
+    """
+    if not (file_path.endswith('.json') or file_path.endswith('.jsonl')):
+        return file_path
+        
+    try:
+        targets = set()
+        
+        # Determine format and read
+        with open(file_path, 'r') as f:
+            if file_path.endswith('.jsonl'):
+                for line in f:
+                    if not line.strip(): continue
+                    try:
+                        obj = json.loads(line)
+                        if isinstance(obj, dict):
+                            # Prioritize 'url', then 'host', then 'ip'
+                            if 'url' in obj: targets.add(obj['url'])
+                            elif 'host' in obj: targets.add(obj['host'])
+                            elif 'ip' in obj: targets.add(obj['ip'])
+                    except: pass
+            else:
+                # JSON Array or Object
+                try:
+                    data = json.load(f)
+                    items = data if isinstance(data, list) else [data]
+                    for obj in items:
+                        if isinstance(obj, dict):
+                            if 'url' in obj: targets.add(obj['url'])
+                            elif 'host' in obj: targets.add(obj['host'])
+                            elif 'ip' in obj: targets.add(obj['ip'])
+                except: pass
+                        
+        if not targets:
+            return file_path
+            
+        # Write to new file
+        base, _ = os.path.splitext(file_path)
+        new_path = f"{base}_targets.txt"
+        
+        with open(new_path, 'w') as f:
+            for t in sorted(targets):
+                f.write(f"{t}\n")
+                
+        console.print(f"[green]ℹ️  Parsed JSON: Extracted {len(targets)} targets to {os.path.basename(new_path)}[/green]")
+        return new_path
+        
+    except Exception as e:
+        console.print(f"[yellow]Warning: Failed to parse JSON target: {e}[/yellow]")
+        return file_path
+
 def cmd_set(ctx: Context, arg: str):
     if not ctx.active_module:
         print("❌ No active module. Use 'use <module>' first.")
@@ -119,6 +173,19 @@ def cmd_set(ctx: Context, arg: str):
         else:
             console.print(f"[red]Error: Variable '{var_key}' not found.[/red]")
             return
+
+    # Check for file resolution (Project files)
+    # If the value looks like a relative path and exists in the project
+    if ctx.current_project and not val.startswith('/') and not val.startswith('$') and var_type != "boolean":
+         project_root = ctx.current_project.path
+         potential_path = os.path.join(project_root, val)
+         if os.path.exists(potential_path):
+             val = str(os.path.abspath(potential_path))
+             console.print(f"[dim]Resolved project file: {val}[/dim]")
+             
+             # Attempt JSON parsing for targets
+             if opt in ('target', 'url', 'domain', 'hosts', 'input_file'):
+                  val = _handle_json_target(val)
 
     if ctx.active_module.update_option(opt, val):
         print(f"✅ {opt} => {val}")

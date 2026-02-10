@@ -28,6 +28,7 @@ steps:
   - name: urlfinder
     tool: bash
     args: " -c 'cat {{target}}|urlfinder -silent' "
+    condition: "{active == true}"
   - name: Collecting_url
     tool: anew
     args: ""
