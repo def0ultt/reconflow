@@ -8,7 +8,45 @@ from rich.panel import Panel
 from rich.text import Text
 from typing import Optional
 
-console = Console()
+import sys
+from typing import List, Callable
+
+class SplitStream:
+    """
+    Splits stdout to original stream and registered listeners.
+    Used to capture CLI output for WebSockets.
+    """
+    def __init__(self, original_stream):
+        self.original = original_stream
+        self.listeners: List[Callable[[str], None]] = []
+
+    def write(self, text):
+        try:
+            self.original.write(text)
+            for listener in self.listeners:
+                try:
+                    listener(text)
+                except:
+                    pass
+        except:
+            pass
+            
+    def flush(self):
+        try:
+            self.original.flush()
+        except:
+            pass
+            
+    def add_listener(self, callback: Callable[[str], None]):
+        self.listeners.append(callback)
+
+    def remove_listener(self, callback: Callable[[str], None]):
+        if callback in self.listeners:
+            self.listeners.remove(callback)
+
+# Initialize console with split stream
+stdout_stream = SplitStream(sys.stdout)
+console = Console(file=stdout_stream, force_terminal=True, color_system="truecolor")
 
 
 def format_tool_execution(step_name: str, tool: str, command: str):
