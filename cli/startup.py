@@ -90,6 +90,7 @@ def run_projects_menu(ctx: Context):
                 "📂 Load Project",
                 "🆕 Create Project",
                 "⚡ Create Temp Project",
+                "ℹ️  Project Details",
                 "📁 Change Project Path",
                 "🗑️  Delete Project",
                 "⬅️  Back to Main Menu"
@@ -126,8 +127,60 @@ def run_projects_menu(ctx: Context):
             _create_temp_project(ctx)
             return True  # Temp project created, return to CLI
             
+        elif action == "ℹ️  Project Details":
+            projects = ctx.project_repo.get_all()
+            if not projects:
+                show_warning("No projects found.")
+                continue
+
+            project_names = [p.name for p in projects]
+            p_name = questionary.select(
+                "Select a project:",
+                choices=project_names + ["⬅️ Cancel"],
+                style=CYBERPUNK_STYLE
+            ).ask()
+
+            if p_name and p_name != "⬅️ Cancel":
+                proj = ctx.project_repo.get_by_name(p_name)
+                _show_project_details(proj)
+
         elif action == "📁 Change Project Path":
-            show_info("Change project path feature - Coming soon!")
+            projects = ctx.project_repo.get_all()
+            if not projects:
+                show_warning("No projects found.")
+                continue
+
+            project_names = [p.name for p in projects]
+            p_name = questionary.select(
+                "Select project to update path:",
+                choices=project_names + ["⬅️ Cancel"],
+                style=CYBERPUNK_STYLE
+            ).ask()
+
+            if p_name and p_name != "⬅️ Cancel":
+                proj = ctx.project_repo.get_by_name(p_name)
+                console.print(f"[dim]Current Path: {proj.path}[/dim]")
+                
+                new_path = questionary.path(
+                    "Enter new project path:",
+                    default=proj.path,
+                    style=CYBERPUNK_STYLE
+                ).ask()
+                
+                if new_path and new_path != proj.path:
+                    confirm = questionary.confirm(
+                        f"Update path to '{new_path}'? (Files will NOT be moved)",
+                        default=True
+                    ).ask()
+                    
+                    if confirm:
+                        try:
+                            # Update directly using repo update
+                             # BaseRepository.update takes object and dict
+                            ctx.project_repo.update(proj, {"path": str(new_path)})
+                            show_success(f"Project path updated to: {new_path}")
+                        except Exception as e:
+                            show_error(f"Failed to update path: {str(e)}")
             
         elif action == "🗑️  Delete Project":
             projects = ctx.project_repo.get_all()
@@ -465,3 +518,64 @@ def _create_temp_project(ctx: Context):
     except Exception as e:
         show_error(f"Failed to create temp project: {str(e)}")
         exit(1)
+
+def _show_project_details(proj):
+    """
+    Display comprehensive project statistics in a beautiful table
+    """
+    console.print()
+    p_path = Path(proj.path)
+    
+    # Calculate stats
+    show_loading("Calculating project statistics")
+    size_bytes, file_count = _get_directory_stats(p_path)
+    
+    table = Table(title=f"🔷 Project Details: {proj.name}", show_header=False, show_lines=True, box=None)
+    table.add_column("Property", style="bold cyan")
+    table.add_column("Value", style="white")
+    
+    table.add_row("ID", str(proj.id))
+    table.add_row("Name", proj.name)
+    table.add_row("Path", proj.path)
+    table.add_row("Created At", str(proj.created_at))
+    table.add_row("Description", proj.description or "N/A")
+    table.add_row("Total Files", str(file_count))
+    table.add_row("Total Size", _format_size(size_bytes))
+    
+    # Check if path actually exists
+    status = "[green]Exists[/green]" if p_path.exists() else "[red]Not Found[/red]"
+    table.add_row("Path Status", status)
+
+    console.print(Align.center(table))
+    console.print()
+    
+    questionary.press_any_key_to_continue().ask()
+
+def _get_directory_stats(path: Path):
+    """Recursively calculate directory size and file count"""
+    total_size = 0
+    file_count = 0
+    
+    if not path.exists():
+        return 0, 0
+        
+    try:
+        for p in path.rglob('*'):
+            if p.is_file():
+                file_count += 1
+                try:
+                    total_size += p.stat().st_size
+                except OSError:
+                    pass
+    except Exception:
+        pass
+        
+    return total_size, file_count
+
+def _format_size(size_bytes):
+    """Format bytes to human readable string"""
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+        if size_bytes < 1024.0:
+            return f"{size_bytes:.2f} {unit}"
+        size_bytes /= 1024.0
+    return f"{size_bytes:.2f} PB"

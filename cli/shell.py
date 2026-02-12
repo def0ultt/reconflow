@@ -26,7 +26,7 @@ class ReconFlowShell(cmd2.Cmd):
         )
         self.context = context
         self.intro = "[bold cyan]Welcome to ReconFlow[/bold cyan]\nType 'help' or '?' for commands.\n"
-        self.prompt = "reconflow> "
+        self.prompt = "ReconFlow>> "
         
         # Remove built-in commands we don't need or want to override
         if 'edit' in self.get_visible_commands():
@@ -117,10 +117,25 @@ class ReconFlowShell(cmd2.Cmd):
         """Autocomplete for 'set' command."""
         if not self.context.active_module:
             return []
-        options = list(self.context.active_module.options.keys())
-        if not text:
-            return options
-        return [o for o in options if o.startswith(text)]
+            
+        # Parse line to see if we are completing option or value
+        # line format: "set option value"
+        parts = line.split()
+        
+        # content of parts depends on cursor position and spaces
+        # Case 1: "set opt" -> completing option
+        # Case 2: "set option " -> completing value (text="")
+        # Case 3: "set option val" -> completing value (text="val")
+        
+        # If we are completing the option name
+        if len(parts) == 1 or (len(parts) == 2 and not line.endswith(' ')):
+             options = list(self.context.active_module.options.keys())
+             if not text:
+                 return options
+             return [o for o in options if o.startswith(text)]
+             
+        # If we are completing value
+        return self._complete_project_files(text)
 
     def do_run(self, arg):
         """

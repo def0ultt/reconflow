@@ -77,6 +77,92 @@ def parse_boolean(value: str):
         return False
     return None
 
+def expand_variables(value: str, ctx: Context) -> str:
+    """
+    Expand special variables in value string.
+    Supports: $(project), $(home), $(date)
+    """
+    import os
+    from datetime import datetime
+    
+    if not isinstance(value, str):
+        return value
+    
+    expanded = value
+    
+    # $(project) - Current project directory
+    if '$(project)' in expanded:
+        if not ctx.current_project:
+            raise ValueError("Cannot use $(project) - no project is currently loaded")
+        expanded = expanded.replace('$(project)', ctx.current_project.path)
+    
+    # $(home) - User home directory
+    if '$(home)' in expanded:
+        home_dir = os.path.expanduser('~')
+        expanded = expanded.replace('$(home)', home_dir)
+    
+    # $(date) - Current date (YYYY-MM-DD format)
+    if '$(date)' in expanded:
+        current_date = datetime.now().strftime('%Y-%m-%d')
+        expanded = expanded.replace('$(date)', current_date)
+    
+    return expanded
+
+
+def _handle_json_target(file_path: str) -> str:
+    """
+    Parses a JSON/JSONL file to extract URLs/targets.
+    Returns the path to the extracted text file, or the original path if parsing failed/not applicable.
+    """
+    if not (file_path.endswith('.json') or file_path.endswith('.jsonl')):
+        return file_path
+        
+    try:
+        targets = set()
+        
+        # Determine format and read
+        with open(file_path, 'r') as f:
+            if file_path.endswith('.jsonl'):
+                for line in f:
+                    if not line.strip(): continue
+                    try:
+                        obj = json.loads(line)
+                        if isinstance(obj, dict):
+                            # Prioritize 'url', then 'host', then 'ip'
+                            if 'url' in obj: targets.add(obj['url'])
+                            elif 'host' in obj: targets.add(obj['host'])
+                            elif 'ip' in obj: targets.add(obj['ip'])
+                    except: pass
+            else:
+                # JSON Array or Object
+                try:
+                    data = json.load(f)
+                    items = data if isinstance(data, list) else [data]
+                    for obj in items:
+                        if isinstance(obj, dict):
+                            if 'url' in obj: targets.add(obj['url'])
+                            elif 'host' in obj: targets.add(obj['host'])
+                            elif 'ip' in obj: targets.add(obj['ip'])
+                except: pass
+                        
+        if not targets:
+            return file_path
+            
+        # Write to new file
+        base, _ = os.path.splitext(file_path)
+        new_path = f"{base}_targets.txt"
+        
+        with open(new_path, 'w') as f:
+            for t in sorted(targets):
+                f.write(f"{t}\n")
+                
+        console.print(f"[green]ℹ️  Parsed JSON: Extracted {len(targets)} targets to {os.path.basename(new_path)}[/green]")
+        return new_path
+        
+    except Exception as e:
+        console.print(f"[yellow]Warning: Failed to parse JSON target: {e}[/yellow]")
+        return file_path
+
 def cmd_set(ctx: Context, arg: str):
     if not ctx.active_module:
         print("❌ No active module. Use 'use <module>' first.")
@@ -107,8 +193,8 @@ def cmd_set(ctx: Context, arg: str):
             console.print(f"[red]Error: '{val}' is not a valid boolean value. Use: true, false, yes, no, 1, 0[/red]")
             return
         val = bool_val
-    # Variable Substitution for string variables
-    elif val.startswith('$'):
+    # Variable Substitution for string variables (but not our special variables)
+    elif val.startswith('$') and not any(var in val for var in ['$(project)', '$(home)', '$(date)']):
         var_key = val
         project_id = ctx.current_project.id if ctx.current_project else None
         resolved = ctx.settings_manager.get_variable(var_key, project_id)
@@ -119,6 +205,40 @@ def cmd_set(ctx: Context, arg: str):
         else:
             console.print(f"[red]Error: Variable '{var_key}' not found.[/red]")
             return
+
+    # Expand special variables: $(project), $(home), $(date)
+    if any(var in str(val) for var in ['$(project)', '$(home)', '$(date)']):
+        original_val = val
+        try:
+            val = expand_variables(str(val), ctx)
+            
+            # Show what was expanded
+            if '$(project)' in original_val:
+                console.print(f"[green]✓[/green] Expanded $(project) -> [cyan]{ctx.current_project.path}[/cyan]")
+            if '$(home)' in original_val:
+                import os
+                console.print(f"[green]✓[/green] Expanded $(home) -> [cyan]{os.path.expanduser('~')}[/cyan]")
+            if '$(date)' in original_val:
+                from datetime import datetime
+                console.print(f"[green]✓[/green] Expanded $(date) -> [cyan]{datetime.now().strftime('%Y-%m-%d')}[/cyan]")
+            
+            console.print(f"  [dim]Full value: {val}[/dim]")
+        except ValueError as e:
+            console.print(f"[red]✗ {str(e)}[/red]")
+            console.print("[yellow]💡 Load or create a project first[/yellow]")
+            return
+
+    # Check for file resolution (Project files) - existing logic
+    if ctx.current_project and not val.startswith('/') and not val.startswith('$') and var_type != "boolean":
+         project_root = ctx.current_project.path
+         potential_path = os.path.join(project_root, val)
+         if os.path.exists(potential_path):
+             val = str(os.path.abspath(potential_path))
+             console.print(f"[dim]Resolved project file: {val}[/dim]")
+             
+             # Attempt JSON parsing for targets
+             if opt in ('target', 'url', 'domain', 'hosts', 'input_file'):
+                  val = _handle_json_target(val)
 
     if ctx.active_module.update_option(opt, val):
         print(f"✅ {opt} => {val}")
@@ -144,6 +264,28 @@ def cmd_setg(ctx: Context, arg: str):
     
     # Ensure key starts with $ for storage
     storage_key = key if key.startswith('$') else f"${key}"
+    
+    # Expand special variables: $(project), $(home), $(date)
+    if any(var in str(val) for var in ['$(project)', '$(home)', '$(date)']):
+        original_val = val
+        try:
+            val = expand_variables(str(val), ctx)
+            
+            # Show what was expanded
+            if '$(project)' in original_val:
+                console.print(f"[green]✓[/green] Expanded $(project) -> [cyan]{ctx.current_project.path}[/cyan]")
+            if '$(home)' in original_val:
+                import os
+                console.print(f"[green]✓[/green] Expanded $(home) -> [cyan]{os.path.expanduser('~')}[/cyan]")
+            if '$(date)' in original_val:
+                from datetime import datetime
+                console.print(f"[green]✓[/green] Expanded $(date) -> [cyan]{datetime.now().strftime('%Y-%m-%d')}[/cyan]")
+            
+            console.print(f"  [dim]Full value: {val}[/dim]")
+        except ValueError as e:
+            console.print(f"[red]✗ {str(e)}[/red]")
+            console.print("[yellow]💡 Load or create a project first[/yellow]")
+            return
     
     try:
         ctx.settings_manager.set_variable(storage_key, val, project_id=ctx.current_project.id)
@@ -511,11 +653,11 @@ def cmd_ls(ctx: Context, arg: str):
         item_path = os.path.join(project_path, item)
         
         # Handle Root Files
-        if os.path.isfile(item_path) and item.endswith('.txt'):
-             module_name = "[bold]Root[/bold]"
+        if os.path.isfile(item_path) and not item.endswith('.meta.json'):
+             module_name = "[bold](Project Root)[/bold]"
              file = item
              file_path = item_path
-             step_name = file.replace('.txt', '')
+             step_name = file # Show full filename with extension
              
              # Get file stats
              try:
@@ -561,11 +703,11 @@ def cmd_ls(ctx: Context, arg: str):
         
         # Scan for .txt files in module directory
         for file in os.listdir(item_path):
-            if not file.endswith('.txt'):
+            if file.endswith('.meta.json') or file.startswith('.'):
                 continue
             
             file_path = os.path.join(item_path, file)
-            step_name = file.replace('.txt', '')
+            step_name = file # Show full filename with extension
             
             # Get file stats
             stat = os.stat(file_path)
@@ -651,10 +793,13 @@ def cmd_cat(ctx: Context, arg: str):
         module_name = parts[0]
         filename = parts[1]
         
-        if not filename.endswith('.txt'):
-            filename += '.txt'
-        
-        file_path = os.path.join(project_path, module_name, filename)
+        # Handle Project Root prefixes (including legacy "Root")
+        if module_name in ["Root", "(Project Root)", "[Project Root]"]:
+             file_path = os.path.join(project_path, filename)
+        else:
+             if not filename.endswith('.txt'):
+                 filename += '.txt'
+             file_path = os.path.join(project_path, module_name, filename)
     else:
         # Search all modules for the file
         search_name = arg if arg.endswith('.txt') else f"{arg}.txt"
@@ -754,10 +899,17 @@ def cmd_bcat(ctx: Context, arg: str):
     # Try direct path first
     if '/' in filename:
         mod, name = filename.split('/', 1)
-        if not name.endswith('.json') and not name.endswith('.txt') and not name.endswith('.jsonl'):
-             name += '.json'
+        
+        # Handle Project Root prefixes
+        if mod in ["Root", "(Project Root)", "[Project Root]"]:
+             # Treat as root file
+             p = os.path.join(project_path, name)
+        else:
+             if not name.endswith('.json') and not name.endswith('.txt') and not name.endswith('.jsonl'):
+                  name += '.json'
+             p = os.path.join(project_path, mod, name)
+
         # Check if that exists
-        p = os.path.join(project_path, mod, name)
         if os.path.exists(p):
             file_path = p
         else:

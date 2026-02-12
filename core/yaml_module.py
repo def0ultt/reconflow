@@ -195,8 +195,10 @@ class GenericYamlModule(BaseModule):
             
         # Validate using Schema
         model = validate_yaml(raw_data)
-        
-        self.schema = model
+        self.load_from_schema(model)
+
+    def load_from_schema(self, schema: ModuleSchema):
+        self.schema = schema
 
         # 1. Parse Metadata (Info)
         self.meta.update({
@@ -208,6 +210,7 @@ class GenericYamlModule(BaseModule):
         })
 
         # 2. Parse Vars -> Options
+        self.options = {} # Reset options
         for name, config in self.schema.vars.items():
             self.options[name] = Option(
                 name=name,
@@ -616,8 +619,8 @@ class GenericYamlModule(BaseModule):
         module_dir = os.path.join(project_path, module_id)
         os.makedirs(module_dir, exist_ok=True)
         
-        # Generate output filename
-        output_file = f"{step_name}.txt"
+        # Generate output filename (no extension, just step name)
+        output_file = f"{step_name}"
         return os.path.join(module_dir, output_file)
     
     def _save_step_output(self, path, stdout, stderr, step, duration, command):
@@ -631,26 +634,24 @@ class GenericYamlModule(BaseModule):
                     f.write("\n\n--- STDERR ---\n")
                     f.write(stderr)
             
-            # 2. Parse output to JSON (server-side)
+            # 2. Parse output to JSON (server-side) - but DO NOT SAVE as separate file
+            # Just keep for metadata purposes
             tool_name = step.tool if step.tool else 'unknown'
             json_data = None
             
             if stdout and stdout.strip():
-                json_data = self.parser.parse_to_json(stdout, tool_name)
-            
-            # 3. Save JSON if parsing successful
-            has_json = False
-            record_count = 0
-            
-            if json_data:
-                json_path = path.replace('.txt', '.json')
                 try:
-                    with open(json_path, 'w') as f:
-                        json.dump(json_data, f, indent=2)
-                    has_json = True
-                    record_count = len(json_data)
-                except Exception as e:
-                    console.print(f"[yellow]⚠️  Failed to save JSON: {e}[/yellow]")
+                    # Attempt simple JSON load first
+                     json_data = json.loads(stdout)
+                except:
+                     try:
+                         json_data = self.parser.parse_to_json(stdout, tool_name)
+                     except:
+                         pass
+            
+            # 3. Save JSON removed (User request: exact output only)
+            has_json = bool(json_data)
+            record_count = len(json_data) if isinstance(json_data, list) else (1 if json_data else 0)
             
             # 4. Calculate line count
             line_count = 0
@@ -674,7 +675,7 @@ class GenericYamlModule(BaseModule):
                 'parser_used': tool_name if has_json else None
             }
             
-            meta_path = path.replace('.txt', '.meta.json')
+            meta_path = f"{path}.meta.json"
             with open(meta_path, 'w') as f:
                 json.dump(metadata, f, indent=2)
                 

@@ -1,0 +1,25 @@
+type: module
+info:
+  id: postman-collection-generator
+  name: Postman Collection Generator
+  tag: scan
+  description: >
+    Takes a target URL, analyzes its Content Security Policy (CSP) headers,
+    extracts allowed domains and external resources, and generates a YAML
+    collection that can be imported into Postman for manual security testing
+    and further analysis.
+  author: default
+
+vars:
+  target_file:
+    required: true
+    description: Path to the target URL or input file that will be converted
+      into a Postman-importable YAML collection.
+  name:
+    required: false
+    description: Optional name for the generated Postman collection.
+
+steps:
+  - name: To_postman
+    tool: Topostman
+    args: "-f {{target_file}} -n {{name}}"
