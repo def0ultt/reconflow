@@ -16,6 +16,10 @@ export interface Project {
 export interface ProjectCreate {
     name: string;
     description?: string;
+    path?: string;
+    is_temp?: boolean;
+}
+
 export interface Module {
     id: string;
     name: string;
@@ -25,6 +29,14 @@ export interface Module {
     tag: string | null;
     category: string | null;
     inputs: any[];
+}
+
+export interface Artifact {
+    name: string;
+    path: string;
+    size: number;
+    modified: number;
+    type: string;
 }
 
 export interface WorkflowNode {
@@ -37,4 +49,3 @@ export interface WorkflowNode {
     };
     position: { x: number; y: number };
 }
-
