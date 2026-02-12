@@ -41,8 +41,34 @@ async def listen_logs(execution_id):
     except Exception as e:
         print(f"WS Error/Closed: {e}")
 
+def test_projects():
+    print("\n--- Testing Projects API ---")
+    # 1. List
+    res = requests.get(f"{API_URL}/api/projects")
+    print(f"List Projects: {res.status_code}")
+    
+    # 2. Create Temp
+    print("Creating Temp Project...")
+    res = requests.post(f"{API_URL}/api/projects", json={"name": "test-temp", "is_temp": True})
+    if res.status_code == 200:
+        proj = res.json()
+        print(f"Created: {proj['name']} (ID: {proj['id']}) Path: {proj['path']}")
+        
+        # 3. Get Details
+        res = requests.get(f"{API_URL}/api/projects/{proj['id']}")
+        print(f"Get Details: {res.status_code}")
+        
+        # 4. Delete
+        res = requests.delete(f"{API_URL}/api/projects/{proj['id']}")
+        print(f"Delete: {res.status_code}")
+    else:
+        print(f"Create Failed: {res.text}")
+
 def run_test():
+    test_projects()
+    
     # 1. Trigger Run
+    print("\n--- Testing Workflow API ---")
     print("Triggering Workflow...")
     try:
         res = requests.post(f"{API_URL}/api/run", json={"workflow": WORKFLOW, "variables": {"target": "World"}})

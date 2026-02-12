@@ -1,0 +1,80 @@
+INFO:     Started server process [21774]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Failed to load YAML module /home/defaut/tool/reconflow/modules/cwd-test.yml: Missing 'type' field in YAML.
+[+] Registered module: /module/backup-file-exposure
+[+] Registered module: /module/recon-openredirect
+[+] Registered module: /module/Subdomain-Takeover
+[+] Registered module: /module/xss-scanner
+[-]Error: module with id 'backup-file-exposure' already exists.
+[+] Registered module: /module/git-config-exposer
+[+] Registered module: /module/quick_discover_live_web_server.yml
+Failed to load YAML module /home/defaut/tool/reconflow/modules/build-in/subdomain_enum.yml: Missing 'type' field in YAML.
+[+] Registered module: /module/csp-deep-analyzer
+[+] Registered module: /module/Collecting_url
+[+] Registered module: /module/scan_open_port
+[-]Error: module with id 'recon-openredirect' already exists.
+[+] Registered module: /module/live_web_server
+Failed to load YAML module /home/defaut/tool/reconflow/modules/build-in/WordPress-Security-Testing.yml: 1 validation error for ModuleSchema
+steps.1
+  Value error, Step must specify either 'tool' or 'module'. [type=value_error, input_value={'name': 'nuclei scanner'...H 'Cookie: {{cookie}}'"}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+[+] Registered module: /module/postman-collection-generator
+[-]Error: module with id 'Subdomain-Takeover' already exists.
+[+] Registered module: /module/metadata-analyer
+[-]Error: module with id 'xss-scanner' already exists.
+[+] Registered module: /module/cert-logs
+INFO:     127.0.0.1:34042 - "GET /api/projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34054 - "POST /api/projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34060 - "GET /api/projects/22/artifacts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34072 - "GET /api/projects/22/artifacts/results.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36418 - "GET /api/projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46638 - "GET /api/projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46652 - "GET /api/projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46652 - "GET /api/projects/21 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46638 - "GET /api/projects/21 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54118 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54128 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54128 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54118 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55860 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55864 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55864 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55860 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36252 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36256 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40874 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40884 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40884 - "GET /api/projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40874 - "GET /api/projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40874 - "GET /api/projects/22 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40884 - "GET /api/projects/22 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40884 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40874 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56906 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56906 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51058 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51068 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51068 - "GET /api/projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51058 - "GET /api/projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51058 - "GET /api/projects/21 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51068 - "GET /api/projects/21 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51068 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51058 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51058 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51068 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51068 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51058 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49336 - "GET /api/projects/21 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49350 - "GET /api/projects/21 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49350 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49350 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49382 - "GET /api/projects/21 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49394 - "GET /api/projects/21 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49394 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49382 - "GET /api/modules/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38122 - "GET /api/projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38138 - "GET /api/projects/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38138 - "GET /api/projects/21 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38122 - "GET /api/projects/21 HTTP/1.1" 200 OK
