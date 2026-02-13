@@ -106,7 +106,7 @@ const ToolLibrary = ({ onDragStart }: ToolLibraryProps) => {
 
     return (
         <>
-            <div className="w-72 bg-surface border-r border-white/10 flex flex-col h-full z-20 shadow-xl">
+            <div className="w-full bg-surface border-r border-white/10 flex flex-col h-full z-20 shadow-xl">
                 {/* Header */}
                 <div className="p-4 border-b border-white/10">
                     <div className="flex items-center justify-between mb-3">
@@ -188,7 +188,7 @@ const ToolLibrary = ({ onDragStart }: ToolLibraryProps) => {
                                                             <div className="text-xs font-medium text-gray-200 group-hover:text-white truncate">
                                                                 {tool.name}
                                                             </div>
-                                                            <div className="text-[10px] text-gray-500 truncate">
+                                                            <div className="text-[10px] text-gray-500 line-clamp-2 leading-relaxed">
                                                                 {tool.description || 'No description'}
                                                             </div>
                                                         </div>

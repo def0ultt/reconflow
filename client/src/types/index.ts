@@ -72,3 +72,5 @@ export interface ToolTemplate {
     author: string | null;
     is_active: boolean;
 }
+
+export * from './workflow';
