@@ -49,3 +49,26 @@ export interface WorkflowNode {
     };
     position: { x: number; y: number };
 }
+
+export interface ToolIO {
+    name: string;
+    type: string;       // "string" | "file" | "list"
+    required?: boolean;
+    description?: string;
+}
+
+export interface ToolTemplate {
+    id: number;
+    name: string;
+    description: string | null;
+    binary_path: string | null;
+    command_template: string | null;
+    default_args: string[];
+    category: string | null;
+    tags: string[];
+    inputs: ToolIO[];
+    outputs: ToolIO[];
+    icon: string | null;
+    author: string | null;
+    is_active: boolean;
+}

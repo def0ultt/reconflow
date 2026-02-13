@@ -8,6 +8,7 @@ from server.api.workflow import router as workflow_router
 from server.api.projects import router as projects_router
 from server.api.modules import router as modules_router
 from server.api.artifacts import router as artifacts_router
+from server.api.tools import router as tools_router
 
 from server.core.log_manager import log_manager
 from utils.output_formatter import stdout_stream
@@ -47,6 +48,7 @@ app.include_router(workflow_router, prefix="/api", tags=["Workflow"])
 app.include_router(projects_router, prefix="/api/projects", tags=["Projects"])
 app.include_router(modules_router, prefix="/api/modules", tags=["Modules"])
 app.include_router(artifacts_router, prefix="/api/projects", tags=["Artifacts"])
+app.include_router(tools_router, prefix="/api/tools", tags=["Tools"])
 
 @app.get("/")
 async def root():
