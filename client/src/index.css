@@ -496,7 +496,7 @@ body {
   background: #0c0c0e;
   display: flex;
   flex-direction: column;
-  height: 200px;
+
   flex-shrink: 0;
   transition: height 0.2s ease;
 }

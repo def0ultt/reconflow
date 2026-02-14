@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
 import { Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { LogEntry, LogChannel } from '../../types';
@@ -21,9 +21,16 @@ const channelColors: Record<LogChannel, string> = {
     system: 'text-blue-400',
 };
 
+const MIN_HEIGHT = 100;
+const MAX_HEIGHT = 600;
+
 const LogsPanel = ({ logs, onClear }: LogsPanelProps) => {
     const [activeTab, setActiveTab] = useState<LogChannel | 'all'>('all');
     const [collapsed, setCollapsed] = useState(false);
+    const [height, setHeight] = useState(200);
+    const [isResizing, setIsResizing] = useState(false);
+
+    const panelRef = useRef<HTMLDivElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const filtered = activeTab === 'all' ? logs : logs.filter((l) => l.channel === activeTab);
@@ -35,8 +42,62 @@ const LogsPanel = ({ logs, onClear }: LogsPanelProps) => {
         }
     }, [filtered.length]);
 
+    const startResizing = useCallback((e: React.MouseEvent) => {
+        e.preventDefault(); // Prevent text selection
+        setIsResizing(true);
+    }, []);
+
+    const stopResizing = useCallback(() => {
+        setIsResizing(false);
+    }, []);
+
+    const resize = useCallback(
+        (e: MouseEvent) => {
+            if (isResizing && panelRef.current) {
+                // Determine new height based on mouse position relative to panel bottom
+                // Since panel is at bottom, bottom edge is fixed (mostly), top moves
+                const bottom = panelRef.current.getBoundingClientRect().bottom;
+                const newHeight = bottom - e.clientY;
+
+                if (newHeight >= MIN_HEIGHT && newHeight <= MAX_HEIGHT) {
+                    setHeight(newHeight);
+                }
+            }
+        },
+        [isResizing]
+    );
+
+    useEffect(() => {
+        if (isResizing) {
+            window.addEventListener('mousemove', resize);
+            window.addEventListener('mouseup', stopResizing);
+        }
+        return () => {
+            window.removeEventListener('mousemove', resize);
+            window.removeEventListener('mouseup', stopResizing);
+        };
+    }, [isResizing, resize, stopResizing]);
+
     return (
-        <div className={clsx('logs-panel', collapsed && 'logs-panel--collapsed')}>
+        <div
+            ref={panelRef}
+            className={clsx('logs-panel relative group/panel', collapsed && 'logs-panel--collapsed')}
+            style={{
+                height: collapsed ? 36 : height,
+                transition: isResizing ? 'none' : 'height 0.2s ease'
+            }}
+        >
+            {/* Resize Handle (Top Border) */}
+            {!collapsed && (
+                <div
+                    className={clsx(
+                        "absolute top-0 left-0 w-full h-1 cursor-row-resize hover:bg-primary/50 transition-colors z-50",
+                        isResizing && "bg-primary/50"
+                    )}
+                    onMouseDown={startResizing}
+                />
+            )}
+
             {/* Header */}
             <div className="logs-panel__header">
                 <div className="logs-panel__tabs">
